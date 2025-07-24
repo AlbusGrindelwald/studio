@@ -9,8 +9,8 @@ export const signInWithGoogle = async (): Promise<User | null> => {
     const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error: any) {
-    if (error.code === AuthErrorCodes.POPUP_CLOSED_BY_USER) {
-      console.log("Sign-in popup closed by user.");
+    if (error.code === AuthErrorCodes.POPUP_CLOSED_BY_USER || error.code === 'auth/cancelled-popup-request') {
+      console.log("Sign-in popup closed or cancelled by user.");
       return null;
     }
     if (error.code === 'auth/configuration-not-found') {

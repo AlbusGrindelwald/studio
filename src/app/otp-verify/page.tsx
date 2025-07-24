@@ -12,6 +12,7 @@ import type { MockConfirmationResult } from '@/lib/auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, Delete } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 
 function OtpVerificationForm() {
   const router = useRouter();

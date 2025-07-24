@@ -5,85 +5,55 @@ import {
   signInWithPopup,
   User,
   AuthErrorCodes,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  ConfirmationResult,
 } from 'firebase/auth';
 import { auth } from './firebase';
 
-// Helper to get RecaptchaVerifier
-const getRecaptchaVerifier = (containerId: string) => {
-  if ((window as any).recaptchaVerifier) {
-    (window as any).recaptchaVerifier.clear();
-  }
-  const recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
-    size: 'invisible',
-    callback: (response: any) => {
-      // reCAPTCHA solved, allow signInWithPhoneNumber.
-      console.log('reCAPTCHA solved');
+// Mock ConfirmationResult for the simulated OTP flow
+export interface MockConfirmationResult {
+  confirm: (otp: string) => Promise<{ user: User }>;
+  verificationId: string;
+}
+
+// In a real app, you would use a service to send an OTP.
+// For this example, we'll simulate it.
+export const sendOtp = async (phoneNumber: string): Promise<MockConfirmationResult> => {
+  console.log(`DEV-ONLY: OTP for ${phoneNumber} is 123456`);
+  // This is a mock confirmation result.
+  const mockConfirmationResult: MockConfirmationResult = {
+    confirm: async (otp: string) => {
+      if (otp === '123456') {
+        // In a real app, you would get a real user object.
+        // Here we create a mock user object.
+        const mockUser = {
+          uid: 'mock-user-id',
+          phoneNumber: `+91${phoneNumber}`,
+          displayName: 'Mock User',
+        } as User;
+        return Promise.resolve({ user: mockUser });
+      } else {
+        throw new Error('Invalid OTP. Please try again.');
+      }
     },
-    'expired-callback': () => {
-        // Response expired. Ask user to solve reCAPTCHA again.
-        console.log('reCAPTCHA expired');
-    }
-  });
-  (window as any).recaptchaVerifier = recaptchaVerifier;
-  return recaptchaVerifier;
+    verificationId: 'mock-verification-id',
+  };
+  return Promise.resolve(mockConfirmationResult);
 };
 
-
-export const sendOtp = async (phoneNumber: string, containerId: string): Promise<ConfirmationResult> => {
-  const appVerifier = getRecaptchaVerifier(containerId);
-  // Firebase requires the phone number in E.164 format (e.g., +11234567890)
-  const formattedPhoneNumber = `+91${phoneNumber}`;
-
+export const verifyOtp = async (
+  confirmationResult: MockConfirmationResult,
+  otp: string
+): Promise<User> => {
   try {
-    // Ensure reCAPTCHA is rendered
-    await appVerifier.render();
-    const confirmationResult = await signInWithPhoneNumber(auth, formattedPhoneNumber, appVerifier);
-    return confirmationResult;
-  } catch (error: any) {
-    console.error('Error sending OTP:', error.code, error.message);
-    
-    // Reset reCAPTCHA so user can try again
-    if ((window as any).grecaptcha && (window as any).recaptchaVerifier) {
-        (window as any).recaptchaVerifier.render().then(function(widgetId: any) {
-            (window as any).grecaptcha.reset(widgetId);
-        });
-    }
-    
-    if (error.code === 'auth/billing-not-enabled') {
-      throw new Error(
-        'Phone authentication is a paid feature. Please enable billing on your Google Cloud project to continue.'
-      );
-    }
-    if (error.code === 'auth/invalid-phone-number') {
-        throw new Error('Invalid phone number provided. Please check the number and try again.');
-    }
-    if (error.code === 'auth/operation-not-allowed') {
-        throw new Error('Phone number sign-in is not enabled for this project. Please enable it in the Firebase console under Authentication > Sign-in method.');
-    }
-     if (error.code === 'auth/captcha-check-failed') {
-      throw new Error('The reCAPTCHA response is invalid. Please try again.');
-    }
-     if (error.code === 'auth/too-many-requests') {
-      throw new Error('We have blocked all requests from this device due to unusual activity. Try again later.');
-    }
-    throw new Error('Failed to send OTP. An unknown error occurred. Please try again later.');
-  }
-};
-
-
-export const verifyOtp = async (confirmationResult: ConfirmationResult, otp: string): Promise<User> => {
-  try {
-    const result = await confirmationResult.confirm(otp);
-    return result.user;
+    const { user } = await confirmationResult.confirm(otp);
+    return user;
   } catch (error) {
     console.error('Error verifying OTP:', error);
+    if (error instanceof Error) {
+        throw error;
+    }
     throw new Error('Invalid OTP. Please try again.');
   }
 };
-
 
 export const signInWithGoogle = async (): Promise<User | null> => {
   const provider = new GoogleAuthProvider();

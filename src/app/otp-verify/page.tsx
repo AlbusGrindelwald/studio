@@ -10,7 +10,7 @@ import { Logo } from '@/components/Logo';
 import { Suspense, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { verifyOtp } from '@/lib/auth';
-import type { ConfirmationResult } from 'firebase/auth';
+import type { MockConfirmationResult } from '@/lib/auth';
 
 function OtpVerificationForm() {
   const router = useRouter();
@@ -32,7 +32,7 @@ function OtpVerificationForm() {
     }
     setIsLoading(true);
     try {
-      const confirmationResult = (window as any).confirmationResult as ConfirmationResult;
+      const confirmationResult = (window as any).confirmationResult as MockConfirmationResult;
       if (!confirmationResult) {
         throw new Error('Verification session not found. Please try logging in again.');
       }
@@ -71,6 +71,7 @@ function OtpVerificationForm() {
             <CardDescription>
               We have sent a code to your mobile number
               {phone && <span className="font-bold text-foreground"> +91 {phone}</span>}.
+              (Hint: use 123456)
             </CardDescription>
           </CardHeader>
           <CardContent>

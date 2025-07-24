@@ -12,8 +12,8 @@ import GoogleIcon from '@/components/GoogleIcon';
 import { Logo } from '@/components/Logo';
 import { useEffect, useState } from 'react';
 import { signInWithGoogle, sendOtp } from '@/lib/auth';
+import type { MockConfirmationResult } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
-import type { ConfirmationResult } from 'firebase/auth';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,11 +38,11 @@ export default function LoginPage() {
     }
     setIsLoading(true);
     try {
-        const confirmationResult = await sendOtp(phone, 'recaptcha-container');
+        const confirmationResult = await sendOtp(phone);
         (window as any).confirmationResult = confirmationResult;
         toast({
             title: "OTP Sent",
-            description: "A verification code has been sent to your phone.",
+            description: "A verification code has been 'sent' (check console). Use 123456 to verify.",
         });
         router.push(`/otp-verify?phone=${phone}`);
     } catch (error: any) {
@@ -140,7 +140,6 @@ export default function LoginPage() {
             </>
           </CardContent>
         </Card>
-        <div id="recaptcha-container"></div>
       </div>
     </div>
   );

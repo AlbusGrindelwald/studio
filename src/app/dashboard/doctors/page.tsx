@@ -8,6 +8,7 @@ import { DoctorCard } from '@/components/doctors/DoctorCard';
 import { Search } from 'lucide-react';
 import type { Doctor } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function DoctorsPage() {
   const [searchTerm, setSearchTerm] = useState('');

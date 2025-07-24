@@ -104,7 +104,6 @@ function OtpVerificationForm() {
             <CardDescription>
               We have sent a code to your email
               {email && <span className="font-bold text-foreground"> {email}</span>}.
-              (Hint: use 123456)
             </CardDescription>
           </CardHeader>
           <CardContent>

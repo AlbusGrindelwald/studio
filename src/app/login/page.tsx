@@ -28,24 +28,40 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        toast({
-            title: "Invalid Email Address",
-            description: "Please enter a valid email address.",
-            variant: "destructive"
-        });
-        return;
+    
+    const isEmail = email.includes('@');
+    const isPhone = /^\d+$/.test(email);
+
+    if (!isEmail && !isPhone) {
+      toast({
+        title: "Invalid Input",
+        description: "Please enter a valid email or phone number.",
+        variant: "destructive"
+      });
+      return;
     }
+
+    if (isEmail) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+          toast({
+              title: "Invalid Email Address",
+              description: "Please enter a valid email address.",
+              variant: "destructive"
+          });
+          return;
+      }
+    }
+    
     setIsLoading(true);
     try {
         const confirmationResult = await sendOtp(email);
         (window as any).confirmationResult = confirmationResult;
         toast({
             title: "OTP Sent",
-            description: "A verification code has been 'sent' to your email (check console). Use 123456 to verify.",
+            description: "A verification code has been 'sent' (check console). Use 123456 to verify.",
         });
-        router.push(`/otp-verify?email=${email}`);
+        router.push(`/otp-verify?email=${encodeURIComponent(email)}`);
     } catch (error: any) {
         console.error(error);
         toast({
@@ -96,7 +112,7 @@ export default function LoginPage() {
                 <Label htmlFor="email">Mobile /Email</Label>
                 <Input
                   id="email"
-                  type="email"
+                  type="text"
                   placeholder="login with email or mobile number"
                   required
                   value={email}

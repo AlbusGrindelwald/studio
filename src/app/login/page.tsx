@@ -36,18 +36,12 @@ export default function LoginPage() {
           description: `Welcome back, ${user.displayName}!`,
         });
         router.push('/dashboard');
-      } else {
-        toast({
-          title: "Sign In Failed",
-          description: "Could not sign in with Google. Please try again.",
-          variant: "destructive",
-        });
       }
-    } catch (error) {
+    } catch (error: any) {
         console.error(error)
         toast({
             title: "Sign In Failed",
-            description: "An unexpected error occurred. Please try again.",
+            description: error.message || "An unexpected error occurred. Please try again.",
             variant: "destructive",
         });
     }

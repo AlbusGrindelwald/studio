@@ -13,7 +13,11 @@ export const signInWithGoogle = async (): Promise<User | null> => {
       console.log("Sign-in popup closed by user.");
       return null;
     }
+    if (error.code === 'auth/configuration-not-found') {
+        console.error("Firebase sign-in configuration is missing. Please enable the Google Sign-in provider in the Firebase console's Authentication section.");
+        throw new Error("Google Sign-in is not enabled for this project. Please enable it in the Firebase Console.");
+    }
     console.error("Error signing in with Google: ", error);
-    return null;
+    throw error;
   }
 };

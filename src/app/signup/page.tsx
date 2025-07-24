@@ -62,6 +62,10 @@ export default function SignupPage() {
                   required
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" placeholder="********" required />
+              </div>
               <Button type="submit" className="w-full">
                 Create Account
               </Button>

@@ -2,14 +2,17 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Logo } from '@/components/Logo';
+import { Suspense } from 'react';
 
-export default function OtpVerifyPage() {
+function OtpVerificationForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const phone = searchParams.get('phone');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -17,7 +20,7 @@ export default function OtpVerifyPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <Logo className="mx-auto mb-4 text-3xl" />
@@ -25,7 +28,10 @@ export default function OtpVerifyPage() {
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Enter Verification Code</CardTitle>
-            <CardDescription>We have sent a code to your mobile number.</CardDescription>
+            <CardDescription>
+              We have sent a code to your mobile number
+              {phone && <span className="font-bold text-foreground"> +XX XXXXX{phone.slice(5)}</span>}.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -55,5 +61,13 @@ export default function OtpVerifyPage() {
         </Card>
       </div>
     </div>
-  );
+  )
+}
+
+export default function OtpVerifyPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OtpVerificationForm />
+    </Suspense>
+  )
 }

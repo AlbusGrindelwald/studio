@@ -33,20 +33,7 @@ function AppointmentCard({
   onReschedule: (id: string, newDate: string, newTime: string) => void,
 }) {
   const { toast } = useToast();
-  const [isReschedulable, setIsReschedulable] = useState(false);
   const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
-
-  useEffect(() => {
-    if (appointment.status === 'upcoming') {
-      const appointmentDateTime = new Date(`${appointment.date}T${appointment.time.replace(' AM', ':00').replace(' PM', ':00')}`);
-      if (appointment.time.includes('PM') && !appointment.time.startsWith('12')) {
-        appointmentDateTime.setHours(appointmentDateTime.getHours() + 12);
-      }
-      const now = new Date();
-      const oneHourBefore = new Date(appointmentDateTime.getTime() - 60 * 60 * 1000);
-      setIsReschedulable(now < oneHourBefore);
-    }
-  }, [appointment]);
 
   const handleCancel = () => {
     onCancel(appointment.id);
@@ -87,7 +74,7 @@ function AppointmentCard({
                 doctor={appointment.doctor}
                 onReschedule={handleReschedule}
                 trigger={
-                  <Button variant="outline" size="sm" className="flex-1" disabled={!isReschedulable} title={!isReschedulable ? "Cannot reschedule within 1 hour of appointment" : ""}>
+                  <Button variant="outline" size="sm" className="flex-1">
                     Reschedule
                   </Button>
                 }

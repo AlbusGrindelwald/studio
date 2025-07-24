@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarCheck, ChevronRight, Search, User, Stethoscope } from 'lucide-react';
+import { CalendarCheck, ChevronRight, Search, User, Stethoscope, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAppointments, subscribe } from '@/lib/appointments';
@@ -71,7 +71,7 @@ export default function DashboardPage() {
           <p className="text-muted-foreground">How are you feeling today?</p>
         </div>
         <Button variant="outline" size="icon" className="rounded-full">
-            <User className="h-5 w-5" />
+            <Bell className="h-5 w-5" />
         </Button>
       </header>
 

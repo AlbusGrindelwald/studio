@@ -41,12 +41,16 @@ function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
     setIsClient(true);
   }, []);
 
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <nav className={cn('flex flex-col gap-2', className)} {...props}>
       {navItems.map((item) => (
         <Link key={item.href} href={item.href}>
           <Button
-            variant={isClient && pathname === item.href ? 'secondary' : 'ghost'}
+            variant={pathname === item.href ? 'secondary' : 'ghost'}
             className="w-full justify-start"
           >
             <item.icon className="mr-2 h-4 w-4" />
@@ -59,6 +63,12 @@ function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -81,6 +91,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
+            {isClient && (
               <nav className="grid gap-2 text-lg font-medium">
                 <div className="mb-4 flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
                   <Logo />
@@ -96,6 +107,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </Link>
                 ))}
               </nav>
+            )}
             </SheetContent>
           </Sheet>
           <div className="w-full flex-1" />

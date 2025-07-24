@@ -8,7 +8,7 @@ export const doctors: Doctor[] = [
     location: 'Springfield, IL',
     rating: 4.9,
     reviews: 215,
-    image: 'https://placehold.co/128x128.png',
+    image: 'https://images.unsplash.com/photo-1576091160550-2173dba9996a',
     description: 'Dr. Reed is a board-certified cardiologist with over 15 years of experience in treating heart conditions. She is known for her patient-centric approach and dedication to cardiovascular health.',
     availability: {
       '2024-08-15': ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM'],

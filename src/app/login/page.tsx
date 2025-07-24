@@ -13,6 +13,7 @@ import { Logo } from '@/components/Logo';
 import { useEffect, useState } from 'react';
 import { signInWithGoogle, sendOtp } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -82,59 +83,65 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
-          <Logo className="mx-auto mb-4" />
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+            <h2 className="text-xl text-muted-foreground">Hi welcome too <span className='text-primary font-semibold'>Shedula</span></h2>
+            <h1 className="text-4xl font-bold">Login</h1>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Login</CardTitle>
-            <CardDescription>Enter your email to receive a login code</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                  />
+        <Card className="shadow-lg rounded-xl">
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Mobile /Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="login with email or mobile number"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="remember-me" />
+                  <Label htmlFor="remember-me" className="text-sm font-normal">Remember Me</Label>
                 </div>
-                
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending OTP..." : "Send OTP"}
-                </Button>
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
-                <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn} disabled={isLoading}>
-                  <GoogleIcon className="mr-2 h-4 w-4" />
-                  Sign in with Google
-                </Button>
-              </form>
-              <div className="mt-4 text-center text-sm">
-                Don&apos;t have an account?{' '}
-                <Link href="/signup" className="font-medium text-primary hover:underline">
-                  Sign up
+                <Link href="#" className="text-sm font-medium text-destructive hover:underline">
+                  Forgot Password
                 </Link>
               </div>
-            </>
+              
+              <Button type="submit" className="w-full bg-[#2BC8BE] hover:bg-[#2BC8BE]/90 text-white" size="lg" disabled={isLoading}>
+                {isLoading ? "Logging in..." : "Login"}
+              </Button>
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    Or login With
+                  </span>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn} disabled={isLoading}>
+                <GoogleIcon className="mr-2 h-4 w-4" />
+                Continue with Google
+              </Button>
+            </form>
+            
           </CardContent>
         </Card>
+        <div className="mt-6 text-center text-sm">
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="font-medium text-primary hover:underline">
+                Sign Up
+            </Link>
+            </div>
       </div>
     </div>
   );

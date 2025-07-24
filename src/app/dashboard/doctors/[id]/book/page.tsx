@@ -85,9 +85,6 @@ export default function BookAppointmentPage() {
   };
   
   const allTimeSlots = selectedDate ? doctor.availability[selectedDate] : [];
-  const morningSlots = allTimeSlots.filter(time => parseInt(time.split(':')[0]) < 12);
-  const eveningSlots = allTimeSlots.filter(time => parseInt(time.split(':')[0]) >= 12);
-
 
   return (
     <div className="flex flex-col h-screen bg-muted/40">
@@ -155,8 +152,8 @@ export default function BookAppointmentPage() {
              <div className="space-y-6">
                 <div>
                     <h3 className="font-semibold mb-4">Select slot</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                    {morningSlots.map(time => (
+                    <div className="grid grid-cols-3 gap-3">
+                    {allTimeSlots.map(time => (
                         <Button
                         key={time}
                         variant={selectedTime === time ? 'default' : 'outline'}
@@ -167,23 +164,7 @@ export default function BookAppointmentPage() {
                         </Button>
                     ))}
                     </div>
-                     {morningSlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4">No morning slots available.</p>}
-                </div>
-                 <div>
-                    <h3 className="font-semibold mb-4">Evening Slot</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                    {eveningSlots.map(time => (
-                        <Button
-                        key={time}
-                        variant={selectedTime === time ? 'default' : 'outline'}
-                         className={cn("py-3 h-auto", selectedTime === time && "bg-primary text-primary-foreground")}
-                        onClick={() => setSelectedTime(time)}
-                        >
-                        {time}
-                        </Button>
-                    ))}
-                    </div>
-                     {eveningSlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4">No evening slots available.</p>}
+                     {allTimeSlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4">No slots available for this date.</p>}
                 </div>
             </div>
         )}

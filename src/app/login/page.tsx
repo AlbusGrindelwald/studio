@@ -10,9 +10,12 @@ import { Label } from '@/components/ui/label';
 import GoogleIcon from '@/components/GoogleIcon';
 import { Logo } from '@/components/Logo';
 import { useEffect, useState } from 'react';
+import { signInWithGoogle } from '@/lib/auth';
+import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -22,6 +25,23 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     router.push('/otp-verify');
+  };
+
+  const handleGoogleSignIn = async () => {
+    const user = await signInWithGoogle();
+    if (user) {
+      toast({
+        title: "Signed In",
+        description: `Welcome back, ${user.displayName}!`,
+      });
+      router.push('/dashboard');
+    } else {
+      toast({
+        title: "Sign In Failed",
+        description: "Could not sign in with Google. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -55,7 +75,7 @@ export default function LoginPage() {
                   <Button type="submit" className="w-full">
                     Login
                   </Button>
-                  <Button variant="outline" className="w-full" type="button">
+                  <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn}>
                     <GoogleIcon className="mr-2 h-4 w-4" />
                     Sign in with Google
                   </Button>

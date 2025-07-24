@@ -122,7 +122,7 @@ export default function DoctorDetailPage() {
       </main>
 
       <footer className="p-4 border-t bg-background space-y-4">
-        {earliestSlot ? (
+        {earliestSlot && (
             <Link href={`/dashboard/doctors/${doctor.id}/book`} passHref>
                 <div className="bg-card p-3 rounded-lg flex items-center justify-between cursor-pointer border hover:bg-accent">
                     <div className='flex items-center gap-4'>
@@ -135,10 +135,6 @@ export default function DoctorDetailPage() {
                     <ChevronRight className="h-5 w-5 text-muted-foreground"/>
                 </div>
             </Link>
-        ) : (
-             <div className="bg-card p-3 rounded-lg flex items-center justify-center border">
-                <p className="text-sm text-muted-foreground">No upcoming appointments available.</p>
-            </div>
         )}
         <Button size="lg" className="w-full" onClick={handleBookNow}>Book appointment</Button>
       </footer>

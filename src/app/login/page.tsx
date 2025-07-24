@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -111,18 +112,20 @@ export default function LoginPage() {
                     disabled={isLoading}
                   />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link href="#" className="text-sm font-medium text-primary hover:underline">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Input id="password" type="password" required disabled={isLoading} />
-                </div>
+                
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending OTP..." : "Login"}
+                  {isLoading ? "Sending OTP..." : "Send OTP"}
                 </Button>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
+                  </div>
+                </div>
                 <Button variant="outline" className="w-full" type="button" onClick={handleGoogleSignIn} disabled={isLoading}>
                   <GoogleIcon className="mr-2 h-4 w-4" />
                   Sign in with Google

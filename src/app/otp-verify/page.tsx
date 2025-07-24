@@ -8,10 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Logo } from '@/components/Logo';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { verifyOtp } from '@/lib/auth';
 import type { MockConfirmationResult } from '@/lib/auth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function OtpVerificationForm() {
   const router = useRouter();
@@ -20,6 +21,11 @@ function OtpVerificationForm() {
   const { toast } = useToast();
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,10 +65,36 @@ function OtpVerificationForm() {
     setOtp(numericValue.slice(0, 6));
   };
 
+  if (!isClient) {
+    return (
+        <div className="w-full max-w-md space-y-6">
+            <div className="text-center">
+                 <Logo className="mx-auto mb-4 text-3xl" />
+            </div>
+            <Card>
+                <CardHeader className="text-center">
+                    <Skeleton className="h-7 w-48 mx-auto" />
+                    <Skeleton className="h-4 w-64 mx-auto mt-2" />
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                           <Skeleton className="h-12 w-full" />
+                        </div>
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <div className="mt-4 text-center text-sm">
+                        <Skeleton className="h-4 w-48 mx-auto" />
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    );
+  }
+
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <Logo className="mx-auto mb-4 text-3xl" />
         </div>
@@ -102,7 +134,6 @@ function OtpVerificationForm() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }
@@ -110,7 +141,9 @@ function OtpVerificationForm() {
 export default function OtpVerifyPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <OtpVerificationForm />
+       <div className="flex min-h-screen items-center justify-center bg-background p-4">
+            <OtpVerificationForm />
+       </div>
     </Suspense>
   );
 }

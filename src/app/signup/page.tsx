@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -19,7 +20,6 @@ import { Logo } from '@/components/Logo';
 export default function SignupPage() {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
-  const [phone, setPhone] = useState('');
 
   useEffect(() => {
     setIsClient(true);
@@ -27,13 +27,7 @@ export default function SignupPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle signup logic here
     router.push('/login');
-  };
-
-  const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numericValue = e.target.value.replace(/[^0-9]/g, '');
-    setPhone(numericValue.slice(0, 10));
   };
 
   if (!isClient) {
@@ -67,21 +61,6 @@ export default function SignupPage() {
                   placeholder="john@example.com"
                   required
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="Enter 10-digit phone number"
-                  required
-                  value={phone}
-                  onChange={handlePhoneInput}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required />
               </div>
               <Button type="submit" className="w-full">
                 Create Account

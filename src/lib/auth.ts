@@ -16,8 +16,8 @@ export interface MockConfirmationResult {
 
 // In a real app, you would use a service to send an OTP.
 // For this example, we'll simulate it.
-export const sendOtp = async (phoneNumber: string): Promise<MockConfirmationResult> => {
-  console.log(`DEV-ONLY: OTP for ${phoneNumber} is 123456`);
+export const sendOtp = async (email: string): Promise<MockConfirmationResult> => {
+  console.log(`DEV-ONLY: OTP for ${email} is 123456`);
   // This is a mock confirmation result.
   const mockConfirmationResult: MockConfirmationResult = {
     confirm: async (otp: string) => {
@@ -26,7 +26,7 @@ export const sendOtp = async (phoneNumber: string): Promise<MockConfirmationResu
         // Here we create a mock user object.
         const mockUser = {
           uid: 'mock-user-id',
-          phoneNumber: `+91${phoneNumber}`,
+          email: email,
           displayName: 'Mock User',
         } as User;
         return Promise.resolve({ user: mockUser });

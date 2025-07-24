@@ -12,14 +12,13 @@ import GoogleIcon from '@/components/GoogleIcon';
 import { Logo } from '@/components/Logo';
 import { useEffect, useState } from 'react';
 import { signInWithGoogle, sendOtp } from '@/lib/auth';
-import type { MockConfirmationResult } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -28,23 +27,24 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (phone.length !== 10) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
         toast({
-            title: "Invalid Phone Number",
-            description: "Please enter a valid 10-digit phone number.",
+            title: "Invalid Email Address",
+            description: "Please enter a valid email address.",
             variant: "destructive"
         });
         return;
     }
     setIsLoading(true);
     try {
-        const confirmationResult = await sendOtp(phone);
+        const confirmationResult = await sendOtp(email);
         (window as any).confirmationResult = confirmationResult;
         toast({
             title: "OTP Sent",
-            description: "A verification code has been 'sent' (check console). Use 123456 to verify.",
+            description: "A verification code has been 'sent' to your email (check console). Use 123456 to verify.",
         });
-        router.push(`/otp-verify?phone=${phone}`);
+        router.push(`/otp-verify?email=${email}`);
     } catch (error: any) {
         console.error(error);
         toast({
@@ -55,11 +55,6 @@ export default function LoginPage() {
     } finally {
         setIsLoading(false);
     }
-  };
-
-  const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const numericValue = e.target.value.replace(/[^0-9]/g, '');
-    setPhone(numericValue.slice(0, 10));
   };
 
   const handleGoogleSignIn = async () => {
@@ -95,20 +90,20 @@ export default function LoginPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
-            <CardDescription>Enter your mobile number to access your account</CardDescription>
+            <CardDescription>Enter your email to receive a login code</CardDescription>
           </CardHeader>
           <CardContent>
             <>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="mobile">Mobile Number</Label>
+                  <Label htmlFor="email">Email Address</Label>
                   <Input
-                    id="mobile"
-                    type="tel"
-                    placeholder="Enter 10-digit phone number"
+                    id="email"
+                    type="email"
+                    placeholder="name@example.com"
                     required
-                    value={phone}
-                    onChange={handlePhoneInput}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
                   />
                 </div>

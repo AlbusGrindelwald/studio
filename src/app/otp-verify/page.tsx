@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -15,7 +16,7 @@ import type { MockConfirmationResult } from '@/lib/auth';
 function OtpVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const phone = searchParams.get('phone');
+  const email = searchParams.get('email');
   const { toast } = useToast();
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +40,7 @@ function OtpVerificationForm() {
       const user = await verifyOtp(confirmationResult, otp);
       toast({
         title: 'Verification Successful!',
-        description: `Welcome, ${user.phoneNumber}!`,
+        description: `Welcome, ${user.email}!`,
       });
       router.push('/dashboard/appointments');
     } catch (error: any) {
@@ -69,8 +70,8 @@ function OtpVerificationForm() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Enter Verification Code</CardTitle>
             <CardDescription>
-              We have sent a code to your mobile number
-              {phone && <span className="font-bold text-foreground"> +91 {phone}</span>}.
+              We have sent a code to your email
+              {email && <span className="font-bold text-foreground"> {email}</span>}.
               (Hint: use 123456)
             </CardDescription>
           </CardHeader>

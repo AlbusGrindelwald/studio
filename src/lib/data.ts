@@ -24,7 +24,7 @@ export const doctors: Doctor[] = [
     location: 'Metropolis, NY',
     rating: 4.8,
     reviews: 189,
-    image: 'https://images.unsplash.com/photo-1622253692010-333f2da60710',
+    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     description: 'Dr. Thorne specializes in medical and cosmetic dermatology. He is an expert in treating acne, eczema, and performing minor skin surgeries, with a focus on innovative treatments.',
     availability: {
       '2024-08-15': ['08:00 AM', '08:30 AM', '09:00 AM'],

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -83,7 +84,7 @@ export default function DoctorDetailPage() {
                 alt={`Photo of ${doctor.name}`}
                 width={128}
                 height={128}
-                className="mx-auto rounded-full border-4 border-primary/20"
+                className="mx-auto rounded-full border-4 border-primary/20 object-cover"
                 data-ai-hint="doctor portrait"
               />
               <h1 className="mt-4 text-2xl font-bold">{doctor.name}</h1>

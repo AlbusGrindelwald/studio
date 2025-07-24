@@ -1,3 +1,4 @@
+
 import type { Doctor, Appointment } from './types';
 
 export const doctors: Doctor[] = [
@@ -8,7 +9,7 @@ export const doctors: Doctor[] = [
     location: 'Springfield, IL',
     rating: 4.9,
     reviews: 215,
-    image: 'https://images.unsplash.com/photo-1576091160550-2173dba9996a',
+    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2',
     description: 'Dr. Reed is a board-certified cardiologist with over 15 years of experience in treating heart conditions. She is known for her patient-centric approach and dedication to cardiovascular health.',
     availability: {
       '2024-08-15': ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM'],
@@ -23,7 +24,7 @@ export const doctors: Doctor[] = [
     location: 'Metropolis, NY',
     rating: 4.8,
     reviews: 189,
-    image: 'https://placehold.co/128x128.png',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da60710',
     description: 'Dr. Thorne specializes in medical and cosmetic dermatology. He is an expert in treating acne, eczema, and performing minor skin surgeries, with a focus on innovative treatments.',
     availability: {
       '2024-08-15': ['08:00 AM', '08:30 AM', '09:00 AM'],
@@ -38,7 +39,7 @@ export const doctors: Doctor[] = [
     location: 'Oakwood, CA',
     rating: 5.0,
     reviews: 320,
-    image: 'https://placehold.co/128x128.png',
+    image: 'https://images.unsplash.com/photo-1612276532431-c44a56e09341',
     description: 'With a friendly and warm demeanor, Dr. Petrova is a favorite among children and parents alike. She provides comprehensive care for infants, children, and adolescents.',
     availability: {
       '2024-08-16': ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM'],
@@ -53,7 +54,7 @@ export const doctors: Doctor[] = [
     location: 'Rivertown, TX',
     rating: 4.7,
     reviews: 154,
-    image: 'https://placehold.co/128x128.png',
+    image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54',
     description: 'Dr. Chen is a leading orthopedic surgeon specializing in sports injuries and joint replacement. He uses the latest minimally invasive techniques to ensure faster recovery for his patients.',
     availability: {
       '2024-08-15': ['11:00 AM', '03:00 PM'],

@@ -60,7 +60,7 @@ function AppointmentCard({
           alt={`Photo of ${appointment.doctor.name}`}
           width={64}
           height={64}
-          className="rounded-full border"
+          className="rounded-full border object-cover"
           data-ai-hint="doctor portrait"
         />
         <div className="flex-grow">

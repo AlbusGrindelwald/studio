@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Star, MapPin } from 'lucide-react';
@@ -15,7 +16,7 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
           alt={`Photo of ${doctor.name}`}
           width={80}
           height={80}
-          className="rounded-full border"
+          className="rounded-full border object-cover"
           data-ai-hint="doctor portrait"
         />
         <div className="flex-1">

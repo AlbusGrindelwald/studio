@@ -24,25 +24,38 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push('/otp-verify');
+    router.push('/dashboard');
   };
 
   const handleGoogleSignIn = async () => {
-    const user = await signInWithGoogle();
-    if (user) {
-      toast({
-        title: "Signed In",
-        description: `Welcome back, ${user.displayName}!`,
-      });
-      router.push('/dashboard');
-    } else {
-      toast({
-        title: "Sign In Failed",
-        description: "Could not sign in with Google. Please try again.",
-        variant: "destructive",
-      });
+    try {
+      const user = await signInWithGoogle();
+      if (user) {
+        toast({
+          title: "Signed In",
+          description: `Welcome back, ${user.displayName}!`,
+        });
+        router.push('/dashboard');
+      } else {
+        toast({
+          title: "Sign In Failed",
+          description: "Could not sign in with Google. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+        console.error(error)
+        toast({
+            title: "Sign In Failed",
+            description: "An unexpected error occurred. Please try again.",
+            variant: "destructive",
+        });
     }
   };
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -56,7 +69,6 @@ export default function LoginPage() {
             <CardDescription>Enter your mobile number to access your account</CardDescription>
           </CardHeader>
           <CardContent>
-            {isClient && (
               <>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
@@ -87,7 +99,6 @@ export default function LoginPage() {
                   </Link>
                 </div>
               </>
-            )}
           </CardContent>
         </Card>
       </div>

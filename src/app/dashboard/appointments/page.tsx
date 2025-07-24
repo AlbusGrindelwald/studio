@@ -21,7 +21,13 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-function AppointmentCard({ appointment }: { appointment: Appointment }) {
+function AppointmentCard({ 
+  appointment, 
+  onCancel 
+}: { 
+  appointment: Appointment,
+  onCancel: (id: string) => void,
+}) {
   const { toast } = useToast();
   const [isReschedulable, setIsReschedulable] = useState(false);
 
@@ -38,6 +44,7 @@ function AppointmentCard({ appointment }: { appointment: Appointment }) {
   }, [appointment]);
   
   const handleCancel = () => {
+    onCancel(appointment.id);
     toast({
         title: 'Appointment Canceled',
         description: `Your appointment with ${appointment.doctor.name} has been canceled.`,
@@ -100,8 +107,18 @@ function AppointmentCard({ appointment }: { appointment: Appointment }) {
 }
 
 export default function AppointmentsPage() {
+  const [appointments, setAppointments] = useState<Appointment[]>(mockAppointments);
+
+  const handleCancelAppointment = (id: string) => {
+    setAppointments(prev => 
+      prev.map(app => 
+        app.id === id ? { ...app, status: 'canceled' } : app
+      )
+    );
+  };
+
   const filterAppointments = (status: Appointment['status']) => 
-    mockAppointments.filter(app => app.status === status);
+    appointments.filter(app => app.status === status);
 
   return (
     <div className="flex flex-col gap-6">
@@ -118,7 +135,7 @@ export default function AppointmentsPage() {
         <TabsContent value="upcoming">
             <div className="space-y-4 pt-4">
                 {filterAppointments('upcoming').length > 0 ? filterAppointments('upcoming').map(app => (
-                    <AppointmentCard key={app.id} appointment={app} />
+                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} />
                 )) : (
                     <p className="text-center text-muted-foreground py-8">No upcoming appointments.</p>
                 )}
@@ -127,7 +144,7 @@ export default function AppointmentsPage() {
         <TabsContent value="completed">
             <div className="space-y-4 pt-4">
                 {filterAppointments('completed').length > 0 ? filterAppointments('completed').map(app => (
-                    <AppointmentCard key={app.id} appointment={app} />
+                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} />
                 )) : (
                      <p className="text-center text-muted-foreground py-8">No completed appointments.</p>
                 )}
@@ -136,7 +153,7 @@ export default function AppointmentsPage() {
         <TabsContent value="canceled">
             <div className="space-y-4 pt-4">
                 {filterAppointments('canceled').length > 0 ? filterAppointments('canceled').map(app => (
-                    <AppointmentCard key={app.id} appointment={app} />
+                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} />
                 )) : (
                     <p className="text-center text-muted-foreground py-8">No canceled appointments.</p>
                 )}

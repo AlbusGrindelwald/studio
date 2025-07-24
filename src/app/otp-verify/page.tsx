@@ -10,8 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { verifyOtp } from '@/lib/auth';
 import type { MockConfirmationResult } from '@/lib/auth';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Delete } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 function OtpVerificationForm() {
@@ -50,23 +49,6 @@ function OtpVerificationForm() {
       inputsRef.current[index - 1]?.focus();
     }
   };
-  
-  const handleNumberPadClick = (num: string) => {
-    const emptyIndex = otp.findIndex(val => val === '');
-    if (emptyIndex !== -1) {
-      handleOtpChange(emptyIndex, num);
-    }
-  };
-
-  const handleDeleteClick = () => {
-    const lastFilledIndex = otp.map(v => !!v).lastIndexOf(true);
-    if(lastFilledIndex > -1) {
-        const newOtp = [...otp];
-        newOtp[lastFilledIndex] = '';
-        setOtp(newOtp);
-        inputsRef.current[lastFilledIndex]?.focus();
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -103,10 +85,6 @@ function OtpVerificationForm() {
     }
   };
   
-  const numberPad = [
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0'
-  ];
-
   if (!isClient) {
     return (
         <div className="w-full max-w-sm space-y-6">
@@ -164,27 +142,6 @@ function OtpVerificationForm() {
           </form>
       </main>
 
-      <footer className="p-4 bg-white">
-        <div className="grid grid-cols-3 gap-y-4">
-          {numberPad.map((num) => (
-            <Button
-              key={num}
-              variant="ghost"
-              className="text-3xl h-16"
-              onClick={() => handleNumberPadClick(num)}
-            >
-              {num}
-            </Button>
-          ))}
-          <Button
-            variant="ghost"
-            className="text-3xl h-16 flex items-center justify-center"
-            onClick={handleDeleteClick}
-          >
-            <Delete size={28} />
-          </Button>
-        </div>
-      </footer>
     </div>
   );
 }

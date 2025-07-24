@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -10,6 +11,7 @@ import {
   Stethoscope,
   User,
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -33,13 +35,18 @@ const navItems = [
 
 function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <nav className={cn('flex flex-col gap-2', className)} {...props}>
       {navItems.map((item) => (
         <Link key={item.href} href={item.href}>
           <Button
-            variant={pathname === item.href ? 'secondary' : 'ghost'}
+            variant={isClient && pathname === item.href ? 'secondary' : 'ghost'}
             className="w-full justify-start"
           >
             <item.icon className="mr-2 h-4 w-4" />

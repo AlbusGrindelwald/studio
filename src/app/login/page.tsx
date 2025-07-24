@@ -25,7 +25,7 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push('/dashboard');
+    router.push('/otp-verify');
   };
 
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {

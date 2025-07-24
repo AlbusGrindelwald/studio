@@ -51,7 +51,12 @@ export const sendOtp = async (phoneNumber: string, containerId: string): Promise
             (window as any).grecaptcha.reset(widgetId);
         });
     }
-
+    
+    if (error.code === 'auth/billing-not-enabled') {
+      throw new Error(
+        'Phone authentication is a paid feature. Please enable billing on your Google Cloud project to continue.'
+      );
+    }
     if (error.code === 'auth/invalid-phone-number') {
         throw new Error('Invalid phone number provided. Please check the number and try again.');
     }

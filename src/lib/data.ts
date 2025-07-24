@@ -24,7 +24,7 @@ export const doctors: Doctor[] = [
     location: 'Metropolis, NY',
     rating: 4.8,
     reviews: 189,
-    image: 'https://images.unsplash.com/photo-1622253692010-333f2da60710',
+    image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54',
     description: 'Dr. Thorne specializes in medical and cosmetic dermatology. He is an expert in treating acne, eczema, and performing minor skin surgeries, with a focus on innovative treatments.',
     availability: {
       '2024-08-15': ['08:00 AM', '08:30 AM', '09:00 AM'],
@@ -54,7 +54,7 @@ export const doctors: Doctor[] = [
     location: 'Rivertown, TX',
     rating: 4.7,
     reviews: 154,
-    image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da60710',
     description: 'Dr. Chen is a leading orthopedic surgeon specializing in sports injuries and joint replacement. He uses the latest minimally invasive techniques to ensure faster recovery for his patients.',
     availability: {
       '2024-08-15': ['11:00 AM', '03:00 PM'],

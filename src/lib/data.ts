@@ -24,7 +24,7 @@ export const doctors: Doctor[] = [
     location: 'Metropolis, NY',
     rating: 4.8,
     reviews: 189,
-    image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54',
+    image: 'https://images.unsplash.com/photo-1622253692010-333f2da60710',
     description: 'Dr. Thorne specializes in medical and cosmetic dermatology. He is an expert in treating acne, eczema, and performing minor skin surgeries, with a focus on innovative treatments.',
     availability: {
       '2024-08-15': ['08:00 AM', '08:30 AM', '09:00 AM'],
@@ -39,7 +39,7 @@ export const doctors: Doctor[] = [
     location: 'Oakwood, CA',
     rating: 5.0,
     reviews: 320,
-    image: 'https://images.unsplash.com/photo-1612276532431-c44a56e09341',
+    image: 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     description: 'With a friendly and warm demeanor, Dr. Petrova is a favorite among children and parents alike. She provides comprehensive care for infants, children, and adolescents.',
     availability: {
       '2024-08-16': ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM'],
@@ -54,7 +54,7 @@ export const doctors: Doctor[] = [
     location: 'Rivertown, TX',
     rating: 4.7,
     reviews: 154,
-    image: 'https://images.unsplash.com/photo-1622253692010-333f2da60710',
+    image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     description: 'Dr. Chen is a leading orthopedic surgeon specializing in sports injuries and joint replacement. He uses the latest minimally invasive techniques to ensure faster recovery for his patients.',
     availability: {
       '2024-08-15': ['11:00 AM', '03:00 PM'],

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { appointments as mockAppointments } from '@/lib/data';
 import type { Appointment } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -21,16 +21,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { RescheduleDialog } from '@/components/appointments/RescheduleDialog';
 
-function AppointmentCard({ 
-  appointment, 
-  onCancel 
-}: { 
+function AppointmentCard({
+  appointment,
+  onCancel,
+  onReschedule,
+}: {
   appointment: Appointment,
   onCancel: (id: string) => void,
+  onReschedule: (id: string, newDate: string, newTime: string) => void,
 }) {
   const { toast } = useToast();
   const [isReschedulable, setIsReschedulable] = useState(false);
+  const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
 
   useEffect(() => {
     if (appointment.status === 'upcoming') {
@@ -43,13 +47,17 @@ function AppointmentCard({
       setIsReschedulable(now < oneHourBefore);
     }
   }, [appointment]);
-  
+
   const handleCancel = () => {
     onCancel(appointment.id);
     toast({
-        title: 'Appointment Canceled',
-        description: `Your appointment with ${appointment.doctor.name} has been canceled.`,
+      title: 'Appointment Canceled',
+      description: `Your appointment with ${appointment.doctor.name} has been canceled.`,
     });
+  };
+
+  const handleReschedule = (newDate: string, newTime: string) => {
+    onReschedule(appointment.id, newDate, newTime);
   };
 
   return (
@@ -73,9 +81,17 @@ function AppointmentCard({
         <div className="flex flex-col sm:items-end gap-2 w-full sm:w-auto">
           {appointment.status === 'upcoming' && (
             <div className="flex gap-2 w-full sm:w-auto">
-              <Button variant="outline" size="sm" className="flex-1" disabled={!isReschedulable} title={!isReschedulable ? "Cannot reschedule within 1 hour of appointment" : ""}>
-                Reschedule
-              </Button>
+              <RescheduleDialog
+                open={isRescheduleOpen}
+                onOpenChange={setIsRescheduleOpen}
+                doctor={appointment.doctor}
+                onReschedule={handleReschedule}
+                trigger={
+                  <Button variant="outline" size="sm" className="flex-1" disabled={!isReschedulable} title={!isReschedulable ? "Cannot reschedule within 1 hour of appointment" : ""}>
+                    Reschedule
+                  </Button>
+                }
+              />
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm" className="flex-1">Cancel</Button>
@@ -117,20 +133,28 @@ export default function AppointmentsPage() {
   }, []);
 
   const handleCancelAppointment = (id: string) => {
-    setAppointments(prev => 
-      prev.map(app => 
+    setAppointments(prev =>
+      prev.map(app =>
         app.id === id ? { ...app, status: 'canceled' } : app
       )
     );
   };
+  
+  const handleRescheduleAppointment = (id: string, newDate: string, newTime: string) => {
+    setAppointments(prev =>
+      prev.map(app =>
+        app.id === id ? { ...app, date: newDate, time: newTime } : app
+      )
+    );
+  };
 
-  const filterAppointments = (status: Appointment['status']) => 
+  const filterAppointments = (status: Appointment['status']) =>
     appointments.filter(app => app.status === status);
 
   if (!isClient) {
     return null;
   }
-    
+
   return (
     <div className="flex flex-col gap-6">
        <div>
@@ -146,7 +170,7 @@ export default function AppointmentsPage() {
         <TabsContent value="upcoming">
             <div className="space-y-4 pt-4">
                 {filterAppointments('upcoming').length > 0 ? filterAppointments('upcoming').map(app => (
-                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} />
+                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} onReschedule={handleRescheduleAppointment} />
                 )) : (
                     <p className="text-center text-muted-foreground py-8">No upcoming appointments.</p>
                 )}
@@ -155,7 +179,7 @@ export default function AppointmentsPage() {
         <TabsContent value="completed">
             <div className="space-y-4 pt-4">
                 {filterAppointments('completed').length > 0 ? filterAppointments('completed').map(app => (
-                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} />
+                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} onReschedule={handleRescheduleAppointment} />
                 )) : (
                      <p className="text-center text-muted-foreground py-8">No completed appointments.</p>
                 )}
@@ -164,7 +188,7 @@ export default function AppointmentsPage() {
         <TabsContent value="canceled">
             <div className="space-y-4 pt-4">
                 {filterAppointments('canceled').length > 0 ? filterAppointments('canceled').map(app => (
-                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} />
+                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} onReschedule={handleRescheduleAppointment} />
                 )) : (
                     <p className="text-center text-muted-foreground py-8">No canceled appointments.</p>
                 )}

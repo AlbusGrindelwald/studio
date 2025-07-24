@@ -78,46 +78,48 @@ export default function DoctorDetailPage() {
         <h1 className="text-xl font-bold">Doctor Profile</h1>
       </header>
       
-      <main className="flex-1 overflow-y-auto p-4 space-y-6 bg-background">
-        <div>
-            <div className="bg-card text-card-foreground rounded-xl p-4 flex items-start gap-4 shadow-sm border">
-                <Image
-                    src={doctor.image}
-                    alt={`Photo of ${doctor.name}`}
-                    width={80}
-                    height={80}
-                    className="rounded-lg border object-cover"
-                    data-ai-hint="doctor portrait"
-                />
-                <div className="flex-1">
-                    <h2 className="font-bold text-lg">{doctor.name}</h2>
-                    <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
-                    <p className="text-sm text-primary font-medium">MBBS, MS (Surgeon)</p>
-                    <p className="text-xs text-muted-foreground mt-1">Fellow of Sanskara netralaya, chennai</p>
+      <main className="flex-1 overflow-y-auto bg-background">
+        <div className="p-4 space-y-6">
+            <div>
+                <div className="bg-card text-card-foreground rounded-xl p-4 flex items-start gap-4 shadow-sm border">
+                    <Image
+                        src={doctor.image}
+                        alt={`Photo of ${doctor.name}`}
+                        width={80}
+                        height={80}
+                        className="rounded-lg border object-cover"
+                        data-ai-hint="doctor portrait"
+                    />
+                    <div className="flex-1">
+                        <h2 className="font-bold text-lg">{doctor.name}</h2>
+                        <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+                        <p className="text-sm text-primary font-medium">MBBS, MS (Surgeon)</p>
+                        <p className="text-xs text-muted-foreground mt-1">Fellow of Sanskara netralaya, chennai</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div className="space-y-6">
-            <section>
-                <h3 className="font-semibold mb-3">Speciality</h3>
-                <div className="flex flex-wrap gap-2">
-                    {doctor.specialities.map(s => <Badge key={s} variant="outline" className="py-1 px-3 rounded-full border-primary text-primary">{s}</Badge>)}
-                </div>
-            </section>
+            <div className="space-y-6">
+                <section>
+                    <h3 className="font-semibold mb-3">Speciality</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {doctor.specialities.map(s => <Badge key={s} variant="outline" className="py-1 px-3 rounded-full border-primary text-primary">{s}</Badge>)}
+                    </div>
+                </section>
 
-            <section>
-                <h3 className="font-semibold mb-2">About Doctor</h3>
-                <p className="text-sm text-muted-foreground">
-                    {doctor.description}
-                </p>
-            </section>
-            
-            <section>
-                <h3 className="font-semibold mb-2">Availability For Consulting</h3>
-                <p className="text-sm text-muted-foreground">Monday to Friday | 10 AM to 1 PM</p>
-                <p className="text-sm text-muted-foreground">Saturday | 2 PM to 5 PM</p>
-            </section>
+                <section>
+                    <h3 className="font-semibold mb-2">About Doctor</h3>
+                    <p className="text-sm text-muted-foreground">
+                        {doctor.description}
+                    </p>
+                </section>
+                
+                <section>
+                    <h3 className="font-semibold mb-2">Availability For Consulting</h3>
+                    <p className="text-sm text-muted-foreground">Monday to Friday | 10 AM to 1 PM</p>
+                    <p className="text-sm text-muted-foreground">Saturday | 2 PM to 5 PM</p>
+                </section>
+            </div>
         </div>
       </main>
 

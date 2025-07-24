@@ -21,7 +21,7 @@ export default function SignupPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle signup logic here
-    router.push('/otp-verify');
+    router.push('/login');
   };
 
   return (

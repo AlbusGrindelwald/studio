@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -34,6 +35,7 @@ export default function OtpVerifyPage() {
                   type="text"
                   inputMode="numeric"
                   pattern="\d{6}"
+                  maxLength={6}
                   placeholder="Enter 6-digit code"
                   required
                   className="text-center text-lg tracking-[0.5em]"

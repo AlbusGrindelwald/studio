@@ -79,8 +79,6 @@ export default function BookAppointmentPage() {
       description: `Your appointment with ${doctor.name} on ${format(parseISO(selectedDate), 'MMM d, yyyy')} at ${selectedTime} is confirmed.`,
     });
     
-    setSelectedDate(null);
-    setSelectedTime(null);
     router.push('/dashboard/appointments');
   };
   

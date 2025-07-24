@@ -70,16 +70,16 @@ export default function DoctorDetailPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-muted/40">
-      <header className="bg-background p-4 flex items-center gap-4 fixed top-0 left-0 right-0 z-10 border-b">
+    <div className="flex flex-col h-screen bg-muted/40">
+      <header className="bg-background p-4 flex items-center gap-4 border-b">
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.back()}>
           <ArrowLeft />
         </Button>
         <h1 className="text-xl font-bold">Doctor Profile</h1>
       </header>
       
-      <main className="flex-1 overflow-y-auto pt-20 pb-48 space-y-6 bg-background">
-        <div className="p-4">
+      <main className="flex-1 overflow-y-auto p-4 space-y-6 bg-background">
+        <div>
             <div className="bg-card text-card-foreground rounded-xl p-4 flex items-start gap-4 shadow-sm border">
                 <Image
                     src={doctor.image}
@@ -98,7 +98,7 @@ export default function DoctorDetailPage() {
             </div>
         </div>
 
-        <div className="px-4 space-y-6">
+        <div className="space-y-6">
             <section>
                 <h3 className="font-semibold mb-3">Speciality</h3>
                 <div className="flex flex-wrap gap-2">
@@ -121,7 +121,7 @@ export default function DoctorDetailPage() {
         </div>
       </main>
 
-      <footer className="p-4 border-t bg-background fixed bottom-0 left-0 right-0 z-10 space-y-4">
+      <footer className="p-4 border-t bg-background space-y-4">
         {earliestSlot ? (
             <Link href={`/dashboard/doctors/${doctor.id}/book`} passHref>
                 <div className="bg-card p-3 rounded-lg flex items-center justify-between cursor-pointer border hover:bg-accent">

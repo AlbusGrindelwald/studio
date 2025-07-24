@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Star, MapPin, Calendar, Clock } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
+import { addAppointment } from '@/lib/appointments';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +20,7 @@ import {
 
 export default function DoctorDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = typeof params.id === 'string' ? params.id : '';
   const doctor = findDoctorById(id);
   const { toast } = useToast();
@@ -48,13 +50,24 @@ export default function DoctorDetailPage() {
   };
 
   const handleConfirmBooking = () => {
+    if (!selectedDate || !selectedTime) return;
+
+    addAppointment({
+      doctorId: doctor.id,
+      date: selectedDate,
+      time: selectedTime,
+    });
+
     setIsConfirming(false);
     toast({
       title: 'Appointment Booked!',
       description: `Your appointment with ${doctor.name} on ${selectedDate} at ${selectedTime} is confirmed.`,
     });
+    
+    // Reset selection and navigate to appointments page
     setSelectedDate(null);
     setSelectedTime(null);
+    router.push('/dashboard/appointments');
   };
   
   const availableDates = Object.keys(doctor.availability);

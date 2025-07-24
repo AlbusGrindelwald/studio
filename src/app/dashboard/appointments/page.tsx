@@ -2,7 +2,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { appointments as mockAppointments } from '@/lib/data';
+import {
+  getAppointments,
+  rescheduleAppointment,
+  updateAppointmentStatus,
+  subscribe,
+} from '@/lib/appointments';
 import type { Appointment } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -115,24 +120,24 @@ export default function AppointmentsPage() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setAppointments(mockAppointments);
+    const handleAppointmentsChange = () => {
+      setAppointments(getAppointments());
+    };
+
+    const unsubscribe = subscribe(handleAppointmentsChange);
+    handleAppointmentsChange(); // Initial fetch
+
     setIsClient(true);
+    
+    return () => unsubscribe();
   }, []);
 
   const handleCancelAppointment = (id: string) => {
-    setAppointments(prev =>
-      prev.map(app =>
-        app.id === id ? { ...app, status: 'canceled' } : app
-      )
-    );
+    updateAppointmentStatus(id, 'canceled');
   };
   
   const handleRescheduleAppointment = (id: string, newDate: string, newTime: string) => {
-    setAppointments(prev =>
-      prev.map(app =>
-        app.id === id ? { ...app, date: newDate, time: newTime } : app
-      )
-    );
+    rescheduleAppointment(id, newDate, newTime);
   };
 
   const filterAppointments = (status: Appointment['status']) =>

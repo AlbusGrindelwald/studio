@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { CalendarCheck, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { appointments as mockAppointments } from '@/lib/data';
+import { getAppointments, subscribe } from '@/lib/appointments';
 import type { Appointment } from '@/lib/types';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 function AppointmentCard({ appointment }: { appointment: Appointment }) {
+  const router = useRouter();
   return (
     <div className="flex items-center justify-between rounded-lg border p-4">
       <div className="flex items-center gap-4">
@@ -22,7 +24,7 @@ function AppointmentCard({ appointment }: { appointment: Appointment }) {
           <p className="text-sm text-muted-foreground">{new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at {appointment.time}</p>
         </div>
       </div>
-      <Button variant="outline" size="sm">
+       <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/appointments')}>
         Details
       </Button>
     </div>
@@ -35,8 +37,16 @@ export default function DashboardPage() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setAppointments(mockAppointments);
+    const handleAppointmentsChange = () => {
+      setAppointments(getAppointments());
+    };
+
+    const unsubscribe = subscribe(handleAppointmentsChange);
+    handleAppointmentsChange(); // Initial fetch
+    
     setIsClient(true);
+    
+    return () => unsubscribe();
   }, []);
 
   const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').slice(0, 2);

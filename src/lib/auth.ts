@@ -5,6 +5,10 @@ import { auth } from "./firebase";
 
 export const signInWithGoogle = async (): Promise<User | null> => {
   const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({
+    'auth_domain': auth.config.authDomain
+  });
+  
   try {
     const result = await signInWithPopup(auth, provider);
     return result.user;

@@ -17,6 +17,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
+  const [phone, setPhone] = useState('');
 
   useEffect(() => {
     setIsClient(true);
@@ -25,6 +26,11 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     router.push('/dashboard');
+  };
+
+  const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, '');
+    setPhone(numericValue.slice(0, 10));
   };
 
   const handleGoogleSignIn = async () => {
@@ -67,7 +73,14 @@ export default function LoginPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="mobile">Mobile Number</Label>
-                    <Input id="mobile" type="tel" placeholder="+1 (555) 000-0000" required />
+                    <Input
+                      id="mobile"
+                      type="tel"
+                      placeholder="Enter 10-digit phone number"
+                      required
+                      value={phone}
+                      onChange={handlePhoneInput}
+                    />
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">

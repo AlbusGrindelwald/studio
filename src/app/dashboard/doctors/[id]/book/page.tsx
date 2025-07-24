@@ -88,15 +88,15 @@ export default function BookAppointmentPage() {
 
   return (
     <div className="flex flex-col h-screen bg-muted/40">
-       <header className="bg-primary text-primary-foreground p-4 flex items-center gap-4">
+       <header className="bg-background p-4 flex items-center gap-4 border-b">
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.back()}>
           <ArrowLeft />
         </Button>
         <h1 className="text-xl font-bold">Book Appointment</h1>
       </header>
 
-      <div className="bg-primary p-4 pt-0">
-        <div className="bg-card text-card-foreground rounded-xl p-4 flex items-center gap-4 shadow-lg">
+      <div className="bg-background p-4">
+        <div className="bg-card text-card-foreground rounded-xl p-4 flex items-center gap-4 shadow-sm border">
            <Image
               src={doctor.image}
               alt={`Photo of ${doctor.name}`}

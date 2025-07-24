@@ -2,30 +2,37 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarCheck, Stethoscope } from 'lucide-react';
+import { CalendarCheck, ChevronRight, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAppointments, subscribe } from '@/lib/appointments';
 import type { Appointment } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import Image from 'next/image';
 
 function AppointmentCard({ appointment }: { appointment: Appointment }) {
   const router = useRouter();
   return (
-    <div className="flex items-center justify-between rounded-lg border p-4">
+    <div className="flex items-center justify-between rounded-lg border bg-card p-3">
       <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <CalendarCheck className="h-6 w-6" />
-        </div>
+        <Image 
+          src={appointment.doctor.image}
+          alt={appointment.doctor.name}
+          width={48}
+          height={48}
+          className="rounded-full object-cover"
+          data-ai-hint="doctor portrait"
+        />
         <div>
           <p className="font-semibold">{appointment.doctor.name}</p>
           <p className="text-sm text-muted-foreground">{appointment.doctor.specialty}</p>
-          <p className="text-sm text-muted-foreground">{new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} at {appointment.time}</p>
+          <p className="text-xs text-muted-foreground mt-1">{new Date(appointment.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}, {appointment.time}</p>
         </div>
       </div>
-       <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/appointments')}>
-        Details
+       <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard/appointments')}>
+        <ChevronRight className="h-5 w-5" />
       </Button>
     </div>
   );
@@ -35,6 +42,7 @@ function AppointmentCard({ appointment }: { appointment: Appointment }) {
 export default function DashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const handleAppointmentsChange = () => {
@@ -49,52 +57,55 @@ export default function DashboardPage() {
     return () => unsubscribe();
   }, []);
 
-  const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').slice(0, 2);
+  const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').slice(0, 1);
 
   if (!isClient) {
     return null;
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Welcome back!</h1>
-        <p className="text-muted-foreground">Here&apos;s a quick overview of your health schedule.</p>
+    <div className="flex flex-1 flex-col gap-6 p-4">
+      <header className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Hi, User!</h1>
+          <p className="text-muted-foreground">How are you feeling today?</p>
+        </div>
+        <Button variant="outline" size="icon" className="rounded-full">
+            <User className="h-5 w-5" />
+        </Button>
+      </header>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Input 
+          placeholder="Search for doctors, symptoms..." 
+          className="pl-10 h-12 rounded-full"
+          onFocus={() => router.push('/dashboard/doctors')}
+        />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="flex flex-col">
-          <CardHeader>
-            <CardTitle>Need a Doctor?</CardTitle>
-            <CardDescription>Find and book the best doctors near you.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-grow flex items-center justify-center">
-            <Stethoscope className="h-24 w-24 text-primary/20" />
-          </CardContent>
-          <div className="p-6 pt-0">
-             <Link href="/dashboard/doctors" passHref>
-                <Button className="w-full">Find a Doctor</Button>
-            </Link>
+       <div className="grid grid-cols-2 gap-4">
+        <Card className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 border-blue-200" onClick={() => router.push('/dashboard/doctors')}>
+          <div className="p-3 bg-blue-100 rounded-full mb-2">
+             <Stethoscope className="h-6 w-6 text-blue-600" />
           </div>
+          <p className="font-semibold text-sm">Doctors</p>
+          <p className="text-xs text-muted-foreground">Find a specialist</p>
         </Card>
-        <Card className="flex flex-col">
-          <CardHeader>
-            <CardTitle>AI Recommendation</CardTitle>
-            <CardDescription>Get doctor recommendations based on your symptoms.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-grow flex items-center justify-center">
-             <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="h-24 w-24 text-primary/20"><path d="M12 2a10 10 0 1 0 10 10c0-4.42-2.87-8.17-7-9.58"/><path d="M16 11.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/><path d="M12 3v2"/><path d="M21 12h-2"/><path d="M12 21v-2"/><path d="M3 12H1"/><path d="m19.07 4.93-1.41 1.41"/><path d="m4.93 19.07-1.41-1.41"/><path d="m19.07 19.07-1.41-1.41"/><path d="m4.93 4.93-1.41 1.41"/></svg>
-          </CardContent>
-          <div className="p-6 pt-0">
-            <Link href="/dashboard/recommend" passHref>
-                <Button className="w-full">Get Recommendation</Button>
-            </Link>
+        <Card className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 border-purple-200" onClick={() => router.push('/dashboard/appointments')}>
+          <div className="p-3 bg-purple-100 rounded-full mb-2">
+            <CalendarCheck className="h-6 w-6 text-purple-600" />
           </div>
+          <p className="font-semibold text-sm">Appointments</p>
+          <p className="text-xs text-muted-foreground">Manage bookings</p>
         </Card>
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold tracking-tight mb-4">Upcoming Appointments</h2>
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-lg font-semibold tracking-tight">Upcoming Appointment</h2>
+          <Link href="/dashboard/appointments" className="text-sm text-primary font-medium">See All</Link>
+        </div>
         <div className="space-y-4">
           {upcomingAppointments.length > 0 ? (
             upcomingAppointments.map(app => <AppointmentCard key={app.id} appointment={app} />)
@@ -107,6 +118,27 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+       <div>
+        <h2 className="text-lg font-semibold tracking-tight mb-3">AI Recommendation</h2>
+          <Card className="bg-teal-50 border-teal-200">
+            <CardHeader className="flex flex-row items-center gap-4">
+              <div className="p-3 bg-teal-100 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-teal-600"><path d="M12 2a10 10 0 1 0 10 10c0-4.42-2.87-8.17-7-9.58"/><path d="M16 11.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/><path d="M12 3v2"/><path d="M21 12h-2"/><path d="M12 21v-2"/><path d="M3 12H1"/><path d="m19.07 4.93-1.41 1.41"/><path d="m4.93 19.07-1.41-1.41"/><path d="m19.07 19.07-1.41-1.41"/><path d="m4.93 4.93-1.41 1.41"/></svg>
+              </div>
+              <div>
+                <CardTitle className="text-base">Feeling Unwell?</CardTitle>
+                <CardDescription className="text-xs">Get doctor recommendations based on your symptoms.</CardDescription>
+              </div>
+            </CardHeader>
+             <CardContent>
+               <Link href="/dashboard/recommend" passHref>
+                  <Button className="w-full bg-teal-500 hover:bg-teal-600">Get Recommendation</Button>
+              </Link>
+             </CardContent>
+          </Card>
+      </div>
+
     </div>
   );
 }

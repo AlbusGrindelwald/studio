@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import Link from 'next/link';
@@ -30,7 +29,7 @@ export default function LoginPage() {
     e.preventDefault();
     
     const isEmail = email.includes('@');
-    const isPhone = /^\d+$/.test(email);
+    const isPhone = /^\d+$/.test(email.replace(/\s/g, ''));
 
     if (!isEmail && !isPhone) {
       toast({
@@ -55,8 +54,7 @@ export default function LoginPage() {
     
     setIsLoading(true);
     try {
-        const confirmationResult = await sendOtp(email);
-        (window as any).confirmationResult = confirmationResult;
+        await sendOtp(email);
         toast({
             title: "OTP Sent",
             description: "A verification code has been 'sent' (check console). Use 123456 to verify.",
@@ -99,21 +97,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-            <h2 className="text-xl text-muted-foreground">Hi welcome too <span className='text-primary font-semibold'>Shedula</span></h2>
+            <h2 className="text-xl text-muted-foreground">Hi, welcome to <span className='text-primary font-semibold'>Shedula</span></h2>
             <h1 className="text-4xl font-bold">Login</h1>
         </div>
         <Card className="shadow-lg rounded-xl">
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Mobile /Email</Label>
+                <Label htmlFor="email">Mobile / Email</Label>
                 <Input
                   id="email"
                   type="text"
-                  placeholder="login with email or mobile number"
+                  placeholder="Enter your email or mobile"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -127,11 +125,11 @@ export default function LoginPage() {
                   <Label htmlFor="remember-me" className="text-sm font-normal">Remember Me</Label>
                 </div>
                 <Link href="#" className="text-sm font-medium text-destructive hover:underline">
-                  Forgot Password
+                  Forgot Password?
                 </Link>
               </div>
               
-              <Button type="submit" className="w-full bg-[#2BC8BE] hover:bg-[#2BC8BE]/90 text-white" size="lg" disabled={isLoading}>
+              <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
               <div className="relative my-4">
@@ -140,7 +138,7 @@ export default function LoginPage() {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-card px-2 text-muted-foreground">
-                    Or login With
+                    Or login with
                   </span>
                 </div>
               </div>

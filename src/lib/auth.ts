@@ -20,7 +20,12 @@ const getRecaptchaVerifier = (containerId: string) => {
     size: 'invisible',
     callback: (response: any) => {
       // reCAPTCHA solved, allow signInWithPhoneNumber.
+      console.log('reCAPTCHA solved');
     },
+    'expired-callback': () => {
+        // Response expired. Ask user to solve reCAPTCHA again.
+        console.log('reCAPTCHA expired');
+    }
   });
   (window as any).recaptchaVerifier = recaptchaVerifier;
   return recaptchaVerifier;
@@ -33,22 +38,33 @@ export const sendOtp = async (phoneNumber: string, containerId: string): Promise
   const formattedPhoneNumber = `+91${phoneNumber}`;
 
   try {
+    // Ensure reCAPTCHA is rendered
+    await appVerifier.render();
     const confirmationResult = await signInWithPhoneNumber(auth, formattedPhoneNumber, appVerifier);
     return confirmationResult;
   } catch (error: any) {
-    console.error('Error sending OTP:', error);
+    console.error('Error sending OTP:', error.code, error.message);
+    
+    // Reset reCAPTCHA so user can try again
+    if ((window as any).grecaptcha && (window as any).recaptchaVerifier) {
+        (window as any).recaptchaVerifier.render().then(function(widgetId: any) {
+            (window as any).grecaptcha.reset(widgetId);
+        });
+    }
+
     if (error.code === 'auth/invalid-phone-number') {
         throw new Error('Invalid phone number provided. Please check the number and try again.');
     }
     if (error.code === 'auth/operation-not-allowed') {
         throw new Error('Phone number sign-in is not enabled for this project. Please enable it in the Firebase console under Authentication > Sign-in method.');
     }
-    
-    // Reset reCAPTCHA so user can try again
-    if ((window as any).grecaptcha && (window as any).recaptchaWidgetId) {
-      (window as any).grecaptcha.reset((window as any).recaptchaWidgetId);
+     if (error.code === 'auth/captcha-check-failed') {
+      throw new Error('The reCAPTCHA response is invalid. Please try again.');
     }
-    throw new Error('Failed to send OTP. Please try again later.');
+     if (error.code === 'auth/too-many-requests') {
+      throw new Error('We have blocked all requests from this device due to unusual activity. Try again later.');
+    }
+    throw new Error('Failed to send OTP. An unknown error occurred. Please try again later.');
   }
 };
 

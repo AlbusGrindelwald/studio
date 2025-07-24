@@ -78,7 +78,7 @@ export default function DoctorDetailPage() {
         <h1 className="text-xl font-bold">Doctor Profile</h1>
       </header>
       
-      <main className="flex-1 overflow-y-auto pt-20 pb-40 space-y-6 bg-background">
+      <main className="flex-1 overflow-y-auto pt-20 pb-48 space-y-6 bg-background">
         <div className="p-4">
             <div className="bg-card text-card-foreground rounded-xl p-4 flex items-start gap-4 shadow-sm border">
                 <Image

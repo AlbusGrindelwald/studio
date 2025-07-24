@@ -73,7 +73,7 @@ export default function RecommendPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 p-4">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">AI Doctor Recommendation</h1>
         <p className="text-muted-foreground">Describe your symptoms, and our AI will suggest the right specialists for you.</p>
@@ -102,7 +102,7 @@ export default function RecommendPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="w-full">
                 {isLoading ? 'Getting Recommendations...' : 'Get AI Recommendations'}
               </Button>
             </form>
@@ -111,20 +111,21 @@ export default function RecommendPage() {
       </Card>
 
       {isLoading && (
-         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {[...Array(3)].map((_, i) => (
                 <Card key={i}>
                     <CardContent className="p-4 space-y-4">
                         <div className="flex items-center gap-4">
-                            <Skeleton className="h-20 w-20 rounded-full" />
+                            <Skeleton className="h-20 w-20 rounded-lg" />
                             <div className="space-y-2 flex-1">
                                 <Skeleton className="h-5 w-3/4" />
                                 <Skeleton className="h-4 w-1/2" />
                             </div>
                         </div>
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-5/6" />
-                        <Skeleton className="h-10 w-full mt-2" />
+                         <div className="flex justify-between items-center mt-4">
+                            <Skeleton className="h-8 w-24" />
+                            <Skeleton className="h-8 w-24" />
+                        </div>
                     </CardContent>
                 </Card>
             ))}
@@ -142,12 +143,20 @@ export default function RecommendPage() {
       {recommendations && recommendations.length > 0 && (
          <div>
             <h2 className="text-2xl font-bold tracking-tight mb-4">Recommended Doctors</h2>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {recommendations.map((doc) => (
                 <DoctorCard key={doc.id} doctor={doc} />
             ))}
             </div>
         </div>
+      )}
+
+      {recommendations && recommendations.length === 0 && !isLoading && (
+        <Card>
+          <CardContent className="p-6">
+            <p className="text-center text-muted-foreground">No doctors found based on your symptoms. Please try describing them differently.</p>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

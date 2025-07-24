@@ -26,26 +26,27 @@ export default function DoctorsPage() {
 
   if (!isClient) {
     return (
-       <div className="flex flex-col gap-6">
+       <div className="flex flex-col gap-6 p-4">
         <div>
           <Skeleton className="h-8 w-64 mb-2" />
           <Skeleton className="h-4 w-96" />
         </div>
         <Skeleton className="h-10 w-full" />
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(8)].map((_, i) => (
               <Card key={i}>
                   <CardContent className="p-4 space-y-4">
                       <div className="flex items-center gap-4">
-                          <Skeleton className="h-20 w-20 rounded-full" />
+                          <Skeleton className="h-20 w-20 rounded-lg" />
                           <div className="space-y-2 flex-1">
                               <Skeleton className="h-5 w-3/4" />
                               <Skeleton className="h-4 w-1/2" />
                           </div>
                       </div>
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-5/6" />
-                      <Skeleton className="h-10 w-full mt-2" />
+                      <div className="flex justify-between items-center mt-4">
+                          <Skeleton className="h-8 w-24" />
+                          <Skeleton className="h-8 w-24" />
+                      </div>
                   </CardContent>
               </Card>
           ))}
@@ -55,7 +56,7 @@ export default function DoctorsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 p-4">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Find a Doctor</h1>
         <p className="text-muted-foreground">Search for a specialist or browse our directory.</p>
@@ -69,7 +70,7 @@ export default function DoctorsPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {filteredDoctors.map((doctor) => (
           <DoctorCard key={doctor.id} doctor={doctor} />
         ))}

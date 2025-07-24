@@ -163,7 +163,7 @@ export default function AppointmentsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 p-4">
        <div>
         <h1 className="text-3xl font-bold tracking-tight">My Appointments</h1>
         <p className="text-muted-foreground">View and manage your appointments.</p>

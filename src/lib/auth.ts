@@ -13,6 +13,10 @@ export const signInWithGoogle = async (): Promise<User | null> => {
       console.log("Sign-in popup closed or cancelled by user.");
       return null;
     }
+    if (error.code === 'auth/unauthorized-domain') {
+        console.error("This domain is not authorized for Firebase authentication. Please add it to the list of authorized domains in the Firebase console.");
+        throw new Error("This domain is not authorized for authentication. Please add it to the Firebase Console's authorized domains list.");
+    }
     if (error.code === 'auth/configuration-not-found') {
         console.error("Firebase sign-in configuration is missing. Please enable the Google Sign-in provider in the Firebase console's Authentication section.");
         throw new Error("Google Sign-in is not enabled for this project. Please enable it in the Firebase Console.");

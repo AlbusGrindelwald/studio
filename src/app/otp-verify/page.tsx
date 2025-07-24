@@ -7,20 +7,60 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Logo } from '@/components/Logo';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { verifyOtp } from '@/lib/auth';
+import type { ConfirmationResult } from 'firebase/auth';
 
 function OtpVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phone = searchParams.get('phone');
+  const { toast } = useToast();
+  const [otp, setOtp] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push('/dashboard');
+    if (otp.length !== 6) {
+      toast({
+        title: 'Invalid OTP',
+        description: 'Please enter the 6-digit code.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const confirmationResult = (window as any).confirmationResult as ConfirmationResult;
+      if (!confirmationResult) {
+        throw new Error('Verification session not found. Please try logging in again.');
+      }
+      const user = await verifyOtp(confirmationResult, otp);
+      toast({
+        title: 'Verification Successful!',
+        description: `Welcome, ${user.phoneNumber}!`,
+      });
+      router.push('/dashboard/appointments');
+    } catch (error: any) {
+      toast({
+        title: 'Verification Failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
+  const handleOtpInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numericValue = e.target.value.replace(/[^0-9]/g, '');
+    setOtp(numericValue.slice(0, 6));
+  };
+
+
   return (
-     <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
           <Logo className="mx-auto mb-4 text-3xl" />
@@ -30,7 +70,7 @@ function OtpVerificationForm() {
             <CardTitle className="text-2xl">Enter Verification Code</CardTitle>
             <CardDescription>
               We have sent a code to your mobile number
-              {phone && <span className="font-bold text-foreground"> +XX XXXXX{phone.slice(5)}</span>}.
+              {phone && <span className="font-bold text-foreground"> +91 {phone}</span>}.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -38,17 +78,18 @@ function OtpVerificationForm() {
               <div className="space-y-2">
                 <Input
                   id="otp"
-                  type="text"
+                  type="tel"
                   inputMode="numeric"
-                  pattern="\d{6}"
-                  maxLength={6}
                   placeholder="Enter 6-digit code"
                   required
+                  value={otp}
+                  onChange={handleOtpInput}
                   className="text-center text-lg tracking-[0.5em]"
+                  disabled={isLoading}
                 />
               </div>
-              <Button type="submit" className="w-full">
-                Verify
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Verifying..." : "Verify"}
               </Button>
             </form>
             <div className="mt-4 text-center text-sm">
@@ -61,7 +102,7 @@ function OtpVerificationForm() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
 export default function OtpVerifyPage() {
@@ -69,5 +110,5 @@ export default function OtpVerifyPage() {
     <Suspense fallback={<div>Loading...</div>}>
       <OtpVerificationForm />
     </Suspense>
-  )
+  );
 }

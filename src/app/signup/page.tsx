@@ -23,6 +23,16 @@ export default function SignupPage() {
     // Handle signup logic here
     router.push('/login');
   };
+  
+  const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numeric digits and limit to 10 characters
+    if (value.length > 10) {
+      e.target.value = value.slice(0, 10);
+    } else {
+      e.target.value = value.replace(/[^0-9]/g, '');
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -58,10 +68,10 @@ export default function SignupPage() {
                   id="phone"
                   type="tel"
                   inputMode="numeric"
-                  pattern="[0-9]*"
                   maxLength={10}
                   placeholder="Enter 10-digit phone number"
                   required
+                  onInput={handlePhoneInput}
                 />
               </div>
               <div className="space-y-2">

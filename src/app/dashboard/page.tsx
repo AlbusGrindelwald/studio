@@ -1,9 +1,13 @@
+
+'use client';
+
 import Link from 'next/link';
 import { CalendarCheck, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { appointments } from '@/lib/data';
+import { appointments as mockAppointments } from '@/lib/data';
 import type { Appointment } from '@/lib/types';
+import { useEffect, useState } from 'react';
 
 function AppointmentCard({ appointment }: { appointment: Appointment }) {
   return (
@@ -27,7 +31,19 @@ function AppointmentCard({ appointment }: { appointment: Appointment }) {
 
 
 export default function DashboardPage() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setAppointments(mockAppointments);
+    setIsClient(true);
+  }, []);
+
   const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').slice(0, 2);
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-4">

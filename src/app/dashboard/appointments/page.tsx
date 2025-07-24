@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -107,7 +108,13 @@ function AppointmentCard({
 }
 
 export default function AppointmentsPage() {
-  const [appointments, setAppointments] = useState<Appointment[]>(mockAppointments);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setAppointments(mockAppointments);
+    setIsClient(true);
+  }, []);
 
   const handleCancelAppointment = (id: string) => {
     setAppointments(prev => 
@@ -120,6 +127,10 @@ export default function AppointmentsPage() {
   const filterAppointments = (status: Appointment['status']) => 
     appointments.filter(app => app.status === status);
 
+  if (!isClient) {
+    return null;
+  }
+    
   return (
     <div className="flex flex-col gap-6">
        <div>

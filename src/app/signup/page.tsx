@@ -31,13 +31,8 @@ export default function SignupPage() {
   };
 
   const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Allow only numeric digits and limit to 10 characters
-    if (value.length > 10) {
-      e.target.value = value.slice(0, 10);
-    } else {
-      e.target.value = value.replace(/[^0-9]/g, '');
-    }
+    const numericValue = e.target.value.replace(/[^0-9]/g, '');
+    e.target.value = numericValue.slice(0, 10);
   };
 
   return (

@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -8,9 +9,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import GoogleIcon from '@/components/GoogleIcon';
 import { Logo } from '@/components/Logo';
+import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,34 +36,38 @@ export default function LoginPage() {
             <CardDescription>Enter your mobile number to access your account</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="mobile">Mobile Number</Label>
-                <Input id="mobile" type="tel" placeholder="+1 (555) 000-0000" required />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Link href="#" className="text-sm font-medium text-primary hover:underline">
-                    Forgot password?
+            {isClient && (
+              <>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="mobile">Mobile Number</Label>
+                    <Input id="mobile" type="tel" placeholder="+1 (555) 000-0000" required />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Password</Label>
+                      <Link href="#" className="text-sm font-medium text-primary hover:underline">
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <Input id="password" type="password" required />
+                  </div>
+                  <Button type="submit" className="w-full">
+                    Login
+                  </Button>
+                  <Button variant="outline" className="w-full" type="button">
+                    <GoogleIcon className="mr-2 h-4 w-4" />
+                    Sign in with Google
+                  </Button>
+                </form>
+                <div className="mt-4 text-center text-sm">
+                  Don&apos;t have an account?{' '}
+                  <Link href="#" className="font-medium text-primary hover:underline">
+                    Sign up
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-              <Button variant="outline" className="w-full" type="button">
-                <GoogleIcon className="mr-2 h-4 w-4" />
-                Sign in with Google
-              </Button>
-            </form>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{' '}
-              <Link href="#" className="font-medium text-primary hover:underline">
-                Sign up
-              </Link>
-            </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>

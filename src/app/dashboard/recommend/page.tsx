@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -11,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Card, CardContent } from '@/components/ui/card';
 import { DoctorCard } from '@/components/doctors/DoctorCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { Doctor } from '@/lib/types';
 
 const formSchema = z.object({
   symptoms: z.string().min(10, 'Please describe your symptoms in at least 10 characters.'),
@@ -19,7 +21,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function RecommendPage() {
-  const [recommendations, setRecommendations] = useState<RecommendDoctorsOutput | null>(null);
+  const [recommendations, setRecommendations] = useState<Doctor[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +39,18 @@ export default function RecommendPage() {
 
     try {
       const result = await recommendDoctors({ symptoms: data.symptoms });
-      setRecommendations(result);
+      const recommendedDoctors: Doctor[] = result.doctors.map((doc, index) => ({
+        id: `rec-${index}`,
+        name: doc.name,
+        specialty: doc.specialty,
+        description: doc.description,
+        location: 'Various Locations',
+        rating: 4.5 + (index * 0.1) % 0.5, // deterministic rating
+        reviews: 50 + index * 10, // deterministic reviews
+        image: `https://placehold.co/128x128?text=${doc.name.charAt(0)}`,
+        availability: {}
+      }));
+      setRecommendations(recommendedDoctors);
     } catch (e) {
       setError('Sorry, we were unable to get recommendations at this time. Please try again later.');
       console.error(e);
@@ -113,22 +126,12 @@ export default function RecommendPage() {
         </Card>
       )}
 
-      {recommendations && recommendations.doctors.length > 0 && (
+      {recommendations && recommendations.length > 0 && (
          <div>
             <h2 className="text-2xl font-bold tracking-tight mb-4">Recommended Doctors</h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {recommendations.doctors.map((doc, index) => (
-                <DoctorCard key={index} doctor={{
-                    id: `${index + 100}`, // mock id
-                    name: doc.name,
-                    specialty: doc.specialty,
-                    description: doc.description,
-                    location: 'Various Locations',
-                    rating: 4.5 + (Math.random() * 0.5), // mock rating
-                    reviews: Math.floor(Math.random() * 200) + 50, // mock reviews
-                    image: `https://placehold.co/128x128?text=${doc.name.charAt(0)}`,
-                    availability: {}
-                }} />
+            {recommendations.map((doc) => (
+                <DoctorCard key={doc.id} doctor={doc} />
             ))}
             </div>
         </div>

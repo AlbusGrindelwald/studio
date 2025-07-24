@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { RescheduleDialog } from '@/components/appointments/RescheduleDialog';
 import { ReviewDialog } from '@/components/appointments/ReviewDialog';
+import { useRouter } from 'next/navigation';
 
 function AppointmentCard({
   appointment,
@@ -40,6 +41,7 @@ function AppointmentCard({
 }) {
   const { toast } = useToast();
   const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
+  const router = useRouter();
 
   const handleCancel = () => {
     onCancel(appointment.id);
@@ -51,6 +53,10 @@ function AppointmentCard({
 
   const handleReschedule = (newDate: string, newTime: string) => {
     onReschedule(appointment.id, newDate, newTime);
+  };
+  
+  const handleBookAgain = () => {
+    router.push(`/dashboard/doctors/${appointment.doctor.id}/book`);
   };
 
   return (
@@ -105,12 +111,15 @@ function AppointmentCard({
             </div>
           )}
           {appointment.status === 'completed' && (
-             <ReviewDialog
-                doctor={appointment.doctor}
-                trigger={
-                    <Button variant="outline" size="sm">Leave a Review</Button>
-                }
-            />
+             <div className="flex gap-2 w-full sm:w-auto">
+                <Button variant="secondary" size="sm" onClick={handleBookAgain} className="flex-1">Book Again</Button>
+                <ReviewDialog
+                    doctor={appointment.doctor}
+                    trigger={
+                        <Button variant="outline" size="sm" className="flex-1">Leave a Review</Button>
+                    }
+                />
+            </div>
           )}
           {appointment.status === 'canceled' && (
              <Badge variant="destructive">Canceled</Badge>

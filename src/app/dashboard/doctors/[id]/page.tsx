@@ -73,10 +73,6 @@ export default function DoctorDetailPage() {
     router.push(`/dashboard/doctors/${doctor.id}/book`);
   };
 
-  const specialities = [
-      'Cataract specialist', 'Eye diabetes', 'Conjunctivitis', 'Pre cataract', 'Foreign body', 'Eye check up', 'Refraction'
-  ]
-
   return (
     <div className="flex flex-col h-screen bg-muted/40">
       <header className="bg-primary text-primary-foreground p-4 flex items-center gap-4 fixed top-0 left-0 right-0 z-10">
@@ -111,7 +107,7 @@ export default function DoctorDetailPage() {
         <section>
             <h3 className="font-semibold mb-3">Speciality</h3>
             <div className="flex flex-wrap gap-2">
-                {specialities.map(s => <Badge key={s} variant="outline" className="py-1 px-3 rounded-full border-primary text-primary">{s}</Badge>)}
+                {doctor.specialities.map(s => <Badge key={s} variant="outline" className="py-1 px-3 rounded-full border-primary text-primary">{s}</Badge>)}
             </div>
         </section>
 

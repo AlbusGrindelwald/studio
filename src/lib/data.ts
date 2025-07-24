@@ -15,7 +15,8 @@ export const doctors: Doctor[] = [
       '2024-08-15': ['09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM'],
       '2024-08-16': ['09:30 AM', '11:30 AM', '01:30 PM', '03:00 PM'],
       '2024-08-17': ['10:00 AM', '12:00 PM'],
-    }
+    },
+    specialities: ['Hypertension', 'Heart Failure', 'Echocardiography', 'Coronary Artery Disease']
   },
   {
     id: '2',
@@ -30,7 +31,8 @@ export const doctors: Doctor[] = [
       '2024-08-15': ['08:00 AM', '08:30 AM', '09:00 AM'],
       '2024-08-18': ['01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM'],
       '2024-08-19': ['10:00 AM', '10:30 AM', '11:00 AM'],
-    }
+    },
+    specialities: ['Acne Treatment', 'Eczema Care', 'Skin Cancer Screening', 'Cosmetic Dermatology']
   },
   {
     id: '3',
@@ -45,7 +47,8 @@ export const doctors: Doctor[] = [
       '2024-08-16': ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM'],
       '2024-08-17': ['09:00 AM', '10:00 AM'],
       '2024-08-20': ['02:00 PM', '03:00 PM', '04:00 PM'],
-    }
+    },
+    specialities: ['Well-child visits', 'Vaccinations', 'Childhood Illnesses', 'Developmental Screening']
   },
   {
     id: '4',
@@ -60,7 +63,8 @@ export const doctors: Doctor[] = [
       '2024-08-15': ['11:00 AM', '03:00 PM'],
       '2024-08-18': ['09:00 AM', '10:00 AM', '11:00 AM'],
       '2024-08-21': ['08:00 AM', '09:00 AM'],
-    }
+    },
+    specialities: ['Sports Injuries', 'Joint Replacement', 'Arthroscopic Surgery', 'Fracture Care']
   },
 ];
 

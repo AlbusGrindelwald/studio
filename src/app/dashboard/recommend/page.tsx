@@ -58,7 +58,8 @@ export default function RecommendPage() {
           rating: 4.7, 
           reviews: 100, 
           image: `https://placehold.co/128x128?text=${doc.name.charAt(0)}`,
-          availability: {}
+          availability: {},
+          specialities: [doc.specialty],
         };
       });
 

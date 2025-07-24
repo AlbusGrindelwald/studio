@@ -8,6 +8,7 @@ export interface Doctor {
   image: string;
   description: string;
   availability: Record<string, string[]>;
+  specialities: string[];
 }
 
 export interface Appointment {

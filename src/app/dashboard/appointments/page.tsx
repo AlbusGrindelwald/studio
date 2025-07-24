@@ -27,6 +27,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { RescheduleDialog } from '@/components/appointments/RescheduleDialog';
+import { ReviewDialog } from '@/components/appointments/ReviewDialog';
 
 function AppointmentCard({
   appointment,
@@ -104,7 +105,12 @@ function AppointmentCard({
             </div>
           )}
           {appointment.status === 'completed' && (
-            <Button variant="outline" size="sm">Leave a Review</Button>
+             <ReviewDialog
+                doctor={appointment.doctor}
+                trigger={
+                    <Button variant="outline" size="sm">Leave a Review</Button>
+                }
+            />
           )}
           {appointment.status === 'canceled' && (
              <Badge variant="destructive">Canceled</Badge>

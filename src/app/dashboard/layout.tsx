@@ -19,7 +19,7 @@ const navItems = [
   { href: '/dashboard/doctors', label: 'Doctors', icon: Stethoscope },
   { href: '/dashboard/appointments', label: 'Appointments', icon: CalendarCheck },
   { href: '/dashboard/recommend', label: 'AI', icon: BrainCircuit },
-  { href: '/login', label: 'Profile', icon: User }, // Assuming login is profile for now
+  { href: '/dashboard/profile', label: 'Profile', icon: User },
 ];
 
 function BottomNavBar() {

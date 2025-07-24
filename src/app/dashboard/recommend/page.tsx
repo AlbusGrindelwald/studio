@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { recommendDoctors, RecommendDoctorsOutput } from '@/ai/flows/doctor-recommendation';
+import { recommendDoctors } from '@/ai/flows/doctor-recommendation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -13,6 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DoctorCard } from '@/components/doctors/DoctorCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Doctor } from '@/lib/types';
+import { doctors as allDoctors } from '@/lib/data';
 
 const formSchema = z.object({
   symptoms: z.string().min(10, 'Please describe your symptoms in at least 10 characters.'),
@@ -39,17 +40,28 @@ export default function RecommendPage() {
 
     try {
       const result = await recommendDoctors({ symptoms: data.symptoms });
-      const recommendedDoctors: Doctor[] = result.doctors.map((doc, index) => ({
-        id: `rec-${index}`,
-        name: doc.name,
-        specialty: doc.specialty,
-        description: doc.description,
-        location: 'Various Locations',
-        rating: 4.5 + (index * 0.1) % 0.5, // deterministic rating
-        reviews: 50 + index * 10, // deterministic reviews
-        image: `https://placehold.co/128x128?text=${doc.name.charAt(0)}`,
-        availability: {}
-      }));
+      
+      const recommendedDoctors: Doctor[] = result.doctors.map((doc) => {
+        // Try to find a matching doctor from the existing list
+        const existingDoctor = allDoctors.find(d => d.name === doc.name && d.specialty === doc.specialty);
+        if (existingDoctor) {
+          return existingDoctor;
+        }
+        
+        // If no match is found, create a temporary one (though less ideal)
+        return {
+          id: `rec-${doc.name.replace(/\s+/g, '-')}`,
+          name: doc.name,
+          specialty: doc.specialty,
+          description: doc.description,
+          location: 'Various Locations',
+          rating: 4.7, 
+          reviews: 100, 
+          image: `https://placehold.co/128x128?text=${doc.name.charAt(0)}`,
+          availability: {}
+        };
+      });
+
       setRecommendations(recommendedDoctors);
     } catch (e) {
       setError('Sorry, we were unable to get recommendations at this time. Please try again later.');

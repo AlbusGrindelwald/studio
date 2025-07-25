@@ -2,18 +2,15 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarCheck, ChevronRight, Search, User, Stethoscope, Bell } from 'lucide-react';
+import { CalendarCheck, ChevronRight, Search, User, Stethoscope, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAppointments, subscribe as subscribeAppointments } from '@/lib/appointments';
-import { getNotifications, subscribe as subscribeNotifications } from '@/lib/notifications';
 import type { Appointment } from '@/lib/types';
-import type { Notification } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
 
 function AppointmentCard({ appointment }: { appointment: Appointment }) {
   const router = useRouter();
@@ -44,7 +41,6 @@ function AppointmentCard({ appointment }: { appointment: Appointment }) {
 
 export default function DashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
@@ -52,26 +48,19 @@ export default function DashboardPage() {
     const handleAppointmentsChange = () => {
       setAppointments(getAppointments());
     };
-     const handleNotificationsChange = () => {
-      setNotifications(getNotifications());
-    };
 
     const unsubscribeAppointments = subscribeAppointments(handleAppointmentsChange);
-    const unsubscribeNotifications = subscribeNotifications(handleNotificationsChange);
     
     handleAppointmentsChange(); // Initial fetch
-    handleNotificationsChange(); // Initial fetch
     
     setIsClient(true);
     
     return () => {
         unsubscribeAppointments();
-        unsubscribeNotifications();
     }
   }, []);
 
   const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').slice(0, 1);
-  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
 
   if (!isClient) {
     return null;
@@ -85,12 +74,9 @@ export default function DashboardPage() {
           <p className="text-muted-foreground">How are you feeling today?</p>
         </div>
         <div className="relative">
-            <Button variant="outline" size="icon" className="rounded-full" onClick={() => router.push('/dashboard/notifications')}>
-                <Bell className="h-5 w-5" />
+            <Button variant="outline" size="icon" className="rounded-full" onClick={() => router.push('/dashboard/wishlist')}>
+                <Heart className="h-5 w-5" />
             </Button>
-            {unreadNotificationsCount > 0 && (
-                 <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{unreadNotificationsCount}</Badge>
-            )}
         </div>
       </header>
 

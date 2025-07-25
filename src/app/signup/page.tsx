@@ -33,8 +33,24 @@ export default function SignupPage() {
     setIsClient(true);
   }, []);
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numbers and limit to 10 digits
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setPhone(value);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (phone.length !== 10) {
+      toast({
+        title: 'Invalid Mobile Number',
+        description: 'Please enter a 10-digit mobile number.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setIsLoading(true);
     try {
       createUser({ name, email, password, phone });
@@ -94,10 +110,11 @@ export default function SignupPage() {
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="Your mobile number"
+                  placeholder="Your 10-digit mobile number"
                   required
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={handlePhoneChange}
+                  maxLength={10}
                   disabled={isLoading}
                 />
               </div>

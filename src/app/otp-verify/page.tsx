@@ -29,8 +29,8 @@ function OtpVerificationForm() {
 
   // Effect for non-Google sign-in or when phone number is already present
   useEffect(() => {
-    if (isClient && (!isGoogleSignIn || (isGoogleSignIn && initialIdentifier))) {
-      handleSendOtp();
+    if (isClient && !isGoogleSignIn && initialIdentifier) {
+      handleSendOtp(false); // don't show toast for regular login
     }
   }, [isClient, isGoogleSignIn, initialIdentifier]);
 
@@ -44,16 +44,8 @@ function OtpVerificationForm() {
     }
   }, [otpSent, resendTimer]);
 
-  const handleSendOtp = () => {
-    if (isGoogleSignIn && !phone) {
-      toast({
-        title: 'Mobile Number Required',
-        description: 'Please enter a valid 10-digit mobile number.',
-        variant: 'destructive',
-      });
-      return;
-    }
-     if (isGoogleSignIn && phone.length !== 10) {
+  const handleSendOtp = (showToast = true) => {
+    if (phone.length !== 10) {
       toast({
         title: 'Invalid Mobile Number',
         description: 'Please enter a valid 10-digit mobile number.',
@@ -62,10 +54,12 @@ function OtpVerificationForm() {
       return;
     }
     
-    toast({
-      title: "OTP 'Sent'",
-      description: "Check console for mock OTP. Use 123456 to verify.",
-    });
+    if(showToast) {
+        toast({
+        title: "OTP 'Sent'",
+        description: "Check console for mock OTP. Use 123456 to verify.",
+        });
+    }
     setOtpSent(true);
     setResendTimer(55);
   };
@@ -111,7 +105,9 @@ function OtpVerificationForm() {
       if (otpCode === "123456" && userId) {
         const user = findUserById(userId);
         if (user) {
-          updateUserWithPhone(user.id, phone);
+          if (isGoogleSignIn && !user.phone) {
+             updateUserWithPhone(user.id, phone);
+          }
           loginUser(user.id);
         }
 
@@ -185,7 +181,7 @@ function OtpVerificationForm() {
                       className="text-center"
                       maxLength={10}
                   />
-                  <Button onClick={handleSendOtp} disabled={otpSent || isLoading || phone.length !== 10}>Send</Button>
+                  <Button onClick={() => handleSendOtp()} disabled={otpSent || isLoading || phone.length !== 10}>Send</Button>
                </div>
             </div>
         )}

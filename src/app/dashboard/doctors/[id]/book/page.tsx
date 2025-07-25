@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
+import { addNotification } from '@/lib/notifications';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -67,19 +68,35 @@ export default function BookAppointmentPage() {
   const handleConfirmBooking = () => {
     if (!selectedDate || !selectedTime) return;
 
-    addAppointment({
-      doctorId: doctor.id,
-      date: selectedDate,
-      time: selectedTime,
-    });
+    try {
+      addAppointment({
+        doctorId: doctor.id,
+        date: selectedDate,
+        time: selectedTime,
+      });
+
+      toast({
+        title: 'Appointment Booked!',
+        description: `Your appointment with ${doctor.name} on ${format(parseISO(selectedDate), 'MMM d, yyyy')} at ${selectedTime} is confirmed.`,
+      });
+      
+      router.push('/dashboard/appointments');
+
+    } catch (error: any) {
+        toast({
+            title: 'Booking Failed Please Try Again',
+            description: 'May be Network delay and having some errors please try again thank you...',
+            variant: 'destructive'
+        });
+        addNotification({
+            title: 'Booking Failed',
+            description: `Your appointment with ${doctor.name} could not be booked. Please try again.`,
+            type: 'destructive'
+        });
+    }
+
 
     setIsConfirming(false);
-    toast({
-      title: 'Appointment Booked!',
-      description: `Your appointment with ${doctor.name} on ${format(parseISO(selectedDate), 'MMM d, yyyy')} at ${selectedTime} is confirmed.`,
-    });
-    
-    router.push('/dashboard/appointments');
   };
   
   const allTimeSlots = selectedDate ? doctor.availability[selectedDate] : [];

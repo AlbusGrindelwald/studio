@@ -23,6 +23,11 @@ export const addAppointment = (newAppointment: {
     throw new Error('Doctor not found');
   }
 
+  // Simulate a booking failure for a specific doctor and time
+  if (doctor.id === '1' && newAppointment.time === '02:00 PM') {
+    throw new Error('Booking Failed: This slot is no longer available.');
+  }
+
   const appointment: Appointment = {
     id: `A${appointments.length + 1}`,
     doctor,

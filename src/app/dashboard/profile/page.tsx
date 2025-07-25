@@ -37,7 +37,7 @@ export default function ProfilePage() {
   }, []);
 
   const menuItems = [
-    { icon: Bell, text: 'Notification', href: '#' },
+    { icon: Bell, text: 'Notification', href: '/dashboard/notifications' },
     { icon: HelpCircle, text: 'Help and support', href: '/dashboard/help' },
     { icon: Users, text: 'Invite friends', href: '#' },
   ];

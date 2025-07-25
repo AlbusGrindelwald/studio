@@ -18,3 +18,12 @@ export interface Appointment {
   time: string;
   status: 'upcoming' | 'completed' | 'canceled';
 }
+
+export interface Notification {
+  id: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  read: boolean;
+  type: 'success' | 'destructive' | 'info';
+}

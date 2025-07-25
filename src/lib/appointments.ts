@@ -1,5 +1,7 @@
 import type { Appointment } from './types';
 import { doctors, appointments as mockAppointments } from './data';
+import { addNotification } from './notifications';
+import { format, parseISO } from 'date-fns';
 
 let appointments: Appointment[] = [...mockAppointments];
 
@@ -30,21 +32,50 @@ export const addAppointment = (newAppointment: {
   };
 
   appointments = [appointment, ...appointments];
+
+  addNotification({
+      title: 'Appointment Booked!',
+      description: `Your appointment with ${doctor.name} on ${format(parseISO(newAppointment.date), 'MMM d, yyyy')} at ${newAppointment.time} is confirmed.`,
+      type: 'success'
+  });
+
   notifyListeners();
   return appointment;
 };
 
 export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'completed' | 'canceled') => {
+    const appointment = appointments.find(app => app.id === id);
+    if (!appointment) return;
+    
     appointments = appointments.map(app => 
         app.id === id ? { ...app, status } : app
     );
+
+    if (status === 'canceled') {
+        addNotification({
+            title: 'Appointment Canceled',
+            description: `Your appointment with ${appointment.doctor.name} on ${format(parseISO(appointment.date), 'MMM d, yyyy')} has been canceled.`,
+            type: 'destructive'
+        });
+    }
+
     notifyListeners();
 };
 
 export const rescheduleAppointment = (id: string, newDate: string, newTime: string) => {
+    const appointment = appointments.find(app => app.id === id);
+    if (!appointment) return;
+    
     appointments = appointments.map(app =>
         app.id === id ? { ...app, date: newDate, time: newTime } : app
     );
+    
+    addNotification({
+        title: 'Appointment Rescheduled',
+        description: `Your appointment with ${appointment.doctor.name} has been moved to ${format(parseISO(newDate), 'MMM d, yyyy')} at ${newTime}.`,
+        type: 'info'
+    });
+
     notifyListeners();
 }
 

@@ -1,6 +1,10 @@
+
+import type { User } from './user';
+
 export interface Doctor {
   id: string;
   name: string;
+  email: string;
   specialty: string;
   location: string;
   rating: number;
@@ -14,6 +18,7 @@ export interface Doctor {
 export interface Appointment {
   id: string;
   doctor: Doctor;
+  user: User;
   date: string;
   time: string;
   status: 'upcoming' | 'completed' | 'canceled';

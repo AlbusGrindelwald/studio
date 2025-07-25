@@ -1,5 +1,6 @@
+
 import type { Appointment } from './types';
-import { doctors, appointments as mockAppointments } from './data';
+import { doctors, appointments as mockAppointments, findUserByEmail, findUserById } from './data';
 import { addNotification } from './notifications';
 import { format, parseISO } from 'date-fns';
 
@@ -13,14 +14,24 @@ export const getAppointments = (): Appointment[] => {
   return appointments;
 };
 
+export const getAppointmentsForDoctor = (doctorEmail: string): Appointment[] => {
+    return appointments.filter(app => app.doctor.email === doctorEmail);
+}
+
 export const addAppointment = (newAppointment: {
   doctorId: string;
   date: string;
   time: string;
+  userId: string;
 }) => {
   const doctor = doctors.find(d => d.id === newAppointment.doctorId);
   if (!doctor) {
     throw new Error('Doctor not found');
+  }
+
+  const user = findUserById(newAppointment.userId);
+  if(!user) {
+    throw new Error('User not found');
   }
 
   // Simulate a booking failure for a specific doctor and time
@@ -31,6 +42,7 @@ export const addAppointment = (newAppointment: {
   const appointment: Appointment = {
     id: `A${appointments.length + 1}`,
     doctor,
+    user,
     date: newAppointment.date,
     time: newAppointment.time,
     status: 'upcoming',

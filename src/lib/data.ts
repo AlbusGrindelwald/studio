@@ -1,10 +1,12 @@
 
-import type { Doctor, Appointment } from './types';
+import type { Appointment, Doctor } from './types';
+import { User, getUsers } from './user';
 
 export const doctors: Doctor[] = [
   {
     id: '1',
     name: 'Dr. Evelyn Reed',
+    email: 'evelyn.reed@shedula.com',
     specialty: 'Cardiologist',
     location: 'Springfield, IL',
     rating: 4.9,
@@ -21,6 +23,7 @@ export const doctors: Doctor[] = [
   {
     id: '2',
     name: 'Dr. Marcus Thorne',
+    email: 'marcus.thorne@shedula.com',
     specialty: 'Dermatologist',
     location: 'Metropolis, NY',
     rating: 4.8,
@@ -37,6 +40,7 @@ export const doctors: Doctor[] = [
   {
     id: '3',
     name: 'Dr. Lena Petrova',
+    email: 'lena.petrova@shedula.com',
     specialty: 'Pediatrician',
     location: 'Oakwood, CA',
     rating: 5.0,
@@ -53,6 +57,7 @@ export const doctors: Doctor[] = [
   {
     id: '4',
     name: 'Dr. Samuel Chen',
+    email: 'samuel.chen@shedula.com',
     specialty: 'Orthopedic Surgeon',
     location: 'Rivertown, TX',
     rating: 4.7,
@@ -68,10 +73,17 @@ export const doctors: Doctor[] = [
   },
 ];
 
+// Re-exporting from user.ts to avoid circular dependencies
+export { findUserById, findUserByEmailOrPhone as findUserByEmail } from './user';
+
+const allUsers = getUsers();
+const patientUser = allUsers.find(u => u.email === 'patient@shedula.com') || allUsers[0];
+
 export const appointments: Appointment[] = [
   {
     id: 'A1',
     doctor: doctors[0],
+    user: patientUser,
     date: '2024-08-25',
     time: '10:00 AM',
     status: 'upcoming',
@@ -79,6 +91,7 @@ export const appointments: Appointment[] = [
   {
     id: 'A2',
     doctor: doctors[2],
+    user: patientUser,
     date: '2024-09-02',
     time: '11:00 AM',
     status: 'upcoming',
@@ -86,9 +99,18 @@ export const appointments: Appointment[] = [
   {
     id: 'A3',
     doctor: doctors[1],
+    user: patientUser,
     date: '2024-07-20',
     time: '01:30 PM',
     status: 'completed',
+  },
+   {
+    id: 'A4',
+    doctor: doctors[0],
+    user: patientUser,
+    date: '2024-07-18',
+    time: '02:00 PM',
+    status: 'canceled',
   },
 ];
 

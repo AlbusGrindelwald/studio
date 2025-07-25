@@ -21,6 +21,8 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';
+import { getLoggedInUser } from '@/lib/user';
+import type { User } from '@/lib/user';
 
 export default function BookAppointmentPage() {
   const params = useParams();
@@ -29,6 +31,7 @@ export default function BookAppointmentPage() {
   const doctor = findDoctorById(id);
   const { toast } = useToast();
 
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -36,6 +39,16 @@ export default function BookAppointmentPage() {
 
   const selectedSlotRef = useRef({ date: selectedDate, time: selectedTime, doctorName: doctor?.name });
   selectedSlotRef.current = { date: selectedDate, time: selectedTime, doctorName: doctor?.name };
+
+  useEffect(() => {
+    const user = getLoggedInUser();
+    if (!user) {
+        // Redirect to login if not authenticated
+        router.push('/login');
+    } else {
+        setCurrentUser(user);
+    }
+  }, [router]);
 
 
   useEffect(() => {
@@ -92,13 +105,14 @@ export default function BookAppointmentPage() {
   };
 
   const handleConfirmBooking = () => {
-    if (!selectedDate || !selectedTime) return;
+    if (!selectedDate || !selectedTime || !currentUser) return;
 
     try {
       addAppointment({
         doctorId: doctor.id,
         date: selectedDate,
         time: selectedTime,
+        userId: currentUser.id
       });
 
       setBookingConfirmed(true); // Mark booking as confirmed

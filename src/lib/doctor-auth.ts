@@ -4,16 +4,30 @@ export interface DoctorUser {
   name: string;
   email: string;
   password?: string;
+  publicId?: string; // Links to the public Doctor profile
 }
 
 const DOCTOR_USERS_KEY = 'shedula_doctor_users';
 const LOGGED_IN_DOCTOR_KEY = 'shedula_logged_in_doctor';
 let doctorListeners: (() => void)[] = [];
 
+// Initial hardcoded doctor users linked to public profiles
+const initialDoctorUsers: DoctorUser[] = [
+    { id: 'doc_auth_1', name: 'Dr. Evelyn Reed', email: 'evelyn.reed@shedula.com', password: 'password', publicId: '1' },
+    { id: 'doc_auth_2', name: 'Dr. Marcus Thorne', email: 'marcus.thorne@shedula.com', password: 'password', publicId: '2' },
+    { id: 'doc_auth_3', name: 'Dr. Lena Petrova', email: 'lena.petrova@shedula.com', password: 'password', publicId: '3' },
+    { id: 'doc_auth_4', name: 'Dr. Samuel Chen', email: 'samuel.chen@shedula.com', password: 'password', publicId: '4' },
+];
+
 const getDoctorUsers = (): DoctorUser[] => {
   if (typeof window === 'undefined') return [];
   const usersJson = localStorage.getItem(DOCTOR_USERS_KEY);
-  return usersJson ? JSON.parse(usersJson) : [];
+  if (!usersJson) {
+      // Initialize with hardcoded data if none exists
+      saveDoctorUsers(initialDoctorUsers);
+      return initialDoctorUsers;
+  }
+  return JSON.parse(usersJson);
 };
 
 const saveDoctorUsers = (users: DoctorUser[]) => {
@@ -37,6 +51,25 @@ export const createDoctor = (newDoctor: Omit<DoctorUser, 'id'>) => {
   saveDoctorUsers(doctors);
   return doctor;
 };
+
+export const updateDoctor = (id: string, updates: Partial<Omit<DoctorUser, 'id'>>) => {
+    let doctors = getDoctorUsers();
+    let updatedDoctor: DoctorUser | null = null;
+    const newDoctors = doctors.map(d => {
+        if(d.id === id) {
+            updatedDoctor = { ...d, ...updates };
+            return updatedDoctor;
+        }
+        return d;
+    });
+
+    if (!updatedDoctor) {
+        throw new Error('Doctor not found');
+    }
+    
+    saveDoctorUsers(newDoctors);
+    return updatedDoctor;
+}
 
 export const findDoctorByEmail = (email: string): DoctorUser | undefined => {
   const doctors = getDoctorUsers();

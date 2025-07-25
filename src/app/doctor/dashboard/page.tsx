@@ -2,38 +2,28 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { getLoggedInDoctor, logoutDoctor } from '@/lib/doctor-auth';
+import { getLoggedInDoctor } from '@/lib/doctor-auth';
 import { useEffect, useState, useMemo } from 'react';
 import type { DoctorUser } from '@/lib/doctor-auth';
 import { getAppointmentsForDoctor } from '@/lib/appointments';
 import type { Appointment } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DoctorAppointmentCard } from '@/components/doctor/AppointmentCard';
-import { Logo } from '@/components/Logo';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { LogOut, User as UserIcon } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Users, CalendarCheck, CircleX } from 'lucide-react';
 
 function DoctorDashboardSkeleton() {
     return (
-        <div className="flex flex-col min-h-screen w-full bg-muted/40">
-            <header className="bg-background p-4 flex items-center justify-between border-b sticky top-0 z-10">
-                <Logo className="text-2xl" />
-                <Skeleton className="h-10 w-10 rounded-full" />
+        <div className="flex flex-col flex-1">
+            <header className="bg-background p-4 flex items-center justify-between border-b sticky top-0 z-10 h-16">
+                 <Skeleton className="h-8 w-48" />
             </header>
             <main className="flex-1 p-4 md:p-6">
-                <div className="mb-6">
-                    <Skeleton className="h-8 w-64 mb-2" />
-                    <Skeleton className="h-4 w-96" />
+                <div className="grid gap-4 md:grid-cols-3 mb-6">
+                    <Skeleton className="h-28 w-full" />
+                    <Skeleton className="h-28 w-full" />
+                    <Skeleton className="h-28 w-full" />
                 </div>
                 <div className="grid w-full grid-cols-3 gap-2 mb-4">
                     <Skeleton className="h-10" />
@@ -59,19 +49,13 @@ export default function DoctorDashboardPage() {
 
   useEffect(() => {
     const loggedInDoctor = getLoggedInDoctor();
-    if (!loggedInDoctor) {
-      router.push('/doctor/login');
-    } else {
+    if (loggedInDoctor) {
       setDoctor(loggedInDoctor);
       setAppointments(getAppointmentsForDoctor(loggedInDoctor.email));
     }
     setIsClient(true);
-  }, [router]);
+  }, []);
 
-  const handleLogout = () => {
-    logoutDoctor();
-    router.push('/doctor/login');
-  };
 
   const filteredAppointments = useMemo(() => {
     return {
@@ -84,43 +68,44 @@ export default function DoctorDashboardPage() {
   if (!isClient || !doctor) {
     return <DoctorDashboardSkeleton />;
   }
+  
+  const totalPatients = new Set(appointments.map(a => a.user.id)).size;
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-muted/40">
-        <header className="bg-background p-4 flex items-center justify-between border-b sticky top-0 z-10">
-            <Logo className="text-2xl" />
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                        <Avatar className="h-10 w-10">
-                            <AvatarFallback>
-                               <UserIcon />
-                            </AvatarFallback>
-                        </Avatar>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{doctor.name}</p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                        {doctor.email}
-                        </p>
-                    </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span>Log out</span>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+    <div className="flex flex-col flex-1">
+        <header className="bg-background p-4 flex items-center justify-between border-b sticky top-0 z-10 h-16">
+            <h1 className="text-xl font-bold tracking-tight">Dashboard</h1>
         </header>
 
         <main className="flex-1 p-4 md:p-6">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold tracking-tight">Welcome, {doctor.name}</h1>
-                <p className="text-muted-foreground">Here are your appointments for today and beyond.</p>
+            <div className="grid gap-4 md:grid-cols-3 mb-6">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{totalPatients}</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Upcoming Appointments</CardTitle>
+                        <CalendarCheck className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{filteredAppointments.upcoming.length}</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Canceled Appointments</CardTitle>
+                        <CircleX className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{filteredAppointments.canceled.length}</div>
+                    </CardContent>
+                </Card>
             </div>
             
             <Tabs defaultValue="upcoming" className="w-full">

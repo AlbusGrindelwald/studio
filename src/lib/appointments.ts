@@ -1,8 +1,9 @@
 
-import type { Appointment } from './types';
+import type { Appointment, Doctor } from './types';
 import { doctors, appointments as mockAppointments, findUserByEmail, findUserById } from './data';
 import { addNotification } from './notifications';
 import { format, parseISO } from 'date-fns';
+import { User } from './user';
 
 let appointments: Appointment[] = [...mockAppointments];
 
@@ -16,6 +17,19 @@ export const getAppointments = (): Appointment[] => {
 
 export const getAppointmentsForDoctor = (doctorEmail: string): Appointment[] => {
     return appointments.filter(app => app.doctor.email === doctorEmail);
+}
+
+export const getPatientsForDoctor = (doctorEmail: string): User[] => {
+    const doctorAppointments = getAppointmentsForDoctor(doctorEmail);
+    const patientIds = new Set(doctorAppointments.map(app => app.user.id));
+    const uniquePatients: User[] = [];
+    patientIds.forEach(id => {
+        const user = findUserById(id);
+        if (user) {
+            uniquePatients.push(user);
+        }
+    });
+    return uniquePatients;
 }
 
 export const addAppointment = (newAppointment: {

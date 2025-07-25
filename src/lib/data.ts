@@ -2,7 +2,7 @@
 import type { Appointment, Doctor } from './types';
 import { User, getUsers } from './user';
 
-export const doctors: Doctor[] = [
+export let doctors: Doctor[] = [
   {
     id: '1',
     name: 'Dr. Evelyn Reed',
@@ -114,4 +114,43 @@ export const appointments: Appointment[] = [
   },
 ];
 
-export const findDoctorById = (id: string) => doctors.find(doctor => doctor.id === id);
+export const findDoctorById = (id: string): Doctor | undefined => {
+  return doctors.find(doctor => doctor.id === id);
+}
+
+export const updatePublicDoctor = (id: string, updatedData: Partial<Doctor>): Doctor => {
+  let updatedDoctor: Doctor | undefined;
+  doctors = doctors.map(doc => {
+    if (doc.id === id) {
+      updatedDoctor = { ...doc, ...updatedData };
+      return updatedDoctor;
+    }
+    return doc;
+  });
+
+  if (!updatedDoctor) {
+    throw new Error('Doctor not found to update');
+  }
+
+  return updatedDoctor;
+};
+
+export const updateDoctorAvailability = (doctorId: string, date: string, slots: string[]): Doctor => {
+    let updatedDoctor: Doctor | undefined;
+    doctors = doctors.map(doc => {
+        if (doc.id === doctorId) {
+            const newAvailability = { ...doc.availability, [date]: slots };
+            if (slots.length === 0) {
+                delete newAvailability[date];
+            }
+            updatedDoctor = { ...doc, availability: newAvailability };
+            return updatedDoctor;
+        }
+        return doc;
+    });
+
+    if (!updatedDoctor) {
+        throw new Error('Doctor not found');
+    }
+    return updatedDoctor;
+}

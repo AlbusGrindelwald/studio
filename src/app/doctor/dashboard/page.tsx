@@ -21,6 +21,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function DoctorDashboardSkeleton() {
+    return (
+        <div className="flex flex-col min-h-screen w-full bg-muted/40">
+            <header className="bg-background p-4 flex items-center justify-between border-b sticky top-0 z-10">
+                <Logo className="text-2xl" />
+                <Skeleton className="h-10 w-10 rounded-full" />
+            </header>
+            <main className="flex-1 p-4 md:p-6">
+                <div className="mb-6">
+                    <Skeleton className="h-8 w-64 mb-2" />
+                    <Skeleton className="h-4 w-96" />
+                </div>
+                <div className="grid w-full grid-cols-3 gap-2 mb-4">
+                    <Skeleton className="h-10" />
+                    <Skeleton className="h-10" />
+                    <Skeleton className="h-10" />
+                </div>
+                <div className="space-y-4 pt-4">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                </div>
+            </main>
+        </div>
+    );
+}
+
 
 export default function DoctorDashboardPage() {
   const router = useRouter();
@@ -53,7 +82,7 @@ export default function DoctorDashboardPage() {
   }, [appointments]);
 
   if (!isClient || !doctor) {
-    return <div>Loading...</div>; // Or a proper skeleton loader
+    return <DoctorDashboardSkeleton />;
   }
 
   return (

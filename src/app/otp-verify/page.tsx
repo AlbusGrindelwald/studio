@@ -1,7 +1,6 @@
 
 'use client';
 
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Suspense, useEffect, useState, useRef } from 'react';
@@ -20,32 +19,59 @@ function OtpVerificationForm() {
   const isGoogleSignIn = searchParams.get('isGoogleSignIn') === 'true';
 
   const { toast } = useToast();
-  const [otp, setOtp] = useState<string[]>(['', '', '', '','','']);
+  const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
   const [phone, setPhone] = useState(initialIdentifier || '');
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [resendTimer, setResendTimer] = useState(55);
+  const [resendTimer, setResendTimer] = useState(0);
+  const [otpSent, setOtpSent] = useState(false);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
+  // Effect for non-Google sign-in or when phone number is already present
   useEffect(() => {
-    setIsClient(true);
+    if (isClient && (!isGoogleSignIn || (isGoogleSignIn && initialIdentifier))) {
+      handleSendOtp();
+    }
+  }, [isClient, isGoogleSignIn, initialIdentifier]);
+
+  // Effect for countdown timer
+  useEffect(() => {
+    if (otpSent && resendTimer > 0) {
+      const timer = setInterval(() => {
+        setResendTimer((prev) => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [otpSent, resendTimer]);
+
+  const handleSendOtp = () => {
+    if (isGoogleSignIn && !phone) {
+      toast({
+        title: 'Mobile Number Required',
+        description: 'Please enter a valid 10-digit mobile number.',
+        variant: 'destructive',
+      });
+      return;
+    }
+     if (isGoogleSignIn && phone.length !== 10) {
+      toast({
+        title: 'Invalid Mobile Number',
+        description: 'Please enter a valid 10-digit mobile number.',
+        variant: 'destructive',
+      });
+      return;
+    }
     
-    // Show toast and start timer on mount
     toast({
-        title: "OTP 'Sent'",
-        description: "Check console for mock OTP. Use 123456 to verify.",
+      title: "OTP 'Sent'",
+      description: "Check console for mock OTP. Use 123456 to verify.",
     });
-
-    const timer = setInterval(() => {
-      setResendTimer((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [toast]);
+    setOtpSent(true);
+    setResendTimer(55);
+  };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow only numbers and limit to 10 digits
     if (/^\d*$/.test(value) && value.length <= 10) {
       setPhone(value);
     }
@@ -57,7 +83,6 @@ function OtpVerificationForm() {
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Move to next input
     if (value && index < 5) {
       inputsRef.current[index + 1]?.focus();
     }
@@ -80,33 +105,16 @@ function OtpVerificationForm() {
       });
       return;
     }
-    if (!phone && isGoogleSignIn) {
-      toast({
-        title: 'Mobile Number Required',
-        description: 'Please enter your mobile number to continue.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (isGoogleSignIn && phone.length !== 10) {
-      toast({
-        title: 'Invalid Mobile Number',
-        description: 'Please enter a valid 10-digit mobile number.',
-        variant: 'destructive',
-      });
-      return;
-    }
 
     setIsLoading(true);
     try {
-      if (otpCode === "123456" && userId) { 
+      if (otpCode === "123456" && userId) {
         const user = findUserById(userId);
         if (user) {
           updateUserWithPhone(user.id, phone);
           loginUser(user.id);
         }
-        
+
         toast({
           title: 'Verification Successful!',
           description: `Welcome!`,
@@ -122,24 +130,29 @@ function OtpVerificationForm() {
         variant: 'destructive',
       });
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   if (!isClient) {
     return (
-        <div className="flex flex-col items-center justify-center h-screen bg-background p-4">
-            <Skeleton className="h-8 w-48 mx-auto mb-2" />
-            <Skeleton className="h-5 w-64 mx-auto mb-8" />
-            <div className="flex justify-center gap-3 mb-8">
-                {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-16 w-12 rounded-lg" />)}
-            </div>
-            <Skeleton className="h-6 w-40 mx-auto mb-8" />
-            <Skeleton className="h-12 w-full rounded-full" />
+      <div className="flex flex-col items-center justify-center h-screen bg-background p-4">
+        <Skeleton className="h-8 w-48 mx-auto mb-2" />
+        <Skeleton className="h-5 w-64 mx-auto mb-8" />
+        <div className="flex justify-center gap-3 mb-8">
+          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-16 w-12 rounded-lg" />)}
         </div>
+        <Skeleton className="h-6 w-40 mx-auto mb-8" />
+        <Skeleton className="h-12 w-full rounded-full" />
+      </div>
     );
   }
 
+  const showPhoneInput = isGoogleSignIn && !initialIdentifier;
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -151,27 +164,33 @@ function OtpVerificationForm() {
       </header>
 
       <main className="flex flex-col items-center justify-center text-center p-4 flex-grow">
-          <p className="text-muted-foreground mb-2">
-            {isGoogleSignIn && !initialIdentifier ? 'Enter your mobile number to continue' : 'Code has been sent to'}
-          </p>
-          {!isGoogleSignIn || initialIdentifier ? (
-              <p className="font-bold mb-8">{phone}</p>
-          ) : (
-             <div className="w-full max-w-sm mb-8">
-                <Label htmlFor="phone-number" className="sr-only">Mobile Number</Label>
-                <Input
-                    id="phone-number"
-                    type="tel"
-                    placeholder="Enter your 10-digit mobile number"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    disabled={isLoading}
-                    className="text-center"
-                    maxLength={10}
-                />
-             </div>
-          )}
-          
+        <p className="text-muted-foreground mb-2">
+          {showPhoneInput && !otpSent
+            ? 'Enter your mobile number to get an OTP'
+            : `Code has been sent to`}
+        </p>
+        
+        { !showPhoneInput ? (
+             <p className="font-bold mb-8">{phone}</p>
+        ) : (
+            <div className="w-full max-w-sm mb-8 space-y-4">
+               <div className="flex items-center gap-2">
+                  <Input
+                      id="phone-number"
+                      type="tel"
+                      placeholder="Your 10-digit mobile number"
+                      value={phone}
+                      onChange={handlePhoneChange}
+                      disabled={isLoading || otpSent}
+                      className="text-center"
+                      maxLength={10}
+                  />
+                  <Button onClick={handleSendOtp} disabled={otpSent || isLoading || phone.length !== 10}>Send</Button>
+               </div>
+            </div>
+        )}
+
+        {otpSent && (
           <form onSubmit={handleSubmit} className="space-y-8 w-full max-w-sm">
             <div className="flex justify-center gap-2 sm:gap-3">
               {otp.map((digit, index) => (
@@ -193,16 +212,16 @@ function OtpVerificationForm() {
             </div>
 
             <div className='flex justify-center items-center gap-1'>
-                <p className="text-muted-foreground text-sm">Resend code in</p>
-                <p className='text-sm text-primary font-semibold'>{resendTimer > 0 ? `00:${resendTimer.toString().padStart(2, '0')}` : "00:00"}</p>
+              <p className="text-muted-foreground text-sm">Resend code in</p>
+              <p className='text-sm text-primary font-semibold'>{resendTimer > 0 ? `00:${resendTimer.toString().padStart(2, '0')}` : "00:00"}</p>
             </div>
 
             <Button type="submit" className="w-full rounded-full py-6 text-lg" disabled={isLoading}>
-                {isLoading ? "Verifying..." : "Verify"}
+              {isLoading ? "Verifying..." : "Verify"}
             </Button>
           </form>
+        )}
       </main>
-
     </div>
   );
 }

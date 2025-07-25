@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { findDoctorById as findPublicDoctor, doctors, updatePublicDoctor, Doctor } from '@/lib/data';
+import { findDoctorById as findPublicDoctor, updatePublicDoctor, Doctor } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const profileSchema = z.object({
@@ -38,7 +38,7 @@ function ProfileSkeleton() {
                         <Skeleton className="h-8 w-40 mb-2" />
                         <Skeleton className="h-4 w-64" />
                     </CardHeader>
-                    <CardContent className="space-y-6">
+                    <CardContent className="space-y-6 pt-6">
                         <div className="space-y-2">
                            <Skeleton className="h-4 w-20" />
                            <Skeleton className="h-10 w-full" />
@@ -143,7 +143,7 @@ export default function DoctorProfilePage() {
                         This information will be visible to patients on your public profile.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                              <div className="space-y-2">

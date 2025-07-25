@@ -106,8 +106,8 @@ export default function BookAppointmentPage() {
 
     } catch (error: any) {
         toast({
-            title: 'Booking Failed Please Try Again',
-            description: 'May be Network delay and having some errors please try again thank you...',
+            title: 'Booking Failed',
+            description: error.message || 'This slot is no longer available. Please try another.',
             variant: 'destructive'
         });
         addNotification({

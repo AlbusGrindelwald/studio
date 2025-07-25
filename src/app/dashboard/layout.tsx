@@ -24,6 +24,15 @@ const navItems = [
 
 function BottomNavBar() {
   const pathname = usePathname();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null;
+  }
   
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-background border-t z-50">
@@ -45,16 +54,10 @@ function BottomNavBar() {
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   return (
     <div className="min-h-screen w-full bg-background">
       <main className="pb-20">{children}</main>
-      {isClient && <BottomNavBar />}
+      <BottomNavBar />
     </div>
   );
 }

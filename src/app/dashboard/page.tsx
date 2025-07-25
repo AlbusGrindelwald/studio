@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function AppointmentCard({ appointment }: { appointment: Appointment }) {
   const router = useRouter();
@@ -63,7 +64,33 @@ export default function DashboardPage() {
   const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').slice(0, 1);
 
   if (!isClient) {
-    return null;
+    return (
+        <div className="flex flex-1 flex-col gap-6 p-4">
+            <header className="flex justify-between items-center">
+                <div>
+                    <Skeleton className="h-8 w-32 mb-2" />
+                    <Skeleton className="h-4 w-48" />
+                </div>
+                <Skeleton className="h-10 w-10 rounded-full" />
+            </header>
+            <Skeleton className="h-12 w-full rounded-full" />
+            <div className="grid grid-cols-2 gap-4">
+                <Skeleton className="h-28 w-full" />
+                <Skeleton className="h-28 w-full" />
+            </div>
+            <div>
+                <div className="flex justify-between items-center mb-3">
+                    <Skeleton className="h-6 w-48" />
+                    <Skeleton className="h-4 w-16" />
+                </div>
+                <Skeleton className="h-24 w-full" />
+            </div>
+             <div>
+                <Skeleton className="h-6 w-40 mb-3" />
+                <Skeleton className="h-36 w-full" />
+            </div>
+        </div>
+    );
   }
 
   return (

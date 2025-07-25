@@ -13,7 +13,8 @@ import { useEffect, useState } from 'react';
 import { signInWithGoogle } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import { findUserByEmailOrPhone, loginUser, createUser } from '@/lib/user';
+import { findUserByEmailOrPhone, createUser } from '@/lib/user';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -90,7 +91,45 @@ export default function LoginPage() {
   };
 
   if (!isClient) {
-    return null;
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+            <div className="w-full max-w-sm space-y-8">
+                <div className="text-center">
+                    <Skeleton className="h-5 w-80 mx-auto mb-2" />
+                    <Skeleton className="h-10 w-32 mx-auto" />
+                </div>
+                <Card>
+                    <CardContent className="p-6 space-y-4">
+                        <div className="space-y-2">
+                           <Skeleton className="h-4 w-20" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Skeleton className="h-5 w-28" />
+                            <Skeleton className="h-5 w-24" />
+                        </div>
+                        <Skeleton className="h-12 w-full" />
+                        <div className="relative my-4">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-card px-2 text-muted-foreground">
+                                    <Skeleton className="h-4 w-20" />
+                                </span>
+                            </div>
+                        </div>
+                        <Skeleton className="h-10 w-full" />
+                    </CardContent>
+                </Card>
+                 <Skeleton className="h-5 w-64 mx-auto" />
+            </div>
+        </div>
+    );
   }
 
   return (

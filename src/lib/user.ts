@@ -27,10 +27,17 @@ const saveUsers = (users: User[]) => {
 
 export const createUser = (newUser: Omit<User, 'id'>) => {
   const users = getUsers();
-  const existingUser = users.find(u => u.email === newUser.email);
-  if (existingUser) {
+  const existingUserByEmail = users.find(u => u.email === newUser.email);
+  if (existingUserByEmail) {
     throw new Error('An account with this email already exists.');
   }
+   if (newUser.phone) {
+    const existingUserByPhone = users.find(u => u.phone === newUser.phone);
+    if (existingUserByPhone) {
+        throw new Error('An account with this phone number already exists.');
+    }
+  }
+
   const user: User = { ...newUser, id: `user_${Date.now()}` };
   users.push(user);
   saveUsers(users);

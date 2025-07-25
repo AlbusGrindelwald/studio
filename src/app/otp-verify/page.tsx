@@ -9,14 +9,19 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { updateUserWithPhone, findUserByEmailOrPhone, loginUser } from '@/lib/user';
+import { updateUserWithPhone, findUserById, loginUser } from '@/lib/user';
+import { Label } from '@/components/ui/label';
 
 function OtpVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const identifier = searchParams.get('identifier');
+  const initialIdentifier = searchParams.get('identifier');
+  const userId = searchParams.get('userId');
+  const isGoogleSignIn = searchParams.get('isGoogleSignIn') === 'true';
+
   const { toast } = useToast();
   const [otp, setOtp] = useState<string[]>(['', '', '', '','','']);
+  const [phone, setPhone] = useState(initialIdentifier || '');
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [resendTimer, setResendTimer] = useState(55);
@@ -59,12 +64,21 @@ function OtpVerificationForm() {
       });
       return;
     }
+    if (!phone && isGoogleSignIn) {
+      toast({
+        title: 'Mobile Number Required',
+        description: 'Please enter your mobile number to continue.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      if (otpCode === "123456" && identifier) { 
-        const user = findUserByEmailOrPhone(identifier);
+      if (otpCode === "123456" && userId) { 
+        const user = findUserById(userId);
         if (user) {
-          updateUserWithPhone(user.id, identifier);
+          updateUserWithPhone(user.id, phone);
           loginUser(user.id);
         }
         
@@ -74,7 +88,7 @@ function OtpVerificationForm() {
         });
         router.push('/dashboard');
       } else {
-        throw new Error('Invalid OTP or identifier missing. Please try again.');
+        throw new Error('Invalid OTP or user missing. Please try again.');
       }
     } catch (error: any) {
       toast({
@@ -113,7 +127,22 @@ function OtpVerificationForm() {
 
       <main className="flex flex-col items-center justify-center text-center p-4 flex-grow">
           <p className="text-muted-foreground mb-2">Code has been sent to</p>
-          <p className="font-bold mb-8">{identifier}</p>
+          {phone ? (
+              <p className="font-bold mb-8">{phone}</p>
+          ) : (
+             <div className="w-full max-w-sm mb-8">
+                <Label htmlFor="phone-number" className="sr-only">Mobile Number</Label>
+                <Input
+                    id="phone-number"
+                    type="tel"
+                    placeholder="Enter your mobile number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    disabled={isLoading}
+                    className="text-center"
+                />
+             </div>
+          )}
           
           <form onSubmit={handleSubmit} className="space-y-8 w-full max-w-sm">
             <div className="flex justify-center gap-2 sm:gap-3">

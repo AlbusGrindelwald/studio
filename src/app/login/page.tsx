@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { signInWithGoogle } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import { findUserByEmailOrPhone, loginUser } from '@/lib/user';
+import { findUserByEmailOrPhone, loginUser, createUser } from '@/lib/user';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,38 +34,35 @@ export default function LoginPage() {
     const user = findUserByEmailOrPhone(identifier);
     const isPhone = /^\d+$/.test(identifier.replace(/\s/g, ''));
     
-    if (isPhone) {
-        // For this prototype, we assume if it's a phone number, it's for OTP flow
-        if (user) {
-             // In a real app, you'd send an OTP here. We'll just log them in.
-            loginUser(user.id);
+    if (user) {
+        if (isPhone) {
+             // In a real app, you'd send an OTP here.
             toast({
                 title: "OTP 'Sent'",
                 description: "Check console for mock OTP. Use 123456 to verify.",
             });
-            router.push(`/otp-verify?identifier=${encodeURIComponent(identifier)}`);
-        } else {
-             toast({
-                title: "User Not Found",
-                description: "No account is associated with this phone number. Please sign up.",
-                variant: "destructive"
-            });
+            router.push(`/otp-verify?identifier=${encodeURIComponent(identifier)}&userId=${user.id}`);
+        } else { // Email login
+            if (user.password === password) {
+                toast({
+                    title: "OTP 'Sent'",
+                    description: "Check console for mock OTP. Use 123456 to verify.",
+                });
+                router.push(`/otp-verify?identifier=${encodeURIComponent(user.phone || '')}&userId=${user.id}`);
+            } else {
+                 toast({
+                    title: "Invalid Credentials",
+                    description: "Please check your email and password.",
+                    variant: "destructive"
+                });
+            }
         }
-    } else { // Email login
-        if (user && user.password === password) {
-            loginUser(user.id);
-            toast({
-              title: 'Signed In',
-              description: `Welcome back, ${user.name}!`,
-            });
-            router.push('/dashboard');
-        } else {
-             toast({
-                title: "Invalid Credentials",
-                description: "Please check your email and password.",
-                variant: "destructive"
-            });
-        }
+    } else {
+         toast({
+            title: "User Not Found",
+            description: "No account is associated with this identifier. Please sign up.",
+            variant: "destructive"
+        });
     }
     
     setIsLoading(false);
@@ -73,14 +70,27 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const user = await signInWithGoogle();
-      if (user) {
+      const googleUser = await signInWithGoogle();
+      if (googleUser && googleUser.email) {
+        let appUser = findUserByEmailOrPhone(googleUser.email);
+        
+        // If user doesn't exist, create a new one, but they'll need to enter phone on OTP page
+        if (!appUser) {
+           appUser = createUser({
+             name: googleUser.displayName || 'Google User',
+             email: googleUser.email,
+             password: `google-auth-${Date.now()}` // a dummy password
+           })
+        }
+        
         toast({
-          title: 'Signed In',
-          description: `Welcome back, ${user.displayName}!`,
+          title: "Signed In with Google",
+          description: `Please verify your phone number to continue.`,
         });
-        // You might want to create a user in your own DB here as well
-        router.push('/dashboard');
+        
+        // Redirect to OTP page. If phone exists, pre-fill it.
+        router.push(`/otp-verify?identifier=${encodeURIComponent(appUser.phone || '')}&userId=${appUser.id}&isGoogleSignIn=true`);
+
       }
     } catch (error: any) {
       console.error(error);

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar } from 'lucide-react';
@@ -32,6 +32,26 @@ export default function BookAppointmentPage() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+
+  const selectedSlotRef = useRef({ date: selectedDate, time: selectedTime, doctorName: doctor?.name });
+  selectedSlotRef.current = { date: selectedDate, time: selectedTime, doctorName: doctor?.name };
+
+
+  useEffect(() => {
+    // This function will be called when the component unmounts
+    return () => {
+      // Check if a slot was selected but booking was not confirmed
+      if (selectedSlotRef.current.date && selectedSlotRef.current.time && !bookingConfirmed) {
+        addNotification({
+            title: 'Booking Incomplete',
+            description: `Your appointment with ${selectedSlotRef.current.doctorName} was not confirmed. Please complete the booking process.`,
+            type: 'destructive'
+        });
+      }
+    };
+  }, [bookingConfirmed]);
+
 
   if (!doctor) {
     return (
@@ -74,6 +94,8 @@ export default function BookAppointmentPage() {
         date: selectedDate,
         time: selectedTime,
       });
+
+      setBookingConfirmed(true); // Mark booking as confirmed
 
       toast({
         title: 'Appointment Booked!',

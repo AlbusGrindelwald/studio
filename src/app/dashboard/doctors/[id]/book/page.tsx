@@ -43,14 +43,20 @@ export default function BookAppointmentPage() {
     return () => {
       // Check if a slot was selected but booking was not confirmed
       if (selectedSlotRef.current.date && selectedSlotRef.current.time && !bookingConfirmed) {
+        const description = `Your appointment with ${selectedSlotRef.current.doctorName} was not confirmed. Please complete the booking process.`;
         addNotification({
             title: 'Booking Incomplete',
-            description: `Your appointment with ${selectedSlotRef.current.doctorName} was not confirmed. Please complete the booking process.`,
+            description,
             type: 'destructive'
+        });
+        toast({
+            title: 'Booking Incomplete',
+            description,
+            variant: 'destructive',
         });
       }
     };
-  }, [bookingConfirmed]);
+  }, [bookingConfirmed, toast]);
 
 
   if (!doctor) {

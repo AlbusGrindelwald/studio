@@ -31,7 +31,7 @@ function BottomNavBar() {
         {navItems.map((item) => (
           <Link key={item.href} href={item.href} passHref>
             <div className={cn(
-              "flex flex-col items-center justify-center h-full gap-1",
+              "flex flex-col items-center justify-center h-full gap-1 transition-colors hover:bg-accent/50 hover:text-primary",
               pathname === item.href ? 'text-primary' : 'text-muted-foreground'
             )}>
               <item.icon className="h-6 w-6" />

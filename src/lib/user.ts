@@ -13,7 +13,7 @@ const listeners: (() => void)[] = [];
 const USERS_KEY = 'shedula_users';
 const LOGGED_IN_USER_KEY = 'shedula_logged_in_user';
 
-const getUsers = (): User[] => {
+export const getUsers = (): User[] => {
   if (typeof window === 'undefined') return [];
   const usersJson = localStorage.getItem(USERS_KEY);
   return usersJson ? JSON.parse(usersJson) : [];

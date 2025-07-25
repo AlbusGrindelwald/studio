@@ -13,6 +13,7 @@ export interface Doctor {
   description: string;
   availability: Record<string, string[]>;
   specialities: string[];
+  gender?: 'male' | 'female' | 'other';
 }
 
 export interface Appointment {

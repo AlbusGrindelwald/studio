@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
-import { createDoctor } from '@/lib/doctor-auth';
+import { createDoctor, loginDoctor } from '@/lib/doctor-auth';
 
 export default function DoctorSignupPage() {
   const router = useRouter();
@@ -25,11 +25,14 @@ export default function DoctorSignupPage() {
     setIsLoading(true);
     try {
       createDoctor({ name, email, password });
+      // Log the user in immediately after signup
+      loginDoctor(email, password);
+      
       toast({
         title: 'Account Created',
-        description: 'Your professional account has been created. Please log in.',
+        description: 'Welcome! Please set up your profile.',
       });
-      router.push('/doctor/login');
+      router.push('/doctor/profile-setup');
     } catch (error: any) {
       toast({
         title: 'Signup Failed',

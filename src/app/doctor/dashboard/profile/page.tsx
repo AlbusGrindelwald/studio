@@ -67,31 +67,42 @@ export default function DoctorProfilePage() {
   const { toast } = useToast();
   const [doctorAuth, setDoctorAuth] = useState<DoctorUser | null>(null);
   const [publicDoctor, setPublicDoctor] = useState<Doctor | null>(null);
-  const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      specialty: '',
+      location: '',
+      description: '',
+      specialities: '',
+    },
   });
 
   useEffect(() => {
     const authDoc = getLoggedInDoctor();
     if (authDoc) {
-      setDoctorAuth(authDoc);
       const pubDoc = findPublicDoctor(authDoc.publicId || '');
-      if (pubDoc) {
-        setPublicDoctor(pubDoc);
-        form.reset({
-          name: authDoc.name,
-          email: authDoc.email,
-          specialty: pubDoc.specialty,
-          location: pubDoc.location,
-          description: pubDoc.description,
-          specialities: pubDoc.specialities.join(', '),
-        });
-      }
+      setDoctorAuth(authDoc);
+      setPublicDoctor(pubDoc || null);
     }
-    setIsClient(true);
-  }, [form]);
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (doctorAuth && publicDoctor) {
+      form.reset({
+        name: doctorAuth.name,
+        email: doctorAuth.email,
+        specialty: publicDoctor.specialty,
+        location: publicDoctor.location,
+        description: publicDoctor.description,
+        specialities: publicDoctor.specialities.join(', '),
+      });
+    }
+  }, [doctorAuth, publicDoctor, form]);
 
   const onSubmit: SubmitHandler<ProfileFormValues> = (data) => {
     if (!doctorAuth || !publicDoctor) return;
@@ -99,7 +110,6 @@ export default function DoctorProfilePage() {
     try {
       // Update auth user info
       const updatedAuth = updateDoctor(doctorAuth.id, { name: data.name, email: data.email });
-      setDoctorAuth(updatedAuth);
       
       // Update public doctor profile
       const updatedPublic = updatePublicDoctor(publicDoctor.id, {
@@ -110,6 +120,9 @@ export default function DoctorProfilePage() {
           description: data.description,
           specialities: data.specialities.split(',').map(s => s.trim()),
       });
+      
+      // Update local state to reflect changes immediately
+      setDoctorAuth(updatedAuth);
       setPublicDoctor(updatedPublic);
 
       toast({
@@ -125,8 +138,12 @@ export default function DoctorProfilePage() {
     }
   };
 
-  if(!isClient || !doctorAuth || !publicDoctor) {
+  if (isLoading) {
     return <ProfileSkeleton />;
+  }
+  
+  if (!doctorAuth || !publicDoctor) {
+     return <div className="p-6">Could not load doctor profile. Please try logging in again.</div>
   }
 
   return (

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -37,7 +38,7 @@ export default function ProfilePage() {
 
   const menuItems = [
     { icon: Bell, text: 'Notification', href: '#' },
-    { icon: HelpCircle, text: 'Help and support', href: '#' },
+    { icon: HelpCircle, text: 'Help and support', href: '/dashboard/help' },
     { icon: Users, text: 'Invite friends', href: '#' },
   ];
 
@@ -87,7 +88,7 @@ export default function ProfilePage() {
           <ul className="space-y-1">
             {menuItems.map((item) => (
               <li key={item.text}>
-                <a
+                <Link
                   href={item.href}
                   className="flex items-center gap-4 p-3 rounded-md hover:bg-accent"
                 >
@@ -96,7 +97,7 @@ export default function ProfilePage() {
                     {item.text}
                   </span>
                   <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

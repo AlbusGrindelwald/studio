@@ -8,9 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/Logo';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { loginDoctor } from '@/lib/doctor-auth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 export default function DoctorLoginPage() {
@@ -19,6 +20,11 @@ export default function DoctorLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,6 +47,35 @@ export default function DoctorLoginPage() {
 
     setIsLoading(false);
   };
+
+  if (!isClient) {
+    return (
+       <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+             <Skeleton className="h-8 w-32 mx-auto mb-2" />
+             <Skeleton className="h-6 w-56 mx-auto" />
+        </div>
+        <Card className="shadow-lg rounded-xl">
+          <CardContent className="p-6 space-y-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+
+               <div className="space-y-2">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              
+              <Skeleton className="h-12 w-full" />
+          </CardContent>
+        </Card>
+        <div className="mt-6 text-center text-sm">
+            <Skeleton className="h-5 w-64 mx-auto" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full max-w-sm">

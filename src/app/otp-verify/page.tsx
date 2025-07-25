@@ -9,11 +9,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { updateUserWithPhone, findUserByEmailOrPhone, loginUser } from '@/lib/user';
 
 function OtpVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get('email');
+  const identifier = searchParams.get('identifier');
   const { toast } = useToast();
   const [otp, setOtp] = useState<string[]>(['', '', '', '','','']);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,14 +61,20 @@ function OtpVerificationForm() {
     }
     setIsLoading(true);
     try {
-      if (otpCode === "123456") { 
+      if (otpCode === "123456" && identifier) { 
+        const user = findUserByEmailOrPhone(identifier);
+        if (user) {
+          updateUserWithPhone(user.id, identifier);
+          loginUser(user.id);
+        }
+        
         toast({
           title: 'Verification Successful!',
-          description: `Welcome, ${email}!`,
+          description: `Welcome!`,
         });
         router.push('/dashboard');
       } else {
-        throw new Error('Invalid OTP. Please try again.');
+        throw new Error('Invalid OTP or identifier missing. Please try again.');
       }
     } catch (error: any) {
       toast({
@@ -106,7 +113,7 @@ function OtpVerificationForm() {
 
       <main className="flex flex-col items-center justify-center text-center p-4 flex-grow">
           <p className="text-muted-foreground mb-2">Code has been sent to</p>
-          <p className="font-bold mb-8">{email}</p>
+          <p className="font-bold mb-8">{identifier}</p>
           
           <form onSubmit={handleSubmit} className="space-y-8 w-full max-w-sm">
             <div className="flex justify-center gap-2 sm:gap-3">

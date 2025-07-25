@@ -12,19 +12,39 @@ import {
   Users,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { getLoggedInUser, logoutUser, subscribe } from '@/lib/user';
+import type { User } from '@/lib/user';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const handleUserChange = () => {
+        setUser(getLoggedInUser());
+    }
+
+    const unsubscribe = subscribe(handleUserChange);
+    handleUserChange(); // Initial fetch
+
+    return () => unsubscribe();
+  }, []);
 
   const menuItems = [
     { icon: Bell, text: 'Notification', href: '#' },
     { icon: HelpCircle, text: 'Help and support', href: '#' },
     { icon: Users, text: 'Invite friends', href: '#' },
   ];
+
+  const handleLogout = () => {
+    logoutUser();
+    router.push('/login');
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-muted/40">
@@ -49,9 +69,12 @@ export default function ProfilePage() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <p className="font-bold text-lg">Ravi kumar</p>
+              <p className="font-bold text-lg">{user?.name || 'User'}</p>
               <p className="text-sm text-muted-foreground">
-                Youremail@gmail.com
+                {user?.email || 'youremail@gmail.com'}
+              </p>
+               <p className="text-sm text-muted-foreground">
+                {user?.phone || 'No phone number'}
               </p>
             </div>
             <Button variant="ghost" size="icon">
@@ -83,7 +106,7 @@ export default function ProfilePage() {
           <Button
             variant="ghost"
             className="w-full justify-start gap-4 p-3 text-destructive hover:text-destructive"
-            onClick={() => router.push('/login')}
+            onClick={handleLogout}
           >
             <LogOut className="h-5 w-5" />
             <span className="text-sm font-medium">Logout</span>

@@ -10,15 +10,17 @@ import { Label } from '@/components/ui/label';
 import GoogleIcon from '@/components/GoogleIcon';
 import { Logo } from '@/components/Logo';
 import { useEffect, useState } from 'react';
-import { signInWithGoogle, sendOtp } from '@/lib/auth';
+import { signInWithGoogle } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
+import { findUserByEmailOrPhone, loginUser } from '@/lib/user';
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // Can be email or phone
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -27,49 +29,46 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    const isEmail = email.includes('@');
-    const isPhone = /^\d+$/.test(email.replace(/\s/g, ''));
-
-    if (!isEmail && !isPhone) {
-      toast({
-        title: "Invalid Input",
-        description: "Please enter a valid email or phone number.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (isEmail) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-          toast({
-              title: "Invalid Email Address",
-              description: "Please enter a valid email address.",
-              variant: "destructive"
-          });
-          return;
-      }
-    }
-    
     setIsLoading(true);
-    try {
-        await sendOtp(email);
-        toast({
-            title: "OTP Sent",
-            description: "A verification code has been 'sent' (check console). Use 123456 to verify.",
-        });
-        router.push(`/otp-verify?email=${encodeURIComponent(email)}`);
-    } catch (error: any) {
-        console.error(error);
-        toast({
-            title: "Failed to send OTP",
-            description: error.message,
-            variant: "destructive",
-        });
-    } finally {
-        setIsLoading(false);
+
+    const user = findUserByEmailOrPhone(identifier);
+    const isPhone = /^\d+$/.test(identifier.replace(/\s/g, ''));
+    
+    if (isPhone) {
+        // For this prototype, we assume if it's a phone number, it's for OTP flow
+        if (user) {
+             // In a real app, you'd send an OTP here. We'll just log them in.
+            loginUser(user.id);
+            toast({
+                title: "OTP 'Sent'",
+                description: "Check console for mock OTP. Use 123456 to verify.",
+            });
+            router.push(`/otp-verify?identifier=${encodeURIComponent(identifier)}`);
+        } else {
+             toast({
+                title: "User Not Found",
+                description: "No account is associated with this phone number. Please sign up.",
+                variant: "destructive"
+            });
+        }
+    } else { // Email login
+        if (user && user.password === password) {
+            loginUser(user.id);
+            toast({
+              title: 'Signed In',
+              description: `Welcome back, ${user.name}!`,
+            });
+            router.push('/dashboard');
+        } else {
+             toast({
+                title: "Invalid Credentials",
+                description: "Please check your email and password.",
+                variant: "destructive"
+            });
+        }
     }
+    
+    setIsLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -80,6 +79,7 @@ export default function LoginPage() {
           title: 'Signed In',
           description: `Welcome back, ${user.displayName}!`,
         });
+        // You might want to create a user in your own DB here as well
         router.push('/dashboard');
       }
     } catch (error: any) {
@@ -113,9 +113,21 @@ export default function LoginPage() {
                   type="text"
                   placeholder="Enter your email or mobile"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   disabled={isLoading}
+                />
+              </div>
+
+               <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading || /^\d+$/.test(identifier.replace(/\s/g, ''))}
                 />
               </div>
 

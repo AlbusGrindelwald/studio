@@ -8,52 +8,6 @@ import {
 } from 'firebase/auth';
 import { auth } from './firebase';
 
-// Mock ConfirmationResult for the simulated OTP flow
-export interface MockConfirmationResult {
-  confirm: (otp: string) => Promise<{ user: User }>;
-  verificationId: string;
-}
-
-// In a real app, you would use a service to send an OTP.
-// For this example, we'll simulate it.
-export const sendOtp = async (email: string): Promise<MockConfirmationResult> => {
-  console.log(`DEV-ONLY: OTP for ${email} is 123456`);
-  // This is a mock confirmation result.
-  const mockConfirmationResult: MockConfirmationResult = {
-    confirm: async (otp: string) => {
-      if (otp === '123456') {
-        // In a real app, you would get a real user object.
-        // Here we create a mock user object.
-        const mockUser = {
-          uid: 'mock-user-id',
-          email: email,
-          displayName: 'Mock User',
-        } as User;
-        return Promise.resolve({ user: mockUser });
-      } else {
-        throw new Error('Invalid OTP. Please try again.');
-      }
-    },
-    verificationId: 'mock-verification-id',
-  };
-  return Promise.resolve(mockConfirmationResult);
-};
-
-export const verifyOtp = async (
-  confirmationResult: MockConfirmationResult,
-  otp: string
-): Promise<User> => {
-  try {
-    const { user } = await confirmationResult.confirm(otp);
-    return user;
-  } catch (error) {
-    console.error('Error verifying OTP:', error);
-    if (error instanceof Error) {
-        throw error;
-    }
-    throw new Error('Invalid OTP. Please try again.');
-  }
-};
 
 export const signInWithGoogle = async (): Promise<User | null> => {
   const provider = new GoogleAuthProvider();

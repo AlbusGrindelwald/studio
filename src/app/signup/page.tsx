@@ -16,10 +16,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/Logo';
+import { useToast } from '@/hooks/use-toast';
+import { createUser } from '@/lib/user';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -27,7 +34,23 @@ export default function SignupPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push('/login');
+    setIsLoading(true);
+    try {
+      createUser({ name, email, password });
+      toast({
+        title: 'Account Created',
+        description: 'Your account has been successfully created. Please log in.',
+      });
+      router.push('/login');
+    } catch (error: any) {
+      toast({
+        title: 'Signup Failed',
+        description: error.message || 'An unexpected error occurred.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!isClient) {
@@ -51,7 +74,7 @@ export default function SignupPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" type="text" placeholder="John Doe" required />
+                <Input id="name" type="text" placeholder="John Doe" required value={name} onChange={(e) => setName(e.target.value)} disabled={isLoading} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -60,14 +83,17 @@ export default function SignupPage() {
                   type="email"
                   placeholder="john@example.com"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" placeholder="********" required />
+                <Input id="password" type="password" placeholder="********" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading}/>
               </div>
-              <Button type="submit" className="w-full">
-                Create Account
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Creating Account...' : 'Create Account'}
               </Button>
             </form>
             <div className="mt-4 text-center text-sm">

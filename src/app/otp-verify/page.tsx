@@ -35,6 +35,14 @@ function OtpVerificationForm() {
     return () => clearInterval(timer);
   }, []);
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numbers and limit to 10 digits
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setPhone(value);
+    }
+  };
+
   const handleOtpChange = (index: number, value: string) => {
     if (isNaN(Number(value))) return;
     const newOtp = [...otp];
@@ -69,6 +77,15 @@ function OtpVerificationForm() {
         title: 'Mobile Number Required',
         description: 'Please enter your mobile number to continue.',
         variant: 'destructive'
+      });
+      return;
+    }
+
+    if (isGoogleSignIn && phone.length !== 10) {
+      toast({
+        title: 'Invalid Mobile Number',
+        description: 'Please enter a valid 10-digit mobile number.',
+        variant: 'destructive',
       });
       return;
     }
@@ -126,8 +143,10 @@ function OtpVerificationForm() {
       </header>
 
       <main className="flex flex-col items-center justify-center text-center p-4 flex-grow">
-          <p className="text-muted-foreground mb-2">Code has been sent to</p>
-          {phone ? (
+          <p className="text-muted-foreground mb-2">
+            {isGoogleSignIn && !initialIdentifier ? 'Enter your mobile number to continue' : 'Code has been sent to'}
+          </p>
+          {!isGoogleSignIn || initialIdentifier ? (
               <p className="font-bold mb-8">{phone}</p>
           ) : (
              <div className="w-full max-w-sm mb-8">
@@ -135,11 +154,12 @@ function OtpVerificationForm() {
                 <Input
                     id="phone-number"
                     type="tel"
-                    placeholder="Enter your mobile number"
+                    placeholder="Enter your 10-digit mobile number"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={handlePhoneChange}
                     disabled={isLoading}
                     className="text-center"
+                    maxLength={10}
                 />
              </div>
           )}

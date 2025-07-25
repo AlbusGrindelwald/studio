@@ -37,17 +37,9 @@ export default function LoginPage() {
     if (user) {
         if (isPhone) {
              // In a real app, you'd send an OTP here.
-            toast({
-                title: "OTP 'Sent'",
-                description: "Check console for mock OTP. Use 123456 to verify.",
-            });
             router.push(`/otp-verify?identifier=${encodeURIComponent(identifier)}&userId=${user.id}`);
         } else { // Email login
             if (user.password === password) {
-                toast({
-                    title: "OTP 'Sent'",
-                    description: "Check console for mock OTP. Use 123456 to verify.",
-                });
                 router.push(`/otp-verify?identifier=${encodeURIComponent(user.phone || '')}&userId=${user.id}`);
             } else {
                  toast({
@@ -82,11 +74,6 @@ export default function LoginPage() {
              password: `google-auth-${Date.now()}` // a dummy password
            })
         }
-        
-        toast({
-          title: "Signed In with Google",
-          description: `Please verify your phone number to continue.`,
-        });
         
         // Redirect to OTP page. If phone exists, pre-fill it.
         router.push(`/otp-verify?identifier=${encodeURIComponent(appUser.phone || '')}&userId=${appUser.id}&isGoogleSignIn=true`);

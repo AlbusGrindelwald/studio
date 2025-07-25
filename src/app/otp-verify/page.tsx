@@ -29,11 +29,19 @@ function OtpVerificationForm() {
 
   useEffect(() => {
     setIsClient(true);
+    
+    // Show toast and start timer on mount
+    toast({
+        title: "OTP 'Sent'",
+        description: "Check console for mock OTP. Use 123456 to verify.",
+    });
+
     const timer = setInterval(() => {
       setResendTimer((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
+
     return () => clearInterval(timer);
-  }, []);
+  }, [toast]);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

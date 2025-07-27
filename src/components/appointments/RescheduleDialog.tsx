@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, Sun, Moon } from 'lucide-react';
+import { Calendar, Sun, Moon } from 'lucide-react';
 import type { Doctor } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { format, addDays, startOfDay } from 'date-fns';
@@ -86,7 +86,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
 
         <div className="py-4 space-y-6">
             <div>
-                <h3 className="font-medium text-sm mb-2 flex items-center gap-2">
+                <h3 className="font-medium text-sm mb-4 flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
                     Choose a new date
                 </h3>
@@ -118,7 +118,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
             {selectedDate && (
                 <div className="space-y-6">
                     <div>
-                        <h3 className="font-medium text-sm mb-2 flex items-center gap-2">
+                        <h3 className="font-medium text-sm mb-4 flex items-center gap-2">
                             <Sun className="h-4 w-4 text-yellow-500" />
                             Morning Slots
                         </h3>
@@ -137,7 +137,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
                     </div>
                     
                     <div>
-                        <h3 className="font-medium text-sm mb-2 flex items-center gap-2">
+                        <h3 className="font-medium text-sm mb-4 flex items-center gap-2">
                             <Moon className="h-4 w-4 text-blue-500" />
                             Evening Slots
                         </h3>
@@ -168,4 +168,3 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
     </Dialog>
   );
 }
-

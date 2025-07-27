@@ -29,7 +29,7 @@ const getTimePeriod = (time: string) => {
     const hour = parseInt(time.split(':')[0], 10);
     const isPM = time.toUpperCase().includes('PM');
     if (isPM && hour !== 12) {
-        return (hour + 12) < 12 ? 'morning' : 'evening';
+        return 'evening';
     }
     return hour < 12 ? 'morning' : 'evening';
 };
@@ -162,7 +162,7 @@ export default function BookAppointmentPage() {
     setIsConfirming(false);
   };
   
-  const timeSlots = selectedDate ? doctor.availability[selectedDate] : [];
+  const timeSlots = selectedDate ? doctor.availability[selectedDate] || [] : [];
   const morningSlots = timeSlots.filter(time => getTimePeriod(time) === 'morning');
   const eveningSlots = timeSlots.filter(time => getTimePeriod(time) === 'evening');
 

@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar, Moon, Sun } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
 import { Button } from '@/components/ui/button';
@@ -25,32 +25,27 @@ import type { User } from '@/lib/user';
 import type { Doctor } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const getNextSevenAvailableDays = (doctor: Doctor | null) => {
-  if (!doctor) return [];
-  const availableDates: Date[] = [];
+const getNextSevenDays = () => {
+  const dates: Date[] = [];
   let currentDate = startOfDay(new Date());
-
-  for (let i = 0; i < 30 && availableDates.length < 7; i++) {
-    const dateStr = format(currentDate, 'yyyy-MM-dd');
-    if (doctor.availability[dateStr] && doctor.availability[dateStr].length > 0) {
-      availableDates.push(new Date(currentDate));
-    }
+  for (let i = 0; i < 7; i++) {
+    dates.push(new Date(currentDate));
     currentDate = addDays(currentDate, 1);
   }
-  return availableDates;
+  return dates;
 };
 
 const groupSlots = (slots: string[]) => {
     const morningSlots = slots.filter(time => {
         const hour = parseInt(time.split(':')[0]);
-        const isPM = time.includes('PM');
-        return !isPM || hour === 12;
+        const period = time.split(' ')[1];
+        return period === 'AM';
     });
 
     const eveningSlots = slots.filter(time => {
         const hour = parseInt(time.split(':')[0]);
-        const isPM = time.includes('PM');
-        return isPM && hour !== 12;
+        const period = time.split(' ')[1];
+        return period === 'PM';
     });
     return { morningSlots, eveningSlots };
 }
@@ -58,9 +53,9 @@ const groupSlots = (slots: string[]) => {
 function BookingPageSkeleton() {
   return (
     <div className="flex flex-col h-screen bg-muted/20">
-      <header className="bg-primary text-primary-foreground p-4 flex items-center gap-4">
-        <Skeleton className="h-8 w-8 bg-primary/50" />
-        <Skeleton className="h-6 w-32 bg-primary/50" />
+      <header className="bg-background p-4 flex items-center gap-4 border-b">
+        <Skeleton className="h-8 w-8" />
+        <Skeleton className="h-6 w-32" />
       </header>
       <main className="flex-1 overflow-y-auto p-4 space-y-6">
         <Skeleton className="h-28 w-full rounded-xl" />
@@ -68,7 +63,6 @@ function BookingPageSkeleton() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <Skeleton className="h-6 w-48" />
-            <Skeleton className="h-6 w-24" />
           </div>
           <div className="flex gap-3 pb-4">
             {[...Array(7)].map((_, i) => (
@@ -78,8 +72,8 @@ function BookingPageSkeleton() {
         </div>
         <div>
           <Skeleton className="h-6 w-32 mb-4" />
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {[...Array(8)].map((_, i) => (
               <Skeleton key={i} className="h-10 w-full rounded-md" />
             ))}
           </div>
@@ -107,7 +101,7 @@ export default function BookAppointmentPage() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [isClient, setIsClient] = useState(false);
   
-  const sevenDaySlots = useMemo(() => getNextSevenAvailableDays(doctor), [doctor]);
+  const sevenDaySlots = useMemo(() => getNextSevenDays(), []);
 
   useEffect(() => {
     setDoctor(findDoctorById(id));
@@ -121,10 +115,14 @@ export default function BookAppointmentPage() {
   }, [id, router]);
 
   useEffect(() => {
-    if (sevenDaySlots.length > 0 && !selectedDate) {
-      setSelectedDate(sevenDaySlots[0]);
+    if (doctor && sevenDaySlots.length > 0 && !selectedDate) {
+        const firstAvailableDate = sevenDaySlots.find(day => {
+            const dateStr = format(day, 'yyyy-MM-dd');
+            return doctor.availability[dateStr] && doctor.availability[dateStr].length > 0;
+        });
+      setSelectedDate(firstAvailableDate || null);
     }
-  }, [sevenDaySlots, selectedDate]);
+  }, [doctor, sevenDaySlots, selectedDate]);
 
 
   if (!isClient || !doctor) {
@@ -132,8 +130,11 @@ export default function BookAppointmentPage() {
   }
   
   const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-    setSelectedTime(null);
+    const dateStr = format(date, 'yyyy-MM-dd');
+    if (doctor.availability[dateStr] && doctor.availability[dateStr].length > 0) {
+        setSelectedDate(date);
+        setSelectedTime(null);
+    }
   };
 
   const handleBookNow = () => {
@@ -182,15 +183,15 @@ export default function BookAppointmentPage() {
   
   return (
     <div className="flex flex-col h-screen bg-muted/20">
-       <header className="bg-primary text-primary-foreground p-4 flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/80" onClick={() => router.back()}>
+       <header className="bg-background p-4 flex items-center gap-4 border-b">
+        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" onClick={() => router.back()}>
           <ArrowLeft />
         </Button>
         <h1 className="text-xl font-bold">Book Appointment</h1>
       </header>
      
       <main className="flex-1 overflow-y-auto p-4 space-y-6">
-        <div className="bg-card text-card-foreground rounded-xl p-4 flex items-start gap-4 shadow-md border">
+        <div className="bg-card text-card-foreground rounded-xl p-4 flex items-start gap-4 shadow-sm border">
             <Image
                 src={doctor.image}
                 alt={`Photo of ${doctor.name}`}
@@ -201,33 +202,29 @@ export default function BookAppointmentPage() {
             />
             <div className="flex-1">
                 <h2 className="font-bold text-lg">{doctor.name}</h2>
-                <p className="text-sm text-muted-foreground">{doctor.specialty} - {doctor.location}</p>
-                <p className="text-sm text-primary font-medium mt-1">MBBS, MD (Internal Medicine)</p>
+                <p className="text-sm text-primary">{doctor.specialty}</p>
+                <p className="text-sm text-muted-foreground mt-1">{doctor.location}</p>
             </div>
         </div>
 
         <div>
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-lg">Book Appointment</h3>
-                {selectedDate && (
-                    <div className='flex items-center gap-2 text-muted-foreground'>
-                        <span className="font-semibold text-sm">{format(selectedDate, 'MMMM, yyyy')}</span>
-                        <Calendar className="h-4 w-4" />
-                    </div>
-                )}
-            </div>
+            <h3 className="font-bold text-lg mb-4">Choose your slot</h3>
             <ScrollArea className="w-full whitespace-nowrap rounded-md -mx-1">
                 <div className="flex gap-3 pb-4 px-1">
                     {sevenDaySlots.map(date => {
+                        const dateStr = format(date, 'yyyy-MM-dd');
+                        const isAvailable = doctor.availability[dateStr] && doctor.availability[dateStr].length > 0;
                         return (
                             <button
                                 key={date.toISOString()}
                                 onClick={() => handleDateSelect(date)}
+                                disabled={!isAvailable}
                                 className={cn(
                                     "flex flex-col items-center justify-center p-2 rounded-lg border w-16 h-20 transition-colors shrink-0",
                                     selectedDate?.toISOString() === date.toISOString()
                                     ? "bg-primary text-primary-foreground"
-                                    : "bg-card hover:bg-accent"
+                                    : "bg-card",
+                                    isAvailable ? "cursor-pointer hover:bg-accent" : "bg-muted/50 cursor-not-allowed opacity-50"
                                 )}
                             >
                                 <span className="text-2xl font-bold">{format(date, 'dd')}</span>
@@ -235,7 +232,6 @@ export default function BookAppointmentPage() {
                             </button>
                         )
                     })}
-                     {sevenDaySlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4 w-full">No available dates found.</p>}
                 </div>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
@@ -244,13 +240,16 @@ export default function BookAppointmentPage() {
         {selectedDate && (
             <div className="space-y-6">
                 <div>
-                    <h3 className="font-bold text-lg mb-4">Select slot</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                        <Sun className="h-5 w-5 text-yellow-500" />
+                        Morning
+                    </h3>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                     {morningSlots.map(time => (
                         <Button
                             key={time}
                             variant={selectedTime === time ? 'default' : 'outline'}
-                            className={cn("py-2 h-auto text-xs", selectedTime === time && "bg-primary text-primary-foreground")}
+                            className="py-2 h-auto"
                             onClick={() => setSelectedTime(time)}
                         >
                             {time}
@@ -261,13 +260,16 @@ export default function BookAppointmentPage() {
                 </div>
                  {eveningSlots.length > 0 && (
                      <div>
-                        <h3 className="font-bold text-lg mb-4">Evening Slot</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                            <Moon className="h-5 w-5 text-blue-500" />
+                            Evening
+                        </h3>
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                         {eveningSlots.map(time => (
                             <Button
                             key={time}
                             variant={selectedTime === time ? 'default' : 'outline'}
-                            className={cn("py-2 h-auto text-xs", selectedTime === time && "bg-primary text-primary-foreground")}
+                            className="py-2 h-auto"
                             onClick={() => setSelectedTime(time)}
                             >
                             {time}
@@ -281,8 +283,8 @@ export default function BookAppointmentPage() {
       </main>
 
       <footer className="p-4 border-t bg-background">
-        <Button size="lg" className="w-full" onClick={handleBookNow} disabled={!selectedTime}>
-            Book appointment
+        <Button size="lg" className="w-full h-12 text-base" onClick={handleBookNow} disabled={!selectedTime}>
+             {selectedTime ? `Pay $${doctor.fees} & Book` : 'Book appointment'}
         </Button>
       </footer>
       
@@ -310,5 +312,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
-    

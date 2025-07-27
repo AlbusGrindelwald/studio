@@ -15,6 +15,7 @@ import { doctors } from '@/lib/data';
 import type { Filters } from '@/app/dashboard/doctors/page';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
 
 
 const uniqueLocations = ['all', ...Array.from(new Set(doctors.map(d => d.location)))];
@@ -64,7 +65,7 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
   };
   
   const handleRatingChange = (newRating: number) => {
-    handleValueChange('rating', newRating);
+    handleValueChange('rating', localFilters.rating === newRating ? 0 : newRating);
   };
 
   return (
@@ -147,16 +148,10 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
         <div className="space-y-2">
             {appointmentTypes.map(type => (
                 <div key={type.id} className="flex items-center gap-2">
-                    <RadioGroupItem
+                    <Checkbox
                         id={`type-${type.id}`}
-                        value={type.id}
                         checked={localFilters.appointmentTypes.includes(type.id)}
-                        onClick={() => {
-                            const newTypes = localFilters.appointmentTypes.includes(type.id)
-                                ? localFilters.appointmentTypes.filter(t => t !== type.id)
-                                : [...localFilters.appointmentTypes, type.id];
-                            handleValueChange('appointmentTypes', newTypes);
-                        }}
+                        onCheckedChange={(checked) => handleCheckboxChange('appointmentTypes', type.id, !!checked)}
                     />
                     <Label htmlFor={`type-${type.id}`} className="font-normal">{type.label}</Label>
                 </div>

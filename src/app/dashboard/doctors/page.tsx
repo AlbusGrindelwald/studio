@@ -26,7 +26,7 @@ export type Filters = {
   location: string;
   specialty: string;
   rating: number;
-  fees: number[];
+  fees: string;
   availability: ('today' | 'tomorrow' | 'weekend')[];
   appointmentTypes: ('in-person' | 'online' | 'home-visit')[];
 };
@@ -39,7 +39,7 @@ export default function DoctorsPage() {
     location: 'all',
     specialty: 'all',
     rating: 0,
-    fees: [0, 500],
+    fees: 'any',
     availability: [],
     appointmentTypes: [],
   });
@@ -57,8 +57,17 @@ export default function DoctorsPage() {
     const locationMatch = filters.location === 'all' || doctor.location === filters.location;
     const specialtyMatch = filters.specialty === 'all' || doctor.specialty === filters.specialty;
     const ratingMatch = doctor.rating >= filters.rating;
-    const feesMatch = (doctor.fees || 0) >= filters.fees[0] && (doctor.fees || 0) <= filters.fees[1];
     
+    const feesMatch = () => {
+        if (filters.fees === 'any') return true;
+        const [min, max] = filters.fees.split('-').map(Number);
+        const fee = doctor.fees || 0;
+        if (max) {
+            return fee >= min && fee <= max;
+        }
+        return fee >= min;
+    };
+
     const appointmentTypesMatch = filters.appointmentTypes.length === 0 ||
         filters.appointmentTypes.every(type => doctor.appointmentTypes?.includes(type));
 
@@ -73,7 +82,7 @@ export default function DoctorsPage() {
             return true;
         });
 
-    return searchMatch && locationMatch && specialtyMatch && ratingMatch && feesMatch && appointmentTypesMatch && availabilityMatch;
+    return searchMatch && locationMatch && specialtyMatch && ratingMatch && feesMatch() && appointmentTypesMatch && availabilityMatch;
   });
 
   if (!isClient) {
@@ -116,7 +125,7 @@ export default function DoctorsPage() {
         location: 'all',
         specialty: 'all',
         rating: 0,
-        fees: [0, 500],
+        fees: 'any',
         availability: [],
         appointmentTypes: [],
     });

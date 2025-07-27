@@ -10,8 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { doctors } from '@/lib/data';
 import type { Filters } from '@/app/dashboard/doctors/page';
 import { Star } from 'lucide-react';
@@ -24,6 +23,14 @@ const appointmentTypes: { id: Filters['appointmentTypes'][number], label: string
     { id: 'in-person', label: 'In-person' },
     { id: 'online', label: 'Online' },
     { id: 'home-visit', label: 'Home Visit' },
+];
+
+const feeRanges = [
+    { id: 'any', label: 'Any' },
+    { id: '0-100', label: '$0 - $100' },
+    { id: '100-200', label: '$100 - $200' },
+    { id: '200-300', label: '$200 - $300' },
+    { id: '300', label: 'Over $300' },
 ];
 
 interface DoctorFiltersProps {
@@ -117,20 +124,22 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
         </div>
       </div>
 
-      <div className="space-y-3">
-        <Label htmlFor="fees">Consultation Fee</Label>
-        <Slider
-          id="fees"
-          min={0}
-          max={500}
-          step={10}
+       <div className="space-y-3">
+        <Label>Consultation Fee</Label>
+        <RadioGroup
           value={localFilters.fees}
-          onValueChange={value => handleValueChange('fees', value)}
-        />
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <span>${localFilters.fees[1]}</span>
-          <span>${localFilters.fees[0]}</span>
-        </div>
+          onValueChange={(value) => handleValueChange('fees', value)}
+          className="space-y-2"
+        >
+          {feeRanges.map((range) => (
+            <div key={range.id} className="flex items-center space-x-2">
+              <RadioGroupItem value={range.id} id={`fees-${range.id}`} />
+              <Label htmlFor={`fees-${range.id}`} className="font-normal">
+                {range.label}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
       </div>
 
       <div className="space-y-3">
@@ -138,10 +147,16 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
         <div className="space-y-2">
             {appointmentTypes.map(type => (
                 <div key={type.id} className="flex items-center gap-2">
-                    <Checkbox
+                    <RadioGroupItem
                         id={`type-${type.id}`}
+                        value={type.id}
                         checked={localFilters.appointmentTypes.includes(type.id)}
-                        onCheckedChange={checked => handleCheckboxChange('appointmentTypes', type.id, !!checked)}
+                        onClick={() => {
+                            const newTypes = localFilters.appointmentTypes.includes(type.id)
+                                ? localFilters.appointmentTypes.filter(t => t !== type.id)
+                                : [...localFilters.appointmentTypes, type.id];
+                            handleValueChange('appointmentTypes', newTypes);
+                        }}
                     />
                     <Label htmlFor={`type-${type.id}`} className="font-normal">{type.label}</Label>
                 </div>

@@ -134,25 +134,9 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
             ))}
         </div>
       </div>
-
-      <div className="space-y-3">
-        <Label>Consultation Fee</Label>
-        <RadioGroup
-          value={localFilters.feeRange}
-          onValueChange={value => handleValueChange('feeRange', value)}
-          className="space-y-2"
-        >
-          {feeRanges.map(range => (
-            <div key={range.value} className="flex items-center space-x-2">
-              <RadioGroupItem value={range.value} id={`fee-${range.value}`} />
-              <Label htmlFor={`fee-${range.value}`} className="font-normal">{range.label}</Label>
-            </div>
-          ))}
-        </RadioGroup>
-      </div>
        
       <div className="space-y-3">
-        <Label>Fee Range</Label>
+        <Label>Consultation Fee</Label>
         <Slider
           value={localFilters.feeRangeSlider}
           onValueChange={(value) => handleValueChange('feeRangeSlider', value)}
@@ -164,6 +148,19 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
           <span>${localFilters.feeRangeSlider[0]}</span>
           <span>${localFilters.feeRangeSlider[1]}</span>
         </div>
+
+        <RadioGroup
+          value={localFilters.feeRange}
+          onValueChange={value => handleValueChange('feeRange', value)}
+          className="space-y-2 pt-4"
+        >
+          {feeRanges.map(range => (
+            <div key={range.value} className="flex items-center space-x-2">
+              <RadioGroupItem value={range.value} id={`fee-${range.value}`} />
+              <Label htmlFor={`fee-${range.value}`} className="font-normal">{range.label}</Label>
+            </div>
+          ))}
+        </RadioGroup>
       </div>
 
       <div className="space-y-3">

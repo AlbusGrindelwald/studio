@@ -16,7 +16,7 @@ import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-
+import { Slider } from '@/components/ui/slider';
 
 const uniqueLocations = ['all', ...Array.from(new Set(doctors.map(d => d.location)))];
 const uniqueSpecialties = ['all', ...Array.from(new Set(doctors.map(d => d.specialty)))];
@@ -34,6 +34,8 @@ const feeRanges = [
     { value: '300-9999', label: 'Over $300' },
 ];
 
+const maxFee = Math.max(...doctors.map(d => d.fees || 0), 500);
+
 interface DoctorFiltersProps {
   currentFilters: Filters;
   onApply: (filters: Filters) => void;
@@ -48,6 +50,14 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
 
   const handleValueChange = (key: keyof Filters, value: any) => {
     const newFilters = { ...localFilters, [key]: value };
+    // if radio button is changed, reset slider to prevent conflict
+    if(key === 'feeRange' && value !== 'any') {
+      newFilters.feeRangeSlider = [0, maxFee];
+    }
+    // if slider is changed, reset radio to any
+    if(key === 'feeRangeSlider') {
+      newFilters.feeRange = 'any';
+    }
     setLocalFilters(newFilters);
     onApply(newFilters);
   };
@@ -125,7 +135,7 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
         </div>
       </div>
 
-       <div className="space-y-3">
+      <div className="space-y-3">
         <Label>Consultation Fee</Label>
         <RadioGroup
           value={localFilters.feeRange}
@@ -139,6 +149,21 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
             </div>
           ))}
         </RadioGroup>
+      </div>
+       
+      <div className="space-y-3">
+        <Label>Fee Range</Label>
+        <Slider
+          value={localFilters.feeRangeSlider}
+          onValueChange={(value) => handleValueChange('feeRangeSlider', value)}
+          max={maxFee}
+          step={10}
+          className="my-4"
+        />
+        <div className="flex justify-between text-sm text-muted-foreground">
+          <span>${localFilters.feeRangeSlider[0]}</span>
+          <span>${localFilters.feeRangeSlider[1]}</span>
+        </div>
       </div>
 
       <div className="space-y-3">

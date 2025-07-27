@@ -27,9 +27,12 @@ export type Filters = {
   specialty: string;
   rating: number;
   feeRange: string;
+  feeRangeSlider: [number, number];
   availability?: ('today' | 'tomorrow' | 'weekend')[];
   appointmentTypes?: ('in-person' | 'online' | 'home-visit')[];
 };
+
+const maxFee = Math.max(...allDoctors.map(d => d.fees || 0), 500);
 
 export default function DoctorsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,6 +42,7 @@ export default function DoctorsPage() {
     specialty: 'all',
     rating: 0,
     feeRange: 'any',
+    feeRangeSlider: [0, maxFee],
     availability: [],
     appointmentTypes: [],
   });
@@ -57,15 +61,23 @@ export default function DoctorsPage() {
     const specialtyMatch = filters.specialty === 'all' || doctor.specialty === filters.specialty;
     const ratingMatch = doctor.rating >= filters.rating;
     
-    const feesMatch = (() => {
+    const doctorFee = doctor.fees || 0;
+    
+    // Slider-based fee match
+    const sliderFeesMatch = doctorFee >= filters.feeRangeSlider[0] && doctorFee <= filters.feeRangeSlider[1];
+
+    // Radio button-based fee match (overrides slider if not 'any')
+    const radioFeesMatch = (() => {
         if (filters.feeRange === 'any') return true;
-        const doctorFee = doctor.fees || 0;
         const [min, max] = filters.feeRange.split('-').map(Number);
         if (max) {
             return doctorFee >= min && doctorFee <= max;
         }
         return doctorFee >= min; // For "300+" case
     })();
+
+    // If a radio button is selected, it takes precedence. Otherwise use slider value.
+    const feesMatch = filters.feeRange !== 'any' ? radioFeesMatch : sliderFeesMatch;
 
     const appointmentTypesMatch = !filters.appointmentTypes || filters.appointmentTypes.length === 0 ||
         filters.appointmentTypes.every(type => doctor.appointmentTypes?.includes(type));
@@ -125,6 +137,7 @@ export default function DoctorsPage() {
         specialty: 'all',
         rating: 0,
         feeRange: 'any',
+        feeRangeSlider: [0, maxFee],
         availability: [],
         appointmentTypes: [],
     });

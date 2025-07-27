@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
 import { Button } from '@/components/ui/button';
@@ -19,25 +19,61 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { format, addDays, startOfDay } from 'date-fns';
+import { format, addDays, startOfDay, parseISO } from 'date-fns';
 import { getLoggedInUser } from '@/lib/user';
 import type { User } from '@/lib/user';
 import type { Doctor } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const getNextSevenAvailableDays = (doctor: Doctor | null) => {
     if (!doctor) return [];
     const availableDates: Date[] = [];
     let currentDate = startOfDay(new Date());
 
-    while (availableDates.length < 7 && availableDates.length < 30) { // Limit search to 30 days
+    for (let i = 0; i < 30 && availableDates.length < 7; i++) {
         const dateStr = format(currentDate, 'yyyy-MM-dd');
         if (doctor.availability[dateStr] && doctor.availability[dateStr].length > 0) {
             availableDates.push(new Date(currentDate));
         }
-        currentDate.setDate(currentDate.getDate() + 1);
+        currentDate = addDays(currentDate, 1);
     }
     return availableDates;
 };
+
+function BookingPageSkeleton() {
+  return (
+    <div className="flex flex-col h-screen bg-background">
+      <header className="bg-background p-4 flex items-center gap-4 border-b">
+        <Skeleton className="h-8 w-8" />
+        <Skeleton className="h-6 w-32" />
+      </header>
+      <main className="flex-1 overflow-y-auto p-6 space-y-8">
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-6 w-24" />
+          </div>
+          <div className="flex gap-3 pb-4">
+            {[...Array(7)].map((_, i) => (
+              <Skeleton key={i} className="w-20 h-24 rounded-lg" />
+            ))}
+          </div>
+        </div>
+        <div>
+          <Skeleton className="h-6 w-32 mb-4" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-md" />
+            ))}
+          </div>
+        </div>
+      </main>
+      <footer className="p-4 border-t bg-background">
+        <Skeleton className="h-12 w-full rounded-md" />
+      </footer>
+    </div>
+  );
+}
 
 
 export default function BookAppointmentPage() {
@@ -51,6 +87,7 @@ export default function BookAppointmentPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   
   const sevenDaySlots = useMemo(() => getNextSevenAvailableDays(doctor), [doctor]);
 
@@ -61,6 +98,7 @@ export default function BookAppointmentPage() {
     } else {
         setCurrentUser(user);
     }
+    setIsClient(true);
   }, [router]);
 
   useEffect(() => {
@@ -69,6 +107,10 @@ export default function BookAppointmentPage() {
     }
   }, [sevenDaySlots, selectedDate]);
 
+
+  if (!isClient) {
+    return <BookingPageSkeleton />;
+  }
 
   if (!doctor) {
     return (

@@ -50,14 +50,31 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
 
   const handleValueChange = (key: keyof Filters, value: any) => {
     const newFilters = { ...localFilters, [key]: value };
-    // if radio button is changed, reset slider to prevent conflict
-    if(key === 'feeRange' && value !== 'any') {
-      newFilters.feeRangeSlider = [0, maxFee];
+    
+    if (key === 'feeRange') {
+      switch (value) {
+        case 'any':
+          newFilters.feeRangeSlider = [0, maxFee];
+          break;
+        case '0-100':
+          newFilters.feeRangeSlider = [0, 100];
+          break;
+        case '100-200':
+          newFilters.feeRangeSlider = [100, 200];
+          break;
+        case '200-300':
+          newFilters.feeRangeSlider = [200, 300];
+          break;
+        case '300-9999':
+          newFilters.feeRangeSlider = [300, maxFee];
+          break;
+      }
     }
-    // if slider is changed, reset radio to any
-    if(key === 'feeRangeSlider') {
+    
+    if (key === 'feeRangeSlider') {
       newFilters.feeRange = 'any';
     }
+
     setLocalFilters(newFilters);
     onApply(newFilters);
   };
@@ -136,7 +153,6 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
       </div>
        
       <div className="space-y-3">
-        <Label>Consultation Fee</Label>
         <Slider
           value={localFilters.feeRangeSlider}
           onValueChange={(value) => handleValueChange('feeRangeSlider', value)}

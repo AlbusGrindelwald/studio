@@ -117,12 +117,6 @@ export default function BookAppointmentPage() {
     setIsClient(true);
   }, [id, router]);
 
-  useEffect(() => {
-    if (doctor && sevenDaySlots.length > 0 && !selectedDate) {
-      setSelectedDate(sevenDaySlots[0]);
-    }
-  }, [doctor, sevenDaySlots, selectedDate]);
-
 
   if (!isClient || !doctor) {
     return <BookingPageSkeleton />;

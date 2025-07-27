@@ -53,30 +53,22 @@ export default function PatientDetailsPage() {
               <Label>Gender</Label>
               <RadioGroup
                 defaultValue="male"
-                className="flex gap-4 pt-2"
+                className="flex items-center gap-6 pt-2"
                 onValueChange={setGender}
+                value={gender}
               >
-                <Button
-                  variant={gender === 'male' ? 'default' : 'outline'}
-                  onClick={() => setGender('male')}
-                  className={cn("flex-1", gender !== 'male' && "bg-white")}
-                >
-                  Male
-                </Button>
-                <Button
-                   variant={gender === 'female' ? 'default' : 'outline'}
-                   onClick={() => setGender('female')}
-                   className={cn("flex-1", gender !== 'female' && "bg-white")}
-                >
-                  Female
-                </Button>
-                <Button
-                  variant={gender === 'other' ? 'default' : 'outline'}
-                  onClick={() => setGender('other')}
-                  className={cn("flex-1", gender !== 'other' && "bg-white")}
-                >
-                  Transgender
-                </Button>
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="male" id="male" />
+                    <Label htmlFor="male">Male</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="female" id="female" />
+                    <Label htmlFor="female">Female</Label>
+                </div>
+                 <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="other" id="other" />
+                    <Label htmlFor="other">Transgender</Label>
+                </div>
               </RadioGroup>
             </div>
           </div>

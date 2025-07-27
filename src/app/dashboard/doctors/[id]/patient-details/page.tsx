@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,12 +9,58 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function PatientDetailsSkeleton() {
+    return (
+         <div className="p-6 space-y-8">
+            <div className="space-y-6">
+                <Skeleton className="h-8 w-40" />
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <div className="flex items-center gap-2 pt-2">
+                            <Skeleton className="h-10 w-full" />
+                            <Skeleton className="h-10 w-full" />
+                            <Skeleton className="h-10 w-full" />
+                        </div>
+                    </div>
+                </div>
+                 <div className="space-y-2">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-20 w-full" />
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+                 <div className="space-y-2">
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+            </div>
+         </div>
+    )
+}
 
 export default function PatientDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const id = typeof params.id === 'string' ? params.id : '';
   const [gender, setGender] = useState('male');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleContinue = () => {
     router.push(`/dashboard/doctors/${id}/book`);
@@ -35,6 +81,7 @@ export default function PatientDetailsPage() {
       </header>
 
       <main className="flex-1 overflow-y-auto p-6 space-y-8 bg-muted/20">
+       {isClient ? (
         <div className="space-y-6">
           <h2 className="text-xl font-semibold">Patient Details</h2>
 
@@ -95,6 +142,9 @@ export default function PatientDetailsPage() {
             <Input id="mobile" type="tel" placeholder="Mobile number" />
           </div>
         </div>
+       ) : (
+        <PatientDetailsSkeleton />
+       )}
       </main>
 
       <footer className="p-4 border-t bg-background space-y-3">

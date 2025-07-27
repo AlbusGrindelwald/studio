@@ -52,23 +52,23 @@ export default function PatientDetailsPage() {
                 <Label>Gender</Label>
                 <div className="flex items-center gap-2 pt-2">
                     <Button
-                        variant={gender === 'male' ? 'default' : 'outline'}
                         onClick={() => setGender('male')}
-                        className="flex-1"
+                        className={cn("flex-1", gender === 'male' ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground')}
+                        variant={gender === 'male' ? 'default' : 'outline'}
                     >
                         Male
                     </Button>
                     <Button
-                        variant={gender === 'female' ? 'default' : 'outline'}
                         onClick={() => setGender('female')}
-                        className="flex-1"
+                         className={cn("flex-1", gender === 'female' ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground')}
+                         variant={gender === 'female' ? 'default' : 'outline'}
                     >
                         Female
                     </Button>
                     <Button
-                        variant={gender === 'other' ? 'default' : 'outline'}
                         onClick={() => setGender('other')}
-                        className="flex-1"
+                         className={cn("flex-1", gender === 'other' ? 'bg-primary text-primary-foreground' : 'bg-background text-foreground')}
+                         variant={gender === 'other' ? 'default' : 'outline'}
                     >
                         Transgender
                     </Button>

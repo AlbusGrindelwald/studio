@@ -10,29 +10,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { doctors } from '@/lib/data';
 import type { Filters } from '@/app/dashboard/doctors/page';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
 
 
 const uniqueLocations = ['all', ...Array.from(new Set(doctors.map(d => d.location)))];
 const uniqueSpecialties = ['all', ...Array.from(new Set(doctors.map(d => d.specialty)))];
-const appointmentTypes: { id: Filters['appointmentTypes'][number], label: string }[] = [
+const appointmentTypes: { id: Exclude<Filters['appointmentTypes'], undefined>[number], label: string }[] = [
     { id: 'in-person', label: 'In-person' },
     { id: 'online', label: 'Online' },
     { id: 'home-visit', label: 'Home Visit' },
 ];
 
-const feeRanges = [
-    { id: 'any', label: 'Any' },
-    { id: '0-100', label: '$0 - $100' },
-    { id: '100-200', label: '$100 - $200' },
-    { id: '200-300', label: '$200 - $300' },
-    { id: '300', label: 'Over $300' },
-];
+const allFees = doctors.map(d => d.fees || 0);
+const minFee = Math.min(...allFees);
+const maxFee = Math.max(...allFees);
+
 
 interface DoctorFiltersProps {
   currentFilters: Filters;
@@ -57,7 +54,7 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
     value: string,
     checked: boolean
   ) => {
-    const currentValues = localFilters[key] as string[];
+    const currentValues = localFilters[key] as string[] | undefined || [];
     const newValues = checked
       ? [...currentValues, value]
       : currentValues.filter(v => v !== value);
@@ -67,6 +64,11 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
   const handleRatingChange = (newRating: number) => {
     handleValueChange('rating', localFilters.rating === newRating ? 0 : newRating);
   };
+
+  const handleFeeChange = (newRange: number[]) => {
+    handleValueChange('fees', { min: newRange[0], max: newRange[1] });
+  };
+
 
   return (
     <div className="space-y-8 py-4 px-1">
@@ -125,22 +127,20 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
         </div>
       </div>
 
-       <div className="space-y-3">
-        <Label>Consultation Fee</Label>
-        <RadioGroup
-          value={localFilters.fees}
-          onValueChange={(value) => handleValueChange('fees', value)}
-          className="space-y-2"
-        >
-          {feeRanges.map((range) => (
-            <div key={range.id} className="flex items-center space-x-2">
-              <RadioGroupItem value={range.id} id={`fees-${range.id}`} />
-              <Label htmlFor={`fees-${range.id}`} className="font-normal">
-                {range.label}
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
+      <div className="space-y-3">
+          <Label>Consultation Fee</Label>
+          <Slider
+            value={[localFilters.fees.min, localFilters.fees.max]}
+            onValueChange={handleFeeChange}
+            min={minFee}
+            max={maxFee}
+            step={10}
+            minStepsBetweenThumbs={1}
+          />
+          <div className="flex justify-between text-sm text-muted-foreground">
+              <span>${localFilters.fees.min}</span>
+              <span>${localFilters.fees.max}</span>
+          </div>
       </div>
 
       <div className="space-y-3">
@@ -150,7 +150,7 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
                 <div key={type.id} className="flex items-center gap-2">
                     <Checkbox
                         id={`type-${type.id}`}
-                        checked={localFilters.appointmentTypes.includes(type.id)}
+                        checked={localFilters.appointmentTypes?.includes(type.id)}
                         onCheckedChange={(checked) => handleCheckboxChange('appointmentTypes', type.id, !!checked)}
                     />
                     <Label htmlFor={`type-${type.id}`} className="font-normal">{type.label}</Label>

@@ -26,11 +26,12 @@ export type Filters = {
   location: string;
   specialty: string;
   rating: number;
-  fees: string;
-  availability: ('today' | 'tomorrow' | 'weekend')[];
-  appointmentTypes: ('in-person' | 'online' | 'home-visit')[];
+  fees: { min: number; max: number };
+  availability?: ('today' | 'tomorrow' | 'weekend')[];
+  appointmentTypes?: ('in-person' | 'online' | 'home-visit')[];
 };
 
+const allFees = allDoctors.map(d => d.fees || 0);
 
 export default function DoctorsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,7 +40,7 @@ export default function DoctorsPage() {
     location: 'all',
     specialty: 'all',
     rating: 0,
-    fees: 'any',
+    fees: { min: Math.min(...allFees), max: Math.max(...allFees) },
     availability: [],
     appointmentTypes: [],
   });
@@ -58,21 +59,13 @@ export default function DoctorsPage() {
     const specialtyMatch = filters.specialty === 'all' || doctor.specialty === filters.specialty;
     const ratingMatch = doctor.rating >= filters.rating;
     
-    const feesMatch = () => {
-        if (filters.fees === 'any') return true;
-        const [min, max] = filters.fees.split('-').map(Number);
-        const fee = doctor.fees || 0;
-        if (max) {
-            return fee >= min && fee <= max;
-        }
-        return fee >= min;
-    };
+    const feesMatch = (doctor.fees || 0) >= filters.fees.min && (doctor.fees || 0) <= filters.fees.max;
 
-    const appointmentTypesMatch = filters.appointmentTypes.length === 0 ||
+    const appointmentTypesMatch = !filters.appointmentTypes || filters.appointmentTypes.length === 0 ||
         filters.appointmentTypes.every(type => doctor.appointmentTypes?.includes(type));
 
     // Basic availability check (can be expanded)
-    const availabilityMatch = filters.availability.length === 0 ||
+    const availabilityMatch = !filters.availability || filters.availability.length === 0 ||
         filters.availability.some(avail => {
             if (avail === 'today') {
                 const today = new Date().toISOString().split('T')[0];
@@ -82,7 +75,7 @@ export default function DoctorsPage() {
             return true;
         });
 
-    return searchMatch && locationMatch && specialtyMatch && ratingMatch && feesMatch() && appointmentTypesMatch && availabilityMatch;
+    return searchMatch && locationMatch && specialtyMatch && ratingMatch && feesMatch && appointmentTypesMatch && availabilityMatch;
   });
 
   if (!isClient) {
@@ -125,7 +118,7 @@ export default function DoctorsPage() {
         location: 'all',
         specialty: 'all',
         rating: 0,
-        fees: 'any',
+        fees: { min: Math.min(...allFees), max: Math.max(...allFees) },
         availability: [],
         appointmentTypes: [],
     });

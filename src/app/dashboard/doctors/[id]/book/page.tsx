@@ -205,7 +205,7 @@ export default function BookAppointmentPage() {
                 <h3 className="font-semibold">Choose your slot</h3>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
-                    <span>{selectedDate ? format(parseISO(selectedDate), 'MMMM, yyyy') : 'Select a date'}</span>
+                    <span>{selectedDate ? format(parseISO(selectedDate), 'MMMM, yyyy') : ''}</span>
                 </div>
             </div>
 
@@ -305,5 +305,7 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
+    
 
     

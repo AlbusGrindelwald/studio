@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
 import { addNotification } from '@/lib/notifications';
@@ -163,12 +163,14 @@ export default function BookAppointmentPage() {
   const morningSlots = allTimeSlots.filter(time => {
     const hour = parseInt(time.split(':')[0], 10);
     const isPM = time.toUpperCase().includes('PM');
-    return isPM ? hour === 12 : hour < 12;
+    // Morning is before 12 PM
+    return !isPM || hour === 12;
   });
 
   const eveningSlots = allTimeSlots.filter(time => {
     const hour = parseInt(time.split(':')[0], 10);
     const isPM = time.toUpperCase().includes('PM');
+    // Evening is 12 PM or later
     return isPM && hour !== 12;
   });
 
@@ -224,6 +226,7 @@ export default function BookAppointmentPage() {
                             </button>
                         )
                     })}
+                     {sevenDaySlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4 w-full">No available dates found.</p>}
                 </div>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
@@ -233,7 +236,7 @@ export default function BookAppointmentPage() {
              <div className="space-y-6">
                  <div>
                     <h3 className="font-semibold mb-4">Select slot</h3>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {morningSlots.map(time => (
                         <Button
                         key={time}
@@ -250,7 +253,7 @@ export default function BookAppointmentPage() {
                 {eveningSlots.length > 0 && (
                     <div>
                         <h3 className="font-semibold mb-4">Evening Slot</h3>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {eveningSlots.map(time => (
                             <Button
                             key={time}
@@ -272,7 +275,7 @@ export default function BookAppointmentPage() {
 
       <footer className="p-4 border-t bg-background">
         <Button size="lg" className="w-full" onClick={handleBookNow} disabled={!selectedTime}>
-            {selectedTime ? `Pay $${doctor.fees} & Book` : 'Book Appointment'}
+            {selectedTime && doctor.fees ? `Pay $${doctor.fees} & Book` : 'Book Appointment'}
         </Button>
       </footer>
       
@@ -289,7 +292,7 @@ export default function BookAppointmentPage() {
             <p><strong>Specialty:</strong> {doctor.specialty}</p>
             <p><strong>Date:</strong> {selectedDate && format(parseISO(selectedDate), 'EEEE, MMMM d, yyyy')}</p>
             <p><strong>Time:</strong> {selectedTime}</p>
-            <p className="font-bold"><strong>Fee:</strong> <span className="text-primary">${doctor.fees}</span></p>
+            {doctor.fees && <p className="font-bold"><strong>Fee:</strong> <span className="text-primary">${doctor.fees}</span></p>}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsConfirming(false)}>Cancel</Button>
@@ -300,3 +303,5 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
+    

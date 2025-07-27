@@ -37,13 +37,11 @@ const getNextSevenDays = () => {
 
 const groupSlots = (slots: string[]) => {
     const morningSlots = slots.filter(time => {
-        const hour = parseInt(time.split(':')[0]);
         const period = time.split(' ')[1];
         return period === 'AM';
     });
 
     const eveningSlots = slots.filter(time => {
-        const hour = parseInt(time.split(':')[0]);
         const period = time.split(' ')[1];
         return period === 'PM';
     });

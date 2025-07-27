@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Calendar, Star } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { format, parseISO } from 'date-fns';
@@ -94,7 +94,11 @@ export default function DoctorDetailPage() {
                         <h2 className="font-bold text-lg">{doctor.name}</h2>
                         <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
                         <p className="text-sm text-primary font-medium">MBBS, MD (Internal Medicine)</p>
-                        <p className="text-xs text-muted-foreground mt-1">Fellow of Sanskara netralaya, chennai</p>
+                         <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <span className="font-semibold">{doctor.rating.toFixed(1)}</span>
+                            <span>({doctor.reviews} reviews)</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -32,12 +32,12 @@ export default function PatientDetailsPage() {
         >
           <ArrowLeft />
         </Button>
-        <h1 className="text-xl font-bold">Patient Details (Optional)</h1>
+        <h1 className="text-xl font-bold">Patient Details</h1>
       </header>
 
       <main className="flex-1 overflow-y-auto p-6 space-y-8 bg-muted/20">
         <div className="space-y-6">
-          <h2 className="text-xl font-semibold">Patient Details (Optional)</h2>
+          <h2 className="text-xl font-semibold">Patient Details</h2>
 
           <div className="space-y-2">
             <Label htmlFor="full-name">Full name</Label>
@@ -75,7 +75,7 @@ export default function PatientDetailsPage() {
                   onClick={() => setGender('other')}
                   className={cn("flex-1", gender !== 'other' && "bg-white")}
                 >
-                  Other
+                  Transgender
                 </Button>
               </RadioGroup>
             </div>
@@ -103,9 +103,6 @@ export default function PatientDetailsPage() {
       </main>
 
       <footer className="p-4 border-t bg-background space-y-3">
-        <Button variant="outline" size="lg" className="w-full" onClick={handleContinue}>
-          Make Payment
-        </Button>
         <Button size="lg" className="w-full" onClick={handleContinue}>
           Add Patient Details
         </Button>

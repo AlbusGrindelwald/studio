@@ -31,13 +31,17 @@ const getTimePeriod = (time: string) => {
     if (isPM && hour !== 12) {
         return 'evening';
     }
+    if (!isPM && hour === 12) { // 12:xx AM is morning
+        return 'morning';
+    }
     return hour < 12 ? 'morning' : 'evening';
 };
 
-const getNextSevenDays = (doctor: Doctor) => {
+const getNextSevenDays = (doctor: Doctor | null) => {
+    if (!doctor) return [];
     const availableDates = [];
     const today = startOfDay(new Date());
-    for(let i=0; i<7; i++) {
+    for (let i = 0; i < 7; i++) {
         const date = addDays(today, i);
         const dateStr = format(date, 'yyyy-MM-dd');
         if (doctor.availability[dateStr]?.length > 0) {
@@ -61,7 +65,7 @@ export default function BookAppointmentPage() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   
-  const sevenDaySlots = useMemo(() => doctor ? getNextSevenDays(doctor) : [], [doctor]);
+  const sevenDaySlots = useMemo(() => getNextSevenDays(doctor), [doctor]);
 
   const selectedSlotRef = useRef({ date: selectedDate, time: selectedTime, doctorName: doctor?.name });
   selectedSlotRef.current = { date: selectedDate, time: selectedTime, doctorName: doctor?.name };
@@ -74,6 +78,12 @@ export default function BookAppointmentPage() {
         setCurrentUser(user);
     }
   }, [router]);
+
+  useEffect(() => {
+    if (sevenDaySlots.length > 0 && !selectedDate) {
+      setSelectedDate(sevenDaySlots[0]);
+    }
+  }, [sevenDaySlots, selectedDate]);
 
 
   useEffect(() => {
@@ -93,13 +103,6 @@ export default function BookAppointmentPage() {
       }
     };
   }, [bookingConfirmed, toast]);
-
-   useEffect(() => {
-    if (sevenDaySlots.length > 0 && !selectedDate) {
-      setSelectedDate(sevenDaySlots[0]);
-    }
-  }, [sevenDaySlots, selectedDate]);
-
 
   if (!doctor) {
     return (
@@ -299,3 +302,5 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
+    

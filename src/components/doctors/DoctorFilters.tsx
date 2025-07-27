@@ -128,8 +128,8 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
           onValueChange={value => handleValueChange('fees', value)}
         />
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>${localFilters.fees[0]}</span>
           <span>${localFilters.fees[1]}</span>
+          <span>${localFilters.fees[0]}</span>
         </div>
       </div>
 

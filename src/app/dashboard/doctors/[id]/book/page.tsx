@@ -91,6 +91,7 @@ export default function BookAppointmentPage() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
   const bookingCompleted = useRef(false);
   
   const sevenDaySlots = useMemo(() => getNextSevenDays(), []);
@@ -140,6 +141,8 @@ export default function BookAppointmentPage() {
 
   const handleBookNow = () => {
     if (selectedDate && selectedTime) {
+      const newToken = Math.floor(1000 + Math.random() * 9000).toString();
+      setToken(newToken);
       setIsConfirming(true);
     } else {
       toast({
@@ -151,14 +154,15 @@ export default function BookAppointmentPage() {
   };
 
   const handleConfirmBooking = () => {
-    if (!selectedDate || !selectedTime || !currentUser || !doctor) return;
+    if (!selectedDate || !selectedTime || !currentUser || !doctor || !token) return;
 
     try {
       addAppointment({
         doctorId: doctor.id,
         date: format(selectedDate, 'yyyy-MM-dd'),
         time: selectedTime,
-        userId: currentUser.id
+        userId: currentUser.id,
+        token,
       });
       
       // Mark booking as completed to prevent the notification from firing.
@@ -301,6 +305,7 @@ export default function BookAppointmentPage() {
             <p><strong>Specialty:</strong> {doctor.specialty}</p>
             <p><strong>Date:</strong> {selectedDate && format(selectedDate, 'EEEE, MMMM d, yyyy')}</p>
             <p><strong>Time:</strong> {selectedTime}</p>
+            {token && <p><strong>Token:</strong> {token}</p>}
             {doctor.fees && <p className="font-bold"><strong>Fee:</strong> <span className="text-primary">${doctor.fees}</span></p>}
           </div>
           <DialogFooter>

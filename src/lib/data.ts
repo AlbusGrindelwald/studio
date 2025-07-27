@@ -1,5 +1,4 @@
 
-
 import type { Appointment, Doctor } from './types';
 import { User, getUsers } from './user';
 
@@ -96,6 +95,7 @@ export const appointments: Appointment[] = [
     date: '2024-07-20',
     time: '01:30 PM',
     status: 'completed',
+    token: '7890',
   },
 ];
 

@@ -25,6 +25,7 @@ export interface Appointment {
   date: string;
   time: string;
   status: 'upcoming' | 'completed' | 'canceled';
+  token: string;
 }
 
 export interface Notification {
@@ -35,3 +36,4 @@ export interface Notification {
   read: boolean;
   type: 'success' | 'destructive' | 'info';
 }
+

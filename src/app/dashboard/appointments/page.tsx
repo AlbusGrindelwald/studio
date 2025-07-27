@@ -76,6 +76,7 @@ function AppointmentCard({
           <p className="text-sm mt-1">
             {new Date(appointment.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} at {appointment.time}
           </p>
+          <p className="text-sm font-semibold text-primary mt-1">Token: {appointment.token}</p>
         </div>
         <div className="flex flex-col sm:items-end gap-2 w-full sm:w-auto">
           {appointment.status === 'upcoming' && (

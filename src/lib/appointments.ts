@@ -37,6 +37,7 @@ export const addAppointment = (newAppointment: {
   date: string;
   time: string;
   userId: string;
+  token: string;
 }) => {
   const doctor = doctors.find(d => d.id === newAppointment.doctorId);
   if (!doctor) {
@@ -60,6 +61,7 @@ export const addAppointment = (newAppointment: {
     date: newAppointment.date,
     time: newAppointment.time,
     status: 'upcoming',
+    token: newAppointment.token,
   };
 
   appointments = [appointment, ...appointments];

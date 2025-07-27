@@ -43,7 +43,7 @@ const dummyEveningSlots = ['02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', '04:0
 
 
 export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onReschedule }: RescheduleDialogProps) {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const { toast } = useToast();
   
@@ -86,10 +86,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
 
         <div className="py-4 space-y-6">
             <div>
-                <h3 className="font-medium text-sm mb-4 flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Choose a new date
-                </h3>
+                <h3 className="font-bold text-lg mb-4">Choose a new date</h3>
                 <ScrollArea className="w-full whitespace-nowrap rounded-md -mx-1">
                     <div className="flex gap-3 pb-4 px-1">
                         {sevenDaySlots.map(date => {
@@ -118,16 +115,16 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
             {selectedDate && (
                 <div className="space-y-6">
                     <div>
-                        <h3 className="font-medium text-sm mb-4 flex items-center gap-2">
-                            <Sun className="h-4 w-4 text-yellow-500" />
-                            Morning Slots
+                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                            <Sun className="h-5 w-5 text-yellow-500" />
+                            Morning
                         </h3>
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                         {dummyMorningSlots.map(time => (
                             <Button
                                 key={time}
                                 variant={selectedTime === time ? 'default' : 'outline'}
-                                className="py-2 h-auto text-xs"
+                                className="py-2 h-auto"
                                 onClick={() => setSelectedTime(time)}
                             >
                                 {time}
@@ -137,16 +134,16 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
                     </div>
                     
                     <div>
-                        <h3 className="font-medium text-sm mb-4 flex items-center gap-2">
-                            <Moon className="h-4 w-4 text-blue-500" />
-                            Evening Slots
+                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                            <Moon className="h-5 w-5 text-blue-500" />
+                            Evening
                         </h3>
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                         {dummyEveningSlots.map(time => (
                             <Button
                             key={time}
                             variant={selectedTime === time ? 'default' : 'outline'}
-                            className="py-2 h-auto text-xs"
+                            className="py-2 h-auto"
                             onClick={() => setSelectedTime(time)}
                             >
                             {time}

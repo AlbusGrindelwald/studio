@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar, Sun, Moon } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
 import { addNotification } from '@/lib/notifications';
@@ -28,18 +28,22 @@ import type { Doctor } from '@/lib/types';
 
 const getNextSevenAvailableDays = (doctor: Doctor | null) => {
     if (!doctor) return [];
-    const availableDates = [];
-    const today = startOfDay(new Date());
-    let daysChecked = 0;
-    let currentDate = today;
+    const availableDates: Date[] = [];
+    let currentDate = startOfDay(new Date());
 
-    while (availableDates.length < 7 && daysChecked < 30) { // check up to 30 days ahead
+    while (availableDates.length < 7) {
         const dateStr = format(currentDate, 'yyyy-MM-dd');
         if (doctor.availability[dateStr] && doctor.availability[dateStr].length > 0) {
-            availableDates.push(dateStr);
+            availableDates.push(currentDate);
         }
         currentDate = addDays(currentDate, 1);
-        daysChecked++;
+        // Break after a reasonable search range to avoid infinite loops
+        if (availableDates.length > 0 && availableDates.length < 7 && format(currentDate, 'yyyy-MM-dd') > addDays(availableDates[0], 30).toISOString()) {
+            break;
+        }
+         if (availableDates.length === 0 && format(currentDate, 'yyyy-MM-dd') > addDays(new Date(), 30).toISOString()) {
+            break;
+        }
     }
     return availableDates;
 };
@@ -53,7 +57,7 @@ export default function BookAppointmentPage() {
   const { toast } = useToast();
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
@@ -105,7 +109,7 @@ export default function BookAppointmentPage() {
     );
   }
   
-  const handleDateSelect = (date: string) => {
+  const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
     setSelectedTime(null);
   };
@@ -128,7 +132,7 @@ export default function BookAppointmentPage() {
     try {
       addAppointment({
         doctorId: doctor.id,
-        date: selectedDate,
+        date: format(selectedDate, 'yyyy-MM-dd'),
         time: selectedTime,
         userId: currentUser.id
       });
@@ -137,7 +141,7 @@ export default function BookAppointmentPage() {
 
       toast({
         title: 'Appointment Booked!',
-        description: `Your appointment with ${doctor.name} on ${format(parseISO(selectedDate), 'MMM d, yyyy')} at ${selectedTime} is confirmed.`,
+        description: `Your appointment with ${doctor.name} on ${format(selectedDate, 'MMM d, yyyy')} at ${selectedTime} is confirmed.`,
       });
       
       router.push('/dashboard/appointments');
@@ -158,18 +162,18 @@ export default function BookAppointmentPage() {
     setIsConfirming(false);
   };
   
-  const allTimeSlots = selectedDate ? doctor.availability[selectedDate] || [] : [];
+  const allTimeSlots = selectedDate ? doctor.availability[format(selectedDate, 'yyyy-MM-dd')] || [] : [];
   
   const morningSlots = allTimeSlots.filter(time => {
     const hour = parseInt(time.split(':')[0], 10);
     const isPM = time.toUpperCase().includes('PM');
-    return !isPM || hour === 12;
+    return (!isPM && hour < 12) || (isPM && hour === 12);
   });
 
-  const eveningSlots = allTimeSlots.filter(time => {
+  const afternoonSlots = allTimeSlots.filter(time => {
     const hour = parseInt(time.split(':')[0], 10);
     const isPM = time.toUpperCase().includes('PM');
-    return isPM && hour !== 12;
+    return isPM && hour >= 1 && hour <= 5;
   });
 
   return (
@@ -202,31 +206,24 @@ export default function BookAppointmentPage() {
       <main className="flex-1 overflow-y-auto p-4 space-y-6">
         <div>
             <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-lg">Book Appointment</h3>
-                 {selectedDate && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        <span>{format(parseISO(selectedDate), 'MMMM, yyyy')}</span>
-                    </div>
-                )}
+                <h3 className="font-semibold text-lg">Choose your slot</h3>
             </div>
             <ScrollArea className="w-full whitespace-nowrap rounded-md">
                 <div className="flex gap-3 pb-4">
-                    {sevenDaySlots.map(dateStr => {
-                        const date = parseISO(dateStr);
+                    {sevenDaySlots.map(date => {
                         return (
                             <button
-                                key={dateStr}
-                                onClick={() => handleDateSelect(dateStr)}
+                                key={date.toISOString()}
+                                onClick={() => handleDateSelect(date)}
                                 className={cn(
-                                    "flex flex-col items-center justify-center p-3 rounded-lg border w-16 h-20 transition-colors",
-                                    selectedDate === dateStr
+                                    "flex flex-col items-center justify-center p-3 rounded-lg border w-20 h-24 transition-colors",
+                                    selectedDate?.toISOString() === date.toISOString()
                                     ? "bg-primary text-primary-foreground"
                                     : "bg-card hover:bg-accent"
                                 )}
                             >
-                                <span className="text-xl font-bold">{format(date, 'dd')}</span>
-                                <span className="text-xs uppercase">{format(date, 'E')}</span>
+                                <span className="text-3xl font-bold">{format(date, 'dd')}</span>
+                                <span className="text-sm uppercase">{format(date, 'E')}</span>
                             </button>
                         )
                     })}
@@ -239,8 +236,8 @@ export default function BookAppointmentPage() {
         {selectedDate && (
              <div className="space-y-6">
                  <div>
-                    <h3 className="font-semibold mb-4">Select slot</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <h3 className="font-semibold mb-4 flex items-center gap-2"><Sun className="h-5 w-5 text-orange-400" /> Morning</h3>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                     {morningSlots.map(time => (
                         <Button
                         key={time}
@@ -251,14 +248,15 @@ export default function BookAppointmentPage() {
                         {time}
                         </Button>
                     ))}
+                     {morningSlots.length === 0 && <p className="col-span-full text-muted-foreground text-sm text-center py-4">No morning slots available.</p>}
                     </div>
                 </div>
 
-                {eveningSlots.length > 0 && (
+                {afternoonSlots.length > 0 && (
                     <div>
-                        <h3 className="font-semibold mb-4">Evening Slot</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {eveningSlots.map(time => (
+                        <h3 className="font-semibold mb-4 flex items-center gap-2"><Moon className="h-5 w-5 text-blue-500" /> Afternoon</h3>
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                        {afternoonSlots.map(time => (
                             <Button
                             key={time}
                             variant={selectedTime === time ? 'default' : 'outline'}
@@ -294,7 +292,7 @@ export default function BookAppointmentPage() {
           <div className="space-y-2 py-4">
             <p><strong>Doctor:</strong> {doctor.name}</p>
             <p><strong>Specialty:</strong> {doctor.specialty}</p>
-            <p><strong>Date:</strong> {selectedDate && format(parseISO(selectedDate), 'EEEE, MMMM d, yyyy')}</p>
+            <p><strong>Date:</strong> {selectedDate && format(selectedDate, 'EEEE, MMMM d, yyyy')}</p>
             <p><strong>Time:</strong> {selectedTime}</p>
             {doctor.fees && <p className="font-bold"><strong>Fee:</strong> <span className="text-primary">${doctor.fees}</span></p>}
           </div>

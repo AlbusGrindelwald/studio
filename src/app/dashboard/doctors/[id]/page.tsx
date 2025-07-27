@@ -66,7 +66,7 @@ export default function DoctorDetailPage() {
   }
 
   const handleBookNow = () => {
-    router.push(`/dashboard/doctors/${doctor.id}/book`);
+    router.push(`/dashboard/doctors/${doctor.id}/patient-details`);
   };
 
   return (
@@ -134,7 +134,7 @@ export default function DoctorDetailPage() {
 
       <footer className="p-4 border-t bg-background space-y-4">
         {earliestSlot && (
-            <Link href={`/dashboard/doctors/${doctor.id}/book`} passHref>
+            <Link href={`/dashboard/doctors/${doctor.id}/patient-details`} passHref>
                 <div className="bg-card p-3 rounded-lg flex items-center justify-between cursor-pointer border hover:bg-accent">
                     <div className='flex items-center gap-4'>
                         <Calendar className="h-6 w-6 text-primary" />

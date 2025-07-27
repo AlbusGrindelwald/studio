@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { format, parseISO, addDays, isBefore, startOfDay } from 'date-fns';
+import { format, parseISO, addDays, startOfDay } from 'date-fns';
 import { getLoggedInUser } from '@/lib/user';
 import type { User } from '@/lib/user';
 import type { Doctor } from '@/lib/types';
@@ -28,13 +28,13 @@ import type { Doctor } from '@/lib/types';
 const getTimePeriod = (time: string) => {
     const hour = parseInt(time.split(':')[0], 10);
     const isPM = time.toUpperCase().includes('PM');
-    if (isPM && hour < 12) { // 1 PM to 11 PM
-        return 'evening';
-    }
-    if (!isPM && hour === 12) { // 12:xx AM is morning
+    if (!isPM && hour < 12) { // Before noon
         return 'morning';
     }
-    return hour < 12 ? 'morning' : 'evening';
+    if (isPM && (hour === 12 || hour < 6)) { // 12 PM to 5:59 PM
+        return 'morning'; // Considered afternoon, but visually grouped with morning
+    }
+    return 'evening'; // 6 PM onwards
 };
 
 const getNextSevenAvailableDays = (doctor: Doctor | null) => {
@@ -89,6 +89,8 @@ export default function BookAppointmentPage() {
 
   useEffect(() => {
     return () => {
+      // This cleanup function runs when the component unmounts.
+      // We check if a booking was started but not confirmed.
       if (selectedSlotRef.current.date && selectedSlotRef.current.time && !bookingConfirmed) {
         const description = `Your appointment with ${selectedSlotRef.current.doctorName} was not confirmed. Please complete the booking process.`;
         addNotification({
@@ -115,7 +117,7 @@ export default function BookAppointmentPage() {
   
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
-    setSelectedTime(null);
+    setSelectedTime(null); // Reset time when date changes
   };
 
   const handleBookNow = () => {
@@ -141,7 +143,7 @@ export default function BookAppointmentPage() {
         userId: currentUser.id
       });
 
-      setBookingConfirmed(true);
+      setBookingConfirmed(true); // Mark booking as confirmed
 
       toast({
         title: 'Appointment Booked!',
@@ -303,3 +305,5 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
+    

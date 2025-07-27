@@ -40,13 +40,13 @@ const groupSlots = (slots: string[]) => {
         const hour = parseInt(time.split(':')[0]);
         const period = time.split(' ')[1];
         return period.toUpperCase() === 'AM' || (period.toUpperCase() === 'PM' && hour === 12);
-    });
+    }).sort();
 
     const eveningSlots = slots.filter(time => {
         const hour = parseInt(time.split(':')[0]);
         const period = time.split(' ')[1];
         return period.toUpperCase() === 'PM' && hour !== 12;
-    });
+    }).sort();
     return { morningSlots, eveningSlots };
 }
 
@@ -117,11 +117,6 @@ export default function BookAppointmentPage() {
     setIsClient(true);
   }, [id, router]);
 
-
-  if (!isClient || !doctor) {
-    return <BookingPageSkeleton />;
-  }
-  
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
     setSelectedTime(null);
@@ -140,7 +135,7 @@ export default function BookAppointmentPage() {
   };
 
   const handleConfirmBooking = () => {
-    if (!selectedDate || !selectedTime || !currentUser) return;
+    if (!selectedDate || !selectedTime || !currentUser || !doctor) return;
 
     try {
       addAppointment({
@@ -168,8 +163,16 @@ export default function BookAppointmentPage() {
     setIsConfirming(false);
   };
   
-  const allTimeSlots = selectedDate ? doctor.availability[format(selectedDate, 'yyyy-MM-dd')] || [] : [];
-  const { morningSlots, eveningSlots } = groupSlots(allTimeSlots);
+  const allTimeSlots = useMemo(() => {
+    if (!doctor || !selectedDate) return [];
+    return doctor.availability[format(selectedDate, 'yyyy-MM-dd')] || [];
+  }, [doctor, selectedDate]);
+
+  const { morningSlots, eveningSlots } = useMemo(() => groupSlots(allTimeSlots), [allTimeSlots]);
+  
+  if (!isClient || !doctor) {
+    return <BookingPageSkeleton />;
+  }
   
   return (
     <div className="flex flex-col h-screen bg-muted/20">
@@ -208,10 +211,10 @@ export default function BookAppointmentPage() {
                                 key={date.toISOString()}
                                 onClick={() => handleDateSelect(date)}
                                 className={cn(
-                                    "flex flex-col items-center justify-center p-2 rounded-lg border w-16 h-20 transition-colors shrink-0 cursor-pointer",
+                                    "flex flex-col items-center justify-center p-2 rounded-lg border w-16 h-20 transition-colors shrink-0",
                                     isSelected
                                     ? "bg-primary text-primary-foreground"
-                                    : "bg-background text-foreground"
+                                    : "bg-background text-foreground hover:bg-accent"
                                 )}
                             >
                                 <span className="text-2xl font-bold">{format(date, 'dd')}</span>
@@ -279,7 +282,7 @@ export default function BookAppointmentPage() {
 
       <footer className="p-4 border-t bg-background">
         <Button size="lg" className="w-full h-12 text-base" onClick={handleBookNow} disabled={!selectedTime}>
-             {selectedTime ? `Pay $${doctor.fees} & Book` : 'Book appointment'}
+             {selectedTime ? `Pay $${doctor.fees || '0'} & Book` : 'Book appointment'}
         </Button>
       </footer>
       

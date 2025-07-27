@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
 import { addNotification } from '@/lib/notifications';
@@ -25,17 +25,6 @@ import { getLoggedInUser } from '@/lib/user';
 import type { User } from '@/lib/user';
 import type { Doctor } from '@/lib/types';
 
-const getTimePeriod = (time: string) => {
-    const hour = parseInt(time.split(':')[0], 10);
-    const isPM = time.toUpperCase().includes('PM');
-    if (!isPM && hour < 12) { // Before noon
-        return 'morning';
-    }
-    if (isPM && (hour === 12 || hour < 6)) { // 12 PM to 5:59 PM
-        return 'morning'; // Considered afternoon, but visually grouped with morning
-    }
-    return 'evening'; // 6 PM onwards
-};
 
 const getNextSevenAvailableDays = (doctor: Doctor | null) => {
     if (!doctor) return [];
@@ -80,7 +69,6 @@ export default function BookAppointmentPage() {
   }, [router]);
 
   useEffect(() => {
-    // Automatically select the first available date when the component mounts or slots change
     if (sevenDaySlots.length > 0 && !selectedDate) {
       setSelectedDate(sevenDaySlots[0]);
     }
@@ -89,8 +77,6 @@ export default function BookAppointmentPage() {
 
   useEffect(() => {
     return () => {
-      // This cleanup function runs when the component unmounts.
-      // We check if a booking was started but not confirmed.
       if (selectedSlotRef.current.date && selectedSlotRef.current.time && !bookingConfirmed) {
         const description = `Your appointment with ${selectedSlotRef.current.doctorName} was not confirmed. Please complete the booking process.`;
         addNotification({
@@ -117,7 +103,7 @@ export default function BookAppointmentPage() {
   
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
-    setSelectedTime(null); // Reset time when date changes
+    setSelectedTime(null);
   };
 
   const handleBookNow = () => {
@@ -143,7 +129,7 @@ export default function BookAppointmentPage() {
         userId: currentUser.id
       });
 
-      setBookingConfirmed(true); // Mark booking as confirmed
+      setBookingConfirmed(true);
 
       toast({
         title: 'Appointment Booked!',
@@ -169,8 +155,6 @@ export default function BookAppointmentPage() {
   };
   
   const timeSlots = selectedDate ? doctor.availability[selectedDate] || [] : [];
-  const morningSlots = timeSlots.filter(time => getTimePeriod(time) === 'morning');
-  const eveningSlots = timeSlots.filter(time => getTimePeriod(time) === 'evening');
 
   return (
     <div className="flex flex-col h-screen bg-muted/40">
@@ -202,7 +186,11 @@ export default function BookAppointmentPage() {
       <main className="flex-1 overflow-y-auto p-4 space-y-6">
         <div>
             <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold">Choose your slot</h3>
+                <h3 className="text-lg font-bold">Book Appointment</h3>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    <span>{selectedDate ? format(parseISO(selectedDate), 'MMMM, yyyy') : ''}</span>
+                </div>
             </div>
 
             <ScrollArea className="w-full whitespace-nowrap rounded-md">
@@ -232,40 +220,21 @@ export default function BookAppointmentPage() {
 
         {selectedDate && (
              <div className="space-y-6">
-                {morningSlots.length > 0 && (
-                    <div>
-                        <h3 className="font-semibold mb-4 flex items-center gap-2"><Sun className="h-5 w-5 text-orange-400" /> Morning</h3>
-                        <div className="grid grid-cols-3 gap-3">
-                        {morningSlots.map(time => (
-                            <Button
-                            key={time}
-                            variant={selectedTime === time ? 'default' : 'outline'}
-                            className={cn("py-3 h-auto", selectedTime === time && "bg-primary text-primary-foreground")}
-                            onClick={() => setSelectedTime(time)}
-                            >
-                            {time}
-                            </Button>
-                        ))}
-                        </div>
+                 <div>
+                    <h3 className="font-semibold mb-4">Select slot</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                    {timeSlots.map(time => (
+                        <Button
+                        key={time}
+                        variant={selectedTime === time ? 'default' : 'outline'}
+                        className={cn("py-3 h-auto", selectedTime === time && "bg-primary text-primary-foreground")}
+                        onClick={() => setSelectedTime(time)}
+                        >
+                        {time}
+                        </Button>
+                    ))}
                     </div>
-                )}
-                 {eveningSlots.length > 0 && (
-                    <div>
-                        <h3 className="font-semibold mb-4 flex items-center gap-2"><Moon className="h-5 w-5 text-indigo-400" /> Evening</h3>
-                        <div className="grid grid-cols-3 gap-3">
-                        {eveningSlots.map(time => (
-                            <Button
-                            key={time}
-                            variant={selectedTime === time ? 'default' : 'outline'}
-                            className={cn("py-3 h-auto", selectedTime === time && "bg-primary text-primary-foreground")}
-                            onClick={() => setSelectedTime(time)}
-                            >
-                            {time}
-                            </Button>
-                        ))}
-                        </div>
-                    </div>
-                )}
+                </div>
                 {timeSlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4">No slots available for this date.</p>}
             </div>
         )}
@@ -301,3 +270,5 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
+    

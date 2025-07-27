@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { addNotification } from '@/lib/notifications';
 
 function PatientDetailsSkeleton() {
     return (
@@ -88,6 +89,20 @@ export default function PatientDetailsPage() {
 
   const handleContinue = () => {
     if (isFormComplete) {
+      const notificationPayload = {
+        title: 'Patient Details Added',
+        description: `Details for ${fullName} have been saved for the next step.`,
+      };
+      
+      addNotification({
+        ...notificationPayload,
+        type: 'info'
+      });
+
+      toast({
+        ...notificationPayload
+      });
+
       router.push(`/dashboard/doctors/${id}/book`);
     } else {
         toast({

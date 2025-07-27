@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 function PatientDetailsSkeleton() {
     return (
@@ -55,8 +56,13 @@ export default function PatientDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const id = typeof params.id === 'string' ? params.id : '';
+  const { toast } = useToast();
+
+  const [fullName, setFullName] = useState('');
   const [gender, setGender] = useState('male');
   const [age, setAge] = useState('');
+  const [problem, setProblem] = useState('');
+  const [relation, setRelation] = useState('');
   const [mobile, setMobile] = useState('');
   const [isClient, setIsClient] = useState(false);
 
@@ -66,7 +72,6 @@ export default function PatientDetailsPage() {
   
   const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow only numbers
     if (/^\d*$/.test(value)) {
       setAge(value);
     }
@@ -74,15 +79,23 @@ export default function PatientDetailsPage() {
 
   const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow only numbers and limit to 10 digits
     if (/^\d*$/.test(value) && value.length <= 10) {
       setMobile(value);
     }
   };
 
+  const isFormComplete = fullName && age && gender && problem && relation && mobile.length === 10;
 
   const handleContinue = () => {
-    router.push(`/dashboard/doctors/${id}/book`);
+    if (isFormComplete) {
+      router.push(`/dashboard/doctors/${id}/book`);
+    } else {
+        toast({
+            title: 'Incomplete Form',
+            description: 'Please fill out all the patient details to continue.',
+            variant: 'destructive',
+        });
+    }
   };
 
   return (
@@ -106,7 +119,7 @@ export default function PatientDetailsPage() {
 
           <div className="space-y-2">
             <Label htmlFor="full-name">Full name</Label>
-            <Input id="full-name" placeholder="Patient Name" />
+            <Input id="full-name" placeholder="Patient Name" value={fullName} onChange={e => setFullName(e.target.value)} />
           </div>
 
           <div className="grid grid-cols-2 gap-6">
@@ -148,12 +161,14 @@ export default function PatientDetailsPage() {
               id="problem"
               placeholder="write your problem"
               rows={4}
+              value={problem}
+              onChange={e => setProblem(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="relation">Relation with Patient</Label>
-            <Input id="relation" placeholder="Brother/sister/mother" />
+            <Input id="relation" placeholder="Brother/sister/mother" value={relation} onChange={e => setRelation(e.target.value)} />
           </div>
 
           <div className="space-y-2">
@@ -167,7 +182,7 @@ export default function PatientDetailsPage() {
       </main>
 
       <footer className="p-4 border-t bg-background space-y-3">
-        <Button size="lg" className="w-full" onClick={handleContinue}>
+        <Button size="lg" className="w-full" onClick={handleContinue} disabled={!isFormComplete}>
           Add Patient Details
         </Button>
       </footer>

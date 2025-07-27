@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Moon, Sun } from 'lucide-react';
+import { ArrowLeft, Moon, Sun } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
 import { Button } from '@/components/ui/button';
@@ -37,13 +37,14 @@ const getNextSevenDays = () => {
 
 const groupSlots = (slots: string[]) => {
     const morningSlots = slots.filter(time => {
+        const hour = parseInt(time.split(':')[0]);
         const period = time.split(' ')[1];
-        return period === 'AM';
+        return period === 'AM' || (period === 'PM' && hour === 12);
     });
 
     const eveningSlots = slots.filter(time => {
         const period = time.split(' ')[1];
-        return period === 'PM';
+        return period === 'PM' && parseInt(time.split(':')[0]) !== 12;
     });
     return { morningSlots, eveningSlots };
 }
@@ -94,7 +95,7 @@ export default function BookAppointmentPage() {
   const { toast } = useToast();
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -114,11 +115,7 @@ export default function BookAppointmentPage() {
 
   useEffect(() => {
     if (doctor && sevenDaySlots.length > 0 && !selectedDate) {
-        const firstAvailableDate = sevenDaySlots.find(day => {
-            const dateStr = format(day, 'yyyy-MM-dd');
-            return doctor.availability[dateStr] && doctor.availability[dateStr].length > 0;
-        });
-      setSelectedDate(firstAvailableDate || null);
+      setSelectedDate(sevenDaySlots[0]);
     }
   }, [doctor, sevenDaySlots, selectedDate]);
 
@@ -128,11 +125,8 @@ export default function BookAppointmentPage() {
   }
   
   const handleDateSelect = (date: Date) => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    if (doctor.availability[dateStr] && doctor.availability[dateStr].length > 0) {
-        setSelectedDate(date);
-        setSelectedTime(null);
-    }
+    setSelectedDate(date);
+    setSelectedTime(null);
   };
 
   const handleBookNow = () => {
@@ -210,19 +204,15 @@ export default function BookAppointmentPage() {
             <ScrollArea className="w-full whitespace-nowrap rounded-md -mx-1">
                 <div className="flex gap-3 pb-4 px-1">
                     {sevenDaySlots.map(date => {
-                        const dateStr = format(date, 'yyyy-MM-dd');
-                        const isAvailable = doctor.availability[dateStr] && doctor.availability[dateStr].length > 0;
                         return (
                             <button
                                 key={date.toISOString()}
                                 onClick={() => handleDateSelect(date)}
-                                disabled={!isAvailable}
                                 className={cn(
-                                    "flex flex-col items-center justify-center p-2 rounded-lg border w-16 h-20 transition-colors shrink-0",
+                                    "flex flex-col items-center justify-center p-2 rounded-lg border w-16 h-20 transition-colors shrink-0 cursor-pointer hover:bg-accent",
                                     selectedDate?.toISOString() === date.toISOString()
                                     ? "bg-primary text-primary-foreground"
-                                    : "bg-card",
-                                    isAvailable ? "cursor-pointer hover:bg-accent" : "bg-muted/50 cursor-not-allowed opacity-50"
+                                    : "bg-card"
                                 )}
                             >
                                 <span className="text-2xl font-bold">{format(date, 'dd')}</span>
@@ -276,6 +266,15 @@ export default function BookAppointmentPage() {
                         </div>
                     </div>
                 )}
+                 {allTimeSlots.length > 0 && eveningSlots.length === 0 && (
+                     <div>
+                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                            <Moon className="h-5 w-5 text-blue-500" />
+                            Evening
+                        </h3>
+                         <p className="col-span-full text-muted-foreground text-sm text-center py-4">No evening slots available.</p>
+                    </div>
+                 )}
             </div>
         )}
       </main>

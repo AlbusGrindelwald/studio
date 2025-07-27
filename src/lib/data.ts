@@ -106,6 +106,14 @@ export const appointments: Appointment[] = [
     status: 'upcoming',
   },
   {
+    id: 'A5',
+    doctor: doctors[3],
+    user: patientUser,
+    date: '2024-09-05',
+    time: '09:00 AM',
+    status: 'upcoming',
+  },
+  {
     id: 'A3',
     doctor: doctors[1],
     user: patientUser,
@@ -119,6 +127,14 @@ export const appointments: Appointment[] = [
     user: patientUser,
     date: '2024-07-18',
     time: '02:00 PM',
+    status: 'canceled',
+  },
+  {
+    id: 'A6',
+    doctor: doctors[2],
+    user: patientUser,
+    date: '2024-07-15',
+    time: '03:00 PM',
     status: 'canceled',
   },
 ];

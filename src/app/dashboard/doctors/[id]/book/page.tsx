@@ -203,10 +203,6 @@ export default function BookAppointmentPage() {
         <div>
             <div className="flex justify-between items-center mb-4">
                 <h3 className="font-semibold text-lg">Book Appointment</h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-5 w-5" />
-                    <span>{selectedDate ? format(parseISO(selectedDate), 'MMMM, yyyy') : ''}</span>
-                </div>
             </div>
             <ScrollArea className="w-full whitespace-nowrap rounded-md">
                 <div className="flex gap-3 pb-4">

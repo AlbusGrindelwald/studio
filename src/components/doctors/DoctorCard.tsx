@@ -60,7 +60,10 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
                             </div>
                         </div>
                         <div className="flex justify-between items-center mt-4">
-                            <Badge variant="outline">Available Today</Badge>
+                            <div>
+                                <p className="text-xs text-muted-foreground">Consultation Fee</p>
+                                <p className="font-bold text-primary">${doctor.fees}</p>
+                            </div>
                             <Button size="sm">Book Now</Button>
                         </div>
                     </CardContent>

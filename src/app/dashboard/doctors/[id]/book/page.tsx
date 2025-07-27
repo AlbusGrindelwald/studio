@@ -1,12 +1,13 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Moon, Sun } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
+import { addNotification } from '@/lib/notifications';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -90,6 +91,7 @@ export default function BookAppointmentPage() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const bookingCompleted = useRef(false);
   
   const sevenDaySlots = useMemo(() => getNextSevenDays(), []);
 
@@ -106,6 +108,19 @@ export default function BookAppointmentPage() {
     }
     setIsClient(true);
   }, [id, router]);
+
+   useEffect(() => {
+    return () => {
+      if (!bookingCompleted.current && doctor) {
+        addNotification({
+          title: `Still thinking about ${doctor.name}?`,
+          description: 'Your chosen time slot might not be available for long. Complete your booking now!',
+          type: 'info',
+        });
+      }
+    };
+  }, [doctor]);
+
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
@@ -134,6 +149,8 @@ export default function BookAppointmentPage() {
         time: selectedTime,
         userId: currentUser.id
       });
+      
+      bookingCompleted.current = true;
 
       toast({
         title: 'Appointment Booked!',

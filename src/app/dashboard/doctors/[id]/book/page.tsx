@@ -288,7 +288,7 @@ export default function BookAppointmentPage() {
             <p><strong>Specialty:</strong> {doctor.specialty}</p>
             <p><strong>Date:</strong> {selectedDate && format(parseISO(selectedDate), 'EEEE, MMMM d, yyyy')}</p>
             <p><strong>Time:</strong> {selectedTime}</p>
-            <p><strong>Fee:</strong> ${doctor.fees}</p>
+            <p className="font-bold"><strong>Fee:</strong> <span className="text-primary">${doctor.fees}</span></p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsConfirming(false)}>Cancel</Button>
@@ -299,4 +299,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-

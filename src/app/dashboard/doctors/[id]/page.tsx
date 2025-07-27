@@ -113,6 +113,11 @@ export default function DoctorDetailPage() {
                         {doctor.description}
                     </p>
                 </section>
+
+                <section>
+                    <h3 className="font-semibold mb-2">Consultation Fee</h3>
+                    <p className="text-2xl font-bold text-primary">${doctor.fees}</p>
+                </section>
                 
                 <section>
                     <h3 className="font-semibold mb-2">Availability For Consulting</h3>

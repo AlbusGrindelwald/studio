@@ -56,11 +56,30 @@ export default function PatientDetailsPage() {
   const params = useParams();
   const id = typeof params.id === 'string' ? params.id : '';
   const [gender, setGender] = useState('male');
+  const [age, setAge] = useState('');
+  const [mobile, setMobile] = useState('');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+  
+  const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numbers
+    if (/^\d*$/.test(value)) {
+      setAge(value);
+    }
+  };
+
+  const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numbers and limit to 10 digits
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setMobile(value);
+    }
+  };
+
 
   const handleContinue = () => {
     router.push(`/dashboard/doctors/${id}/book`);
@@ -93,7 +112,7 @@ export default function PatientDetailsPage() {
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="age">Age</Label>
-              <Input id="age" type="number" placeholder="22" />
+              <Input id="age" type="text" inputMode="numeric" placeholder="22" value={age} onChange={handleAgeChange} />
             </div>
             <div className="space-y-2">
                 <Label>Gender</Label>
@@ -139,7 +158,7 @@ export default function PatientDetailsPage() {
 
           <div className="space-y-2">
             <Label htmlFor="mobile">Patient Mobile Number</Label>
-            <Input id="mobile" type="tel" placeholder="Mobile number" />
+            <Input id="mobile" type="tel" placeholder="Mobile number" value={mobile} onChange={handleMobileChange} maxLength={10} />
           </div>
         </div>
        ) : (

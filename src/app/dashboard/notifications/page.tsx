@@ -3,13 +3,24 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Bell, CalendarCheck, CheckCheck, XCircle } from 'lucide-react';
-import { getNotifications, markAllAsRead, subscribe } from '@/lib/notifications';
+import { ArrowLeft, Bell, CalendarCheck, CheckCheck, Trash2, XCircle } from 'lucide-react';
+import { getNotifications, markAllAsRead, subscribe, clearAllNotifications } from '@/lib/notifications';
 import type { Notification } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 function NotificationIcon({ type }: { type: Notification['type'] }) {
   switch (type) {
@@ -45,6 +56,10 @@ export default function NotificationsPage() {
   const handleMarkAllRead = () => {
     markAllAsRead();
   };
+
+  const handleClearAll = () => {
+    clearAllNotifications();
+  };
   
   const hasUnread = notifications.some(n => !n.read);
 
@@ -62,12 +77,36 @@ export default function NotificationsPage() {
           </Button>
           <h1 className="text-xl font-bold">Notifications</h1>
         </div>
-        {hasUnread && (
-            <Button variant="ghost" size="sm" onClick={handleMarkAllRead}>
-                <CheckCheck className="mr-2 h-4 w-4" />
-                Mark all as read
-            </Button>
-        )}
+        <div className='flex items-center gap-2'>
+            {hasUnread && (
+                <Button variant="ghost" size="sm" onClick={handleMarkAllRead}>
+                    <CheckCheck className="mr-2 h-4 w-4" />
+                    Mark all as read
+                </Button>
+            )}
+             {notifications.length > 0 && (
+                 <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="sm">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Clear All
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This will permanently delete all of your notifications. This action cannot be undone.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleClearAll}>Confirm</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                 </AlertDialog>
+             )}
+        </div>
       </header>
       
       <main className="flex-1 overflow-y-auto pt-20 p-4 space-y-3">

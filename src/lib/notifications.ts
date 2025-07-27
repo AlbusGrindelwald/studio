@@ -46,6 +46,11 @@ export const markAllAsRead = () => {
   saveNotifications();
 };
 
+export const clearAllNotifications = () => {
+    notifications = [];
+    saveNotifications();
+}
+
 export const subscribe = (listener: () => void) => {
   listeners.push(listener);
   // Return an unsubscribe function

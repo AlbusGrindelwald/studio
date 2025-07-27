@@ -57,7 +57,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
         title: 'Appointment Rescheduled!',
         description: `Your appointment with ${doctor.name} has been moved to ${format(selectedDate, 'MMM d, yyyy')} at ${selectedTime}.`,
       });
-      setSelectedDate(null);
+      setSelectedDate(new Date());
       setSelectedTime(null);
     } else {
        toast({
@@ -76,7 +76,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Reschedule Appointment</DialogTitle>
           <DialogDescription>
@@ -84,11 +84,11 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4 space-y-6">
+        <div className="py-4 space-y-8">
             <div>
                 <h3 className="font-bold text-lg mb-4">Choose a new date</h3>
                 <ScrollArea className="w-full whitespace-nowrap rounded-md -mx-1">
-                    <div className="flex gap-3 pb-4 px-1">
+                    <div className="flex gap-4 pb-4 px-1">
                         {sevenDaySlots.map(date => {
                             const isSelected = selectedDate?.toISOString().split('T')[0] === date.toISOString().split('T')[0];
                             return (
@@ -96,14 +96,14 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
                                     key={date.toISOString()}
                                     onClick={() => handleDateSelect(date)}
                                     className={cn(
-                                        "flex flex-col items-center justify-center p-2 rounded-lg border w-16 h-20 transition-colors shrink-0",
+                                        "flex flex-col items-center justify-center p-2 rounded-lg border w-20 h-24 transition-colors shrink-0",
                                         isSelected
                                         ? "bg-primary text-primary-foreground"
                                         : "bg-background text-foreground"
                                     )}
                                 >
-                                    <span className="text-2xl font-bold">{format(date, 'dd')}</span>
-                                    <span className="text-xs uppercase font-medium">{format(date, 'E')}</span>
+                                    <span className="text-3xl font-bold">{format(date, 'dd')}</span>
+                                    <span className="text-sm uppercase font-medium">{format(date, 'E')}</span>
                                 </button>
                             )
                         })}
@@ -113,13 +113,13 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
             </div>
 
             {selectedDate && (
-                <div className="space-y-6">
+                <div className="space-y-8">
                     <div>
                         <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                             <Sun className="h-5 w-5 text-yellow-500" />
-                            Morning
+                            Morning Slots
                         </h3>
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
                         {dummyMorningSlots.map(time => (
                             <Button
                                 key={time}
@@ -136,9 +136,9 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
                     <div>
                         <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                             <Moon className="h-5 w-5 text-blue-500" />
-                            Evening
+                            Evening Slots
                         </h3>
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
                         {dummyEveningSlots.map(time => (
                             <Button
                             key={time}

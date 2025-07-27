@@ -26,12 +26,10 @@ export type Filters = {
   location: string;
   specialty: string;
   rating: number;
-  fees: { min: number; max: number };
+  feeRange: string;
   availability?: ('today' | 'tomorrow' | 'weekend')[];
   appointmentTypes?: ('in-person' | 'online' | 'home-visit')[];
 };
-
-const allFees = allDoctors.map(d => d.fees || 0);
 
 export default function DoctorsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,7 +38,7 @@ export default function DoctorsPage() {
     location: 'all',
     specialty: 'all',
     rating: 0,
-    fees: { min: Math.min(...allFees), max: Math.max(...allFees) },
+    feeRange: 'any',
     availability: [],
     appointmentTypes: [],
   });
@@ -59,7 +57,15 @@ export default function DoctorsPage() {
     const specialtyMatch = filters.specialty === 'all' || doctor.specialty === filters.specialty;
     const ratingMatch = doctor.rating >= filters.rating;
     
-    const feesMatch = (doctor.fees || 0) >= filters.fees.min && (doctor.fees || 0) <= filters.fees.max;
+    const feesMatch = (() => {
+        if (filters.feeRange === 'any') return true;
+        const doctorFee = doctor.fees || 0;
+        const [min, max] = filters.feeRange.split('-').map(Number);
+        if (max) {
+            return doctorFee >= min && doctorFee <= max;
+        }
+        return doctorFee >= min; // For "300+" case
+    })();
 
     const appointmentTypesMatch = !filters.appointmentTypes || filters.appointmentTypes.length === 0 ||
         filters.appointmentTypes.every(type => doctor.appointmentTypes?.includes(type));
@@ -118,7 +124,7 @@ export default function DoctorsPage() {
         location: 'all',
         specialty: 'all',
         rating: 0,
-        fees: { min: Math.min(...allFees), max: Math.max(...allFees) },
+        feeRange: 'any',
         availability: [],
         appointmentTypes: [],
     });

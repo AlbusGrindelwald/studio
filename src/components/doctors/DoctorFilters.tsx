@@ -15,7 +15,7 @@ import type { Filters } from '@/app/dashboard/doctors/page';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 
 const uniqueLocations = ['all', ...Array.from(new Set(doctors.map(d => d.location)))];
@@ -26,10 +26,13 @@ const appointmentTypes: { id: Exclude<Filters['appointmentTypes'], undefined>[nu
     { id: 'home-visit', label: 'Home Visit' },
 ];
 
-const allFees = doctors.map(d => d.fees || 0);
-const minFee = Math.min(...allFees);
-const maxFee = Math.max(...allFees);
-
+const feeRanges = [
+    { value: 'any', label: 'Any' },
+    { value: '0-100', label: '$0 - $100' },
+    { value: '100-200', label: '$100 - $200' },
+    { value: '200-300', label: '$200 - $300' },
+    { value: '300-9999', label: 'Over $300' },
+];
 
 interface DoctorFiltersProps {
   currentFilters: Filters;
@@ -64,11 +67,6 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
   const handleRatingChange = (newRating: number) => {
     handleValueChange('rating', localFilters.rating === newRating ? 0 : newRating);
   };
-
-  const handleFeeChange = (newRange: number[]) => {
-    handleValueChange('fees', { min: newRange[0], max: newRange[1] });
-  };
-
 
   return (
     <div className="space-y-8 py-4 px-1">
@@ -127,20 +125,20 @@ export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
         </div>
       </div>
 
-      <div className="space-y-3">
-          <Label>Consultation Fee</Label>
-          <Slider
-            value={[localFilters.fees.min, localFilters.fees.max]}
-            onValueChange={handleFeeChange}
-            min={minFee}
-            max={maxFee}
-            step={10}
-            minStepsBetweenThumbs={1}
-          />
-          <div className="flex justify-between text-sm text-muted-foreground">
-              <span>${localFilters.fees.min}</span>
-              <span>${localFilters.fees.max}</span>
-          </div>
+       <div className="space-y-3">
+        <Label>Consultation Fee</Label>
+        <RadioGroup
+          value={localFilters.feeRange}
+          onValueChange={value => handleValueChange('feeRange', value)}
+          className="space-y-2"
+        >
+          {feeRanges.map(range => (
+            <div key={range.value} className="flex items-center space-x-2">
+              <RadioGroupItem value={range.value} id={`fee-${range.value}`} />
+              <Label htmlFor={`fee-${range.value}`} className="font-normal">{range.label}</Label>
+            </div>
+          ))}
+        </RadioGroup>
       </div>
 
       <div className="space-y-3">

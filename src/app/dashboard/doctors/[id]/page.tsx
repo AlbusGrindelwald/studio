@@ -93,7 +93,7 @@ export default function DoctorDetailPage() {
                     <div className="flex-1">
                         <h2 className="font-bold text-lg">{doctor.name}</h2>
                         <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
-                        <p className="text-sm text-primary font-medium">MBBS, MS (Surgeon)</p>
+                        <p className="text-sm text-primary font-medium">MBBS, MD (Internal Medicine)</p>
                         <p className="text-xs text-muted-foreground mt-1">Fellow of Sanskara netralaya, chennai</p>
                     </div>
                 </div>

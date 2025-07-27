@@ -30,12 +30,16 @@ const getNextSevenAvailableDays = (doctor: Doctor | null) => {
     if (!doctor) return [];
     const availableDates = [];
     const today = startOfDay(new Date());
-    for (let i = 0; i < 7; i++) {
-        const date = addDays(today, i);
-        const dateStr = format(date, 'yyyy-MM-dd');
+    let daysChecked = 0;
+    let currentDate = today;
+
+    while (availableDates.length < 7 && daysChecked < 30) { // check up to 30 days ahead
+        const dateStr = format(currentDate, 'yyyy-MM-dd');
         if (doctor.availability[dateStr] && doctor.availability[dateStr].length > 0) {
             availableDates.push(dateStr);
         }
+        currentDate = addDays(currentDate, 1);
+        daysChecked++;
     }
     return availableDates;
 };
@@ -185,14 +189,6 @@ export default function BookAppointmentPage() {
      
       <main className="flex-1 overflow-y-auto p-4 space-y-6">
         <div>
-            <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold">Book Appointment</h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    <span>{selectedDate ? format(parseISO(selectedDate), 'MMMM, yyyy') : ''}</span>
-                </div>
-            </div>
-
             <ScrollArea className="w-full whitespace-nowrap rounded-md">
                 <div className="flex gap-3 pb-4">
                     {sevenDaySlots.map(dateStr => {
@@ -270,5 +266,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
-    

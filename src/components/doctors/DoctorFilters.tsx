@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -33,6 +33,10 @@ interface DoctorFiltersProps {
 
 export function DoctorFilters({ currentFilters, onApply }: DoctorFiltersProps) {
   const [localFilters, setLocalFilters] = useState<Filters>(currentFilters);
+
+  useEffect(() => {
+    setLocalFilters(currentFilters);
+  }, [currentFilters]);
 
   const handleValueChange = (key: keyof Filters, value: any) => {
     const newFilters = { ...localFilters, [key]: value };

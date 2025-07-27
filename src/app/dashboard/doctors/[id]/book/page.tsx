@@ -39,12 +39,13 @@ const groupSlots = (slots: string[]) => {
     const morningSlots = slots.filter(time => {
         const hour = parseInt(time.split(':')[0]);
         const period = time.split(' ')[1];
-        return period === 'AM' || (period === 'PM' && hour === 12);
+        return period.toUpperCase() === 'AM' || (period.toUpperCase() === 'PM' && hour === 12);
     });
 
     const eveningSlots = slots.filter(time => {
+        const hour = parseInt(time.split(':')[0]);
         const period = time.split(' ')[1];
-        return period === 'PM' && parseInt(time.split(':')[0]) !== 12;
+        return period.toUpperCase() === 'PM' && hour !== 12;
     });
     return { morningSlots, eveningSlots };
 }
@@ -204,13 +205,14 @@ export default function BookAppointmentPage() {
             <ScrollArea className="w-full whitespace-nowrap rounded-md -mx-1">
                 <div className="flex gap-3 pb-4 px-1">
                     {sevenDaySlots.map(date => {
+                        const isSelected = selectedDate?.toISOString().split('T')[0] === date.toISOString().split('T')[0];
                         return (
                             <button
                                 key={date.toISOString()}
                                 onClick={() => handleDateSelect(date)}
                                 className={cn(
                                     "flex flex-col items-center justify-center p-2 rounded-lg border w-16 h-20 transition-colors shrink-0 cursor-pointer",
-                                    selectedDate?.toISOString() === date.toISOString()
+                                    isSelected
                                     ? "bg-primary text-primary-foreground"
                                     : "bg-background text-foreground"
                                 )}
@@ -227,54 +229,53 @@ export default function BookAppointmentPage() {
 
         {selectedDate && (
             <div className="space-y-6">
-                <div>
-                    <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                        <Sun className="h-5 w-5 text-yellow-500" />
-                        Morning
-                    </h3>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                    {morningSlots.map(time => (
-                        <Button
-                            key={time}
-                            variant={selectedTime === time ? 'default' : 'outline'}
-                            className="py-2 h-auto"
-                            onClick={() => setSelectedTime(time)}
-                        >
-                            {time}
-                        </Button>
-                    ))}
-                    {morningSlots.length === 0 && <p className="col-span-full text-muted-foreground text-sm text-center py-4">No morning slots available.</p>}
-                    </div>
-                </div>
-                 {eveningSlots.length > 0 && (
-                     <div>
-                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                            <Moon className="h-5 w-5 text-blue-500" />
-                            Evening
-                        </h3>
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                        {eveningSlots.map(time => (
-                            <Button
-                            key={time}
-                            variant={selectedTime === time ? 'default' : 'outline'}
-                            className="py-2 h-auto"
-                            onClick={() => setSelectedTime(time)}
-                            >
-                            {time}
-                            </Button>
-                        ))}
-                        </div>
-                    </div>
+                {allTimeSlots.length > 0 ? (
+                    <>
+                        {morningSlots.length > 0 && (
+                            <div>
+                                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                                    <Sun className="h-5 w-5 text-yellow-500" />
+                                    Morning
+                                </h3>
+                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                {morningSlots.map(time => (
+                                    <Button
+                                        key={time}
+                                        variant={selectedTime === time ? 'default' : 'outline'}
+                                        className="py-2 h-auto"
+                                        onClick={() => setSelectedTime(time)}
+                                    >
+                                        {time}
+                                    </Button>
+                                ))}
+                                </div>
+                            </div>
+                        )}
+                        
+                        {eveningSlots.length > 0 && (
+                            <div>
+                                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                                    <Moon className="h-5 w-5 text-blue-500" />
+                                    Evening
+                                </h3>
+                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                {eveningSlots.map(time => (
+                                    <Button
+                                    key={time}
+                                    variant={selectedTime === time ? 'default' : 'outline'}
+                                    className="py-2 h-auto"
+                                    onClick={() => setSelectedTime(time)}
+                                    >
+                                    {time}
+                                    </Button>
+                                ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <p className="text-center text-muted-foreground py-8">No slots available for this date.</p>
                 )}
-                 {allTimeSlots.length > 0 && eveningSlots.length === 0 && (
-                     <div>
-                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                            <Moon className="h-5 w-5 text-blue-500" />
-                            Evening
-                        </h3>
-                         <p className="col-span-full text-muted-foreground text-sm text-center py-4">No evening slots available.</p>
-                    </div>
-                 )}
             </div>
         )}
       </main>
@@ -309,3 +310,5 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
+    

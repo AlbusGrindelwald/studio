@@ -90,52 +90,12 @@ const patientUser = allUsers.find(u => u.email === 'patient@shedula.com') || all
 
 export const appointments: Appointment[] = [
   {
-    id: 'A1',
-    doctor: doctors[0],
-    user: patientUser,
-    date: '2024-08-25',
-    time: '10:00 AM',
-    status: 'upcoming',
-  },
-  {
-    id: 'A2',
-    doctor: doctors[2],
-    user: patientUser,
-    date: '2024-09-02',
-    time: '11:00 AM',
-    status: 'upcoming',
-  },
-  {
-    id: 'A5',
-    doctor: doctors[3],
-    user: patientUser,
-    date: '2024-09-05',
-    time: '09:00 AM',
-    status: 'upcoming',
-  },
-  {
     id: 'A3',
     doctor: doctors[1],
     user: patientUser,
     date: '2024-07-20',
     time: '01:30 PM',
     status: 'completed',
-  },
-   {
-    id: 'A4',
-    doctor: doctors[0],
-    user: patientUser,
-    date: '2024-07-18',
-    time: '02:00 PM',
-    status: 'canceled',
-  },
-  {
-    id: 'A6',
-    doctor: doctors[2],
-    user: patientUser,
-    date: '2024-07-15',
-    time: '03:00 PM',
-    status: 'canceled',
   },
 ];
 

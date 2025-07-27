@@ -110,7 +110,11 @@ export default function BookAppointmentPage() {
   }, [id, router]);
 
    useEffect(() => {
+    // This cleanup function will run when the component unmounts.
     return () => {
+      // We use a ref to track if the booking was completed.
+      // If the component unmounts and the booking was not completed,
+      // we show the notification.
       if (!bookingCompleted.current && doctor) {
         const notificationPayload = {
           title: 'Booking Incomplete',
@@ -157,6 +161,7 @@ export default function BookAppointmentPage() {
         userId: currentUser.id
       });
       
+      // Mark booking as completed to prevent the notification from firing.
       bookingCompleted.current = true;
 
       toast({
@@ -307,3 +312,5 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+
+    

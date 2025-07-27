@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
 import { addNotification } from '@/lib/notifications';
@@ -163,14 +163,12 @@ export default function BookAppointmentPage() {
   const morningSlots = allTimeSlots.filter(time => {
     const hour = parseInt(time.split(':')[0], 10);
     const isPM = time.toUpperCase().includes('PM');
-    // Morning is before 12 PM
     return !isPM || hour === 12;
   });
 
   const eveningSlots = allTimeSlots.filter(time => {
     const hour = parseInt(time.split(':')[0], 10);
     const isPM = time.toUpperCase().includes('PM');
-    // Evening is 12 PM or later
     return isPM && hour !== 12;
   });
 
@@ -205,6 +203,12 @@ export default function BookAppointmentPage() {
         <div>
             <div className="flex justify-between items-center mb-4">
                 <h3 className="font-semibold text-lg">Book Appointment</h3>
+                 {selectedDate && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        <span>{format(parseISO(selectedDate), 'MMMM, yyyy')}</span>
+                    </div>
+                )}
             </div>
             <ScrollArea className="w-full whitespace-nowrap rounded-md">
                 <div className="flex gap-3 pb-4">
@@ -302,6 +306,5 @@ export default function BookAppointmentPage() {
       </Dialog>
     </div>
   );
-}
 
     

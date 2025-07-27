@@ -104,7 +104,10 @@ export default function BookAppointmentPage() {
   const sevenDaySlots = useMemo(() => getNextSevenDays(), []);
 
   useEffect(() => {
-    setDoctor(findDoctorById(id));
+    const doc = findDoctorById(id);
+    if(doc){
+        setDoctor(doc);
+    }
     const user = getLoggedInUser();
     if (!user) {
         router.push('/login');
@@ -310,5 +313,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
-    

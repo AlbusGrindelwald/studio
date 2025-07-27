@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarCheck, ChevronRight, Search, User, Stethoscope, Heart } from 'lucide-react';
+import { CalendarCheck, ChevronRight, User, Stethoscope, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAppointments, subscribe as subscribeAppointments } from '@/lib/appointments';
@@ -11,7 +11,6 @@ import type { Appointment } from '@/lib/types';
 import type { User as PatientUser } from '@/lib/user';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -116,15 +115,6 @@ export default function DashboardPage() {
             </Button>
         </div>
       </header>
-
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input 
-          placeholder="Search for doctors, symptoms..." 
-          className="pl-10 h-12 rounded-full"
-          onFocus={() => router.push('/dashboard/doctors')}
-        />
-      </div>
 
        <div className="grid grid-cols-2 gap-4">
         <Card className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 border-blue-200" onClick={() => router.push('/dashboard/doctors')}>

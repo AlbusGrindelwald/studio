@@ -5,11 +5,36 @@ import { addNotification } from './notifications';
 import { format, parseISO } from 'date-fns';
 import { User } from './user';
 
-let appointments: Appointment[] = [...mockAppointments];
-
-// This is a simple in-memory "database".
-// In a real application, you would use a proper database.
+const APPOINTMENTS_KEY = 'shedula_appointments';
+let appointments: Appointment[] = [];
 const listeners: (() => void)[] = [];
+
+const loadAppointments = () => {
+    if (typeof window === 'undefined') return;
+    const stored = localStorage.getItem(APPOINTMENTS_KEY);
+    if (stored) {
+        appointments = JSON.parse(stored);
+    } else {
+        // If nothing is in localStorage, initialize with mock data
+        appointments = [...mockAppointments];
+        saveAppointments();
+    }
+};
+
+const saveAppointments = () => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
+    notifyListeners();
+};
+
+const notifyListeners = () => {
+  listeners.forEach(listener => listener());
+};
+
+// Initialize appointments on load
+if (typeof window !== 'undefined') {
+  loadAppointments();
+}
 
 export const getAppointments = (): Appointment[] => {
   return appointments;
@@ -72,7 +97,7 @@ export const addAppointment = (newAppointment: {
       type: 'success'
   });
 
-  notifyListeners();
+  saveAppointments();
   return appointment;
 };
 
@@ -92,7 +117,7 @@ export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'comple
         });
     }
 
-    notifyListeners();
+    saveAppointments();
 };
 
 export const rescheduleAppointment = (id: string, newDate: string, newTime: string) => {
@@ -109,7 +134,7 @@ export const rescheduleAppointment = (id: string, newDate: string, newTime: stri
         type: 'info'
     });
 
-    notifyListeners();
+    saveAppointments();
 }
 
 export const subscribe = (listener: () => void) => {
@@ -121,8 +146,4 @@ export const subscribe = (listener: () => void) => {
       listeners.splice(index, 1);
     }
   };
-};
-
-const notifyListeners = () => {
-  listeners.forEach(listener => listener());
 };

@@ -28,7 +28,7 @@ import type { Doctor } from '@/lib/types';
 const getTimePeriod = (time: string) => {
     const hour = parseInt(time.split(':')[0], 10);
     const isPM = time.toUpperCase().includes('PM');
-    if (isPM && hour !== 12) {
+    if (isPM && hour < 12) { // 1 PM to 11 PM
         return 'evening';
     }
     if (!isPM && hour === 12) { // 12:xx AM is morning
@@ -37,14 +37,14 @@ const getTimePeriod = (time: string) => {
     return hour < 12 ? 'morning' : 'evening';
 };
 
-const getNextSevenDays = (doctor: Doctor | null) => {
+const getNextSevenAvailableDays = (doctor: Doctor | null) => {
     if (!doctor) return [];
     const availableDates = [];
     const today = startOfDay(new Date());
     for (let i = 0; i < 7; i++) {
         const date = addDays(today, i);
         const dateStr = format(date, 'yyyy-MM-dd');
-        if (doctor.availability[dateStr]?.length > 0) {
+        if (doctor.availability[dateStr] && doctor.availability[dateStr].length > 0) {
             availableDates.push(dateStr);
         }
     }
@@ -65,7 +65,7 @@ export default function BookAppointmentPage() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   
-  const sevenDaySlots = useMemo(() => getNextSevenDays(doctor), [doctor]);
+  const sevenDaySlots = useMemo(() => getNextSevenAvailableDays(doctor), [doctor]);
 
   const selectedSlotRef = useRef({ date: selectedDate, time: selectedTime, doctorName: doctor?.name });
   selectedSlotRef.current = { date: selectedDate, time: selectedTime, doctorName: doctor?.name };
@@ -80,6 +80,7 @@ export default function BookAppointmentPage() {
   }, [router]);
 
   useEffect(() => {
+    // Automatically select the first available date when the component mounts or slots change
     if (sevenDaySlots.length > 0 && !selectedDate) {
       setSelectedDate(sevenDaySlots[0]);
     }
@@ -302,5 +303,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
-    

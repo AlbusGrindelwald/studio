@@ -212,7 +212,7 @@ export default function BookAppointmentPage() {
                                     "flex flex-col items-center justify-center p-2 rounded-lg border w-16 h-20 transition-colors shrink-0 cursor-pointer hover:bg-accent",
                                     selectedDate?.toISOString() === date.toISOString()
                                     ? "bg-primary text-primary-foreground"
-                                    : "bg-card"
+                                    : "bg-background"
                                 )}
                             >
                                 <span className="text-2xl font-bold">{format(date, 'dd')}</span>

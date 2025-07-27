@@ -18,7 +18,9 @@ export let doctors: Doctor[] = [
       '2024-08-16': ['09:30 AM', '11:30 AM', '01:30 PM', '03:00 PM'],
       '2024-08-17': ['10:00 AM', '12:00 PM'],
     },
-    specialities: ['Hypertension', 'Heart Failure', 'Echocardiography', 'Coronary Artery Disease']
+    specialities: ['Hypertension', 'Heart Failure', 'Echocardiography', 'Coronary Artery Disease'],
+    fees: 250,
+    appointmentTypes: ['in-person', 'online'],
   },
   {
     id: '2',
@@ -35,7 +37,9 @@ export let doctors: Doctor[] = [
       '2024-08-18': ['01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM'],
       '2024-08-19': ['10:00 AM', '10:30 AM', '11:00 AM'],
     },
-    specialities: ['Acne Treatment', 'Eczema Care', 'Skin Cancer Screening', 'Cosmetic Dermatology']
+    specialities: ['Acne Treatment', 'Eczema Care', 'Skin Cancer Screening', 'Cosmetic Dermatology'],
+    fees: 180,
+    appointmentTypes: ['in-person'],
   },
   {
     id: '3',
@@ -52,7 +56,9 @@ export let doctors: Doctor[] = [
       '2024-08-17': ['09:00 AM', '10:00 AM'],
       '2024-08-20': ['02:00 PM', '03:00 PM', '04:00 PM'],
     },
-    specialities: ['Well-child visits', 'Vaccinations', 'Childhood Illnesses', 'Developmental Screening']
+    specialities: ['Well-child visits', 'Vaccinations', 'Childhood Illnesses', 'Developmental Screening'],
+    fees: 150,
+    appointmentTypes: ['in-person', 'home-visit'],
   },
   {
     id: '4',
@@ -69,12 +75,14 @@ export let doctors: Doctor[] = [
       '2024-08-18': ['09:00 AM', '10:00 AM', '11:00 AM'],
       '2024-08-21': ['08:00 AM', '09:00 AM'],
     },
-    specialities: ['Sports Injuries', 'Joint Replacement', 'Arthroscopic Surgery', 'Fracture Care']
+    specialities: ['Sports Injuries', 'Joint Replacement', 'Arthroscopic Surgery', 'Fracture Care'],
+    fees: 300,
+    appointmentTypes: ['in-person', 'online'],
   },
 ];
 
 // Re-exporting from user.ts to avoid circular dependencies
-export { findUserById, findUserByEmailOrPhone as findUserByEmail } from './user';
+export { findUserById, findUserByEmailOrPhone, getUsers } from './user';
 
 const allUsers = getUsers();
 const patientUser = allUsers.find(u => u.email === 'patient@shedula.com') || allUsers[0];

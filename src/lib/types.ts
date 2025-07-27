@@ -14,6 +14,8 @@ export interface Doctor {
   availability: Record<string, string[]>;
   specialities: string[];
   gender?: 'male' | 'female' | 'other';
+  fees?: number;
+  appointmentTypes?: ('in-person' | 'online' | 'home-visit')[];
 }
 
 export interface Appointment {

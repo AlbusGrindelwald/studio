@@ -158,7 +158,19 @@ export default function BookAppointmentPage() {
     setIsConfirming(false);
   };
   
-  const timeSlots = selectedDate ? doctor.availability[selectedDate] || [] : [];
+  const allTimeSlots = selectedDate ? doctor.availability[selectedDate] || [] : [];
+  
+  const morningSlots = allTimeSlots.filter(time => {
+    const hour = parseInt(time.split(':')[0], 10);
+    const isPM = time.toUpperCase().includes('PM');
+    return isPM ? hour === 12 : hour < 12;
+  });
+
+  const eveningSlots = allTimeSlots.filter(time => {
+    const hour = parseInt(time.split(':')[0], 10);
+    const isPM = time.toUpperCase().includes('PM');
+    return isPM && hour !== 12;
+  });
 
   return (
     <div className="flex flex-col h-screen bg-muted/40">
@@ -189,6 +201,13 @@ export default function BookAppointmentPage() {
      
       <main className="flex-1 overflow-y-auto p-4 space-y-6">
         <div>
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-lg">Book Appointment</h3>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-5 w-5" />
+                    <span>{selectedDate ? format(parseISO(selectedDate), 'MMMM, yyyy') : ''}</span>
+                </div>
+            </div>
             <ScrollArea className="w-full whitespace-nowrap rounded-md">
                 <div className="flex gap-3 pb-4">
                     {sevenDaySlots.map(dateStr => {
@@ -219,7 +238,7 @@ export default function BookAppointmentPage() {
                  <div>
                     <h3 className="font-semibold mb-4">Select slot</h3>
                     <div className="grid grid-cols-3 gap-3">
-                    {timeSlots.map(time => (
+                    {morningSlots.map(time => (
                         <Button
                         key={time}
                         variant={selectedTime === time ? 'default' : 'outline'}
@@ -231,7 +250,26 @@ export default function BookAppointmentPage() {
                     ))}
                     </div>
                 </div>
-                {timeSlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4">No slots available for this date.</p>}
+
+                {eveningSlots.length > 0 && (
+                    <div>
+                        <h3 className="font-semibold mb-4">Evening Slot</h3>
+                        <div className="grid grid-cols-3 gap-3">
+                        {eveningSlots.map(time => (
+                            <Button
+                            key={time}
+                            variant={selectedTime === time ? 'default' : 'outline'}
+                            className={cn("py-3 h-auto", selectedTime === time && "bg-primary text-primary-foreground")}
+                            onClick={() => setSelectedTime(time)}
+                            >
+                            {time}
+                            </Button>
+                        ))}
+                        </div>
+                    </div>
+                )}
+                
+                {allTimeSlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4">No slots available for this date.</p>}
             </div>
         )}
       </main>

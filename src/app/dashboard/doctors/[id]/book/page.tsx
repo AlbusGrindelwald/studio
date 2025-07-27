@@ -112,14 +112,21 @@ export default function BookAppointmentPage() {
    useEffect(() => {
     return () => {
       if (!bookingCompleted.current && doctor) {
-        addNotification({
+        const notificationPayload = {
           title: 'Booking Incomplete',
           description: `Your appointment with ${doctor.name} was not confirmed. Please complete the booking process.`,
+        };
+        addNotification({
+          ...notificationPayload,
           type: 'destructive',
+        });
+        toast({
+          ...notificationPayload,
+          variant: 'destructive'
         });
       }
     };
-  }, [doctor]);
+  }, [doctor, toast]);
 
 
   const handleDateSelect = (date: Date) => {

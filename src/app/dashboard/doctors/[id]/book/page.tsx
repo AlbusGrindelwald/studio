@@ -1,10 +1,10 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar, Sun, Moon } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
 import { addNotification } from '@/lib/notifications';
@@ -20,9 +20,33 @@ import {
 } from '@/components/ui/dialog';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, addDays, isBefore, startOfDay } from 'date-fns';
 import { getLoggedInUser } from '@/lib/user';
 import type { User } from '@/lib/user';
+import type { Doctor } from '@/lib/types';
+
+const getTimePeriod = (time: string) => {
+    const hour = parseInt(time.split(':')[0], 10);
+    const isPM = time.toUpperCase().includes('PM');
+    if (isPM && hour !== 12) {
+        return (hour + 12) < 12 ? 'morning' : 'evening';
+    }
+    return hour < 12 ? 'morning' : 'evening';
+};
+
+const getNextSevenDays = (doctor: Doctor) => {
+    const availableDates = [];
+    const today = startOfDay(new Date());
+    for(let i=0; i<7; i++) {
+        const date = addDays(today, i);
+        const dateStr = format(date, 'yyyy-MM-dd');
+        if (doctor.availability[dateStr]?.length > 0) {
+            availableDates.push(dateStr);
+        }
+    }
+    return availableDates;
+};
+
 
 export default function BookAppointmentPage() {
   const params = useParams();
@@ -36,6 +60,8 @@ export default function BookAppointmentPage() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  
+  const sevenDaySlots = useMemo(() => doctor ? getNextSevenDays(doctor) : [], [doctor]);
 
   const selectedSlotRef = useRef({ date: selectedDate, time: selectedTime, doctorName: doctor?.name });
   selectedSlotRef.current = { date: selectedDate, time: selectedTime, doctorName: doctor?.name };
@@ -43,7 +69,6 @@ export default function BookAppointmentPage() {
   useEffect(() => {
     const user = getLoggedInUser();
     if (!user) {
-        // Redirect to login if not authenticated
         router.push('/login');
     } else {
         setCurrentUser(user);
@@ -52,9 +77,7 @@ export default function BookAppointmentPage() {
 
 
   useEffect(() => {
-    // This function will be called when the component unmounts
     return () => {
-      // Check if a slot was selected but booking was not confirmed
       if (selectedSlotRef.current.date && selectedSlotRef.current.time && !bookingConfirmed) {
         const description = `Your appointment with ${selectedSlotRef.current.doctorName} was not confirmed. Please complete the booking process.`;
         addNotification({
@@ -71,6 +94,12 @@ export default function BookAppointmentPage() {
     };
   }, [bookingConfirmed, toast]);
 
+   useEffect(() => {
+    if (sevenDaySlots.length > 0 && !selectedDate) {
+      setSelectedDate(sevenDaySlots[0]);
+    }
+  }, [sevenDaySlots, selectedDate]);
+
 
   if (!doctor) {
     return (
@@ -84,13 +113,6 @@ export default function BookAppointmentPage() {
     setSelectedDate(date);
     setSelectedTime(null);
   };
-  
-  const availableDates = Object.keys(doctor.availability);
-  
-  if (availableDates.length > 0 && !selectedDate) {
-      handleDateSelect(availableDates[0]);
-  }
-
 
   const handleBookNow = () => {
     if (selectedDate && selectedTime) {
@@ -115,7 +137,7 @@ export default function BookAppointmentPage() {
         userId: currentUser.id
       });
 
-      setBookingConfirmed(true); // Mark booking as confirmed
+      setBookingConfirmed(true);
 
       toast({
         title: 'Appointment Booked!',
@@ -137,11 +159,12 @@ export default function BookAppointmentPage() {
         });
     }
 
-
     setIsConfirming(false);
   };
   
-  const allTimeSlots = selectedDate ? doctor.availability[selectedDate] : [];
+  const timeSlots = selectedDate ? doctor.availability[selectedDate] : [];
+  const morningSlots = timeSlots.filter(time => getTimePeriod(time) === 'morning');
+  const eveningSlots = timeSlots.filter(time => getTimePeriod(time) === 'evening');
 
   return (
     <div className="flex flex-col h-screen bg-muted/40">
@@ -173,7 +196,7 @@ export default function BookAppointmentPage() {
       <main className="flex-1 overflow-y-auto p-4 space-y-6">
         <div>
             <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold">Book Appointment</h3>
+                <h3 className="font-semibold">Choose your slot</h3>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
                     <span>{selectedDate ? format(parseISO(selectedDate), 'MMMM, yyyy') : 'Select a date'}</span>
@@ -182,7 +205,7 @@ export default function BookAppointmentPage() {
 
             <ScrollArea className="w-full whitespace-nowrap rounded-md">
                 <div className="flex gap-3 pb-4">
-                    {availableDates.map(dateStr => {
+                    {sevenDaySlots.map(dateStr => {
                         const date = parseISO(dateStr);
                         return (
                             <button
@@ -207,28 +230,49 @@ export default function BookAppointmentPage() {
 
         {selectedDate && (
              <div className="space-y-6">
-                <div>
-                    <h3 className="font-semibold mb-4">Select slot</h3>
-                    <div className="grid grid-cols-3 gap-3">
-                    {allTimeSlots.map(time => (
-                        <Button
-                        key={time}
-                        variant={selectedTime === time ? 'default' : 'outline'}
-                        className={cn("py-3 h-auto", selectedTime === time && "bg-primary text-primary-foreground")}
-                        onClick={() => setSelectedTime(time)}
-                        >
-                        {time}
-                        </Button>
-                    ))}
+                {morningSlots.length > 0 && (
+                    <div>
+                        <h3 className="font-semibold mb-4 flex items-center gap-2"><Sun className="h-5 w-5 text-orange-400" /> Morning</h3>
+                        <div className="grid grid-cols-3 gap-3">
+                        {morningSlots.map(time => (
+                            <Button
+                            key={time}
+                            variant={selectedTime === time ? 'default' : 'outline'}
+                            className={cn("py-3 h-auto", selectedTime === time && "bg-primary text-primary-foreground")}
+                            onClick={() => setSelectedTime(time)}
+                            >
+                            {time}
+                            </Button>
+                        ))}
+                        </div>
                     </div>
-                     {allTimeSlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4">No slots available for this date.</p>}
-                </div>
+                )}
+                 {eveningSlots.length > 0 && (
+                    <div>
+                        <h3 className="font-semibold mb-4 flex items-center gap-2"><Moon className="h-5 w-5 text-indigo-400" /> Evening</h3>
+                        <div className="grid grid-cols-3 gap-3">
+                        {eveningSlots.map(time => (
+                            <Button
+                            key={time}
+                            variant={selectedTime === time ? 'default' : 'outline'}
+                            className={cn("py-3 h-auto", selectedTime === time && "bg-primary text-primary-foreground")}
+                            onClick={() => setSelectedTime(time)}
+                            >
+                            {time}
+                            </Button>
+                        ))}
+                        </div>
+                    </div>
+                )}
+                {timeSlots.length === 0 && <p className="text-muted-foreground text-sm text-center py-4">No slots available for this date.</p>}
             </div>
         )}
       </main>
 
       <footer className="p-4 border-t bg-background">
-        <Button size="lg" className="w-full" onClick={handleBookNow}>Book appointment</Button>
+        <Button size="lg" className="w-full" onClick={handleBookNow} disabled={!selectedTime}>
+            {selectedTime ? `Pay $${doctor.fees} & Book` : 'Book Appointment'}
+        </Button>
       </footer>
       
       <Dialog open={isConfirming} onOpenChange={setIsConfirming}>
@@ -244,6 +288,7 @@ export default function BookAppointmentPage() {
             <p><strong>Specialty:</strong> {doctor.specialty}</p>
             <p><strong>Date:</strong> {selectedDate && format(parseISO(selectedDate), 'EEEE, MMMM d, yyyy')}</p>
             <p><strong>Time:</strong> {selectedTime}</p>
+            <p><strong>Fee:</strong> ${doctor.fees}</p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsConfirming(false)}>Cancel</Button>
@@ -254,3 +299,4 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
+

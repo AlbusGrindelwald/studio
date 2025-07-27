@@ -35,20 +35,10 @@ const getNextSevenDays = () => {
   return dates;
 };
 
-const groupSlots = (slots: string[]) => {
-    const morningSlots = slots.filter(time => {
-        const hour = parseInt(time.split(':')[0]);
-        const period = time.split(' ')[1];
-        return period.toUpperCase() === 'AM' || (period.toUpperCase() === 'PM' && hour === 12);
-    }).sort();
+// Dummy time slots
+const dummyMorningSlots = ['09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM'];
+const dummyEveningSlots = ['02:00 PM', '02:30 PM', '03:00 PM', '03:30 PM', '04:00 PM'];
 
-    const eveningSlots = slots.filter(time => {
-        const hour = parseInt(time.split(':')[0]);
-        const period = time.split(' ')[1];
-        return period.toUpperCase() === 'PM' && hour !== 12;
-    }).sort();
-    return { morningSlots, eveningSlots };
-}
 
 function BookingPageSkeleton() {
   return (
@@ -163,13 +153,6 @@ export default function BookAppointmentPage() {
     setIsConfirming(false);
   };
   
-  const allTimeSlots = useMemo(() => {
-    if (!doctor || !selectedDate) return [];
-    return doctor.availability[format(selectedDate, 'yyyy-MM-dd')] || [];
-  }, [doctor, selectedDate]);
-
-  const { morningSlots, eveningSlots } = useMemo(() => groupSlots(allTimeSlots), [allTimeSlots]);
-  
   if (!isClient || !doctor) {
     return <BookingPageSkeleton />;
   }
@@ -229,53 +212,43 @@ export default function BookAppointmentPage() {
 
         {selectedDate && (
             <div className="space-y-6">
-                {allTimeSlots.length > 0 ? (
-                    <>
-                        {morningSlots.length > 0 && (
-                            <div>
-                                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                                    <Sun className="h-5 w-5 text-yellow-500" />
-                                    Morning
-                                </h3>
-                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                                {morningSlots.map(time => (
-                                    <Button
-                                        key={time}
-                                        variant={selectedTime === time ? 'default' : 'outline'}
-                                        className="py-2 h-auto"
-                                        onClick={() => setSelectedTime(time)}
-                                    >
-                                        {time}
-                                    </Button>
-                                ))}
-                                </div>
-                            </div>
-                        )}
-                        
-                        {eveningSlots.length > 0 && (
-                            <div>
-                                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                                    <Moon className="h-5 w-5 text-blue-500" />
-                                    Evening
-                                </h3>
-                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                                {eveningSlots.map(time => (
-                                    <Button
-                                    key={time}
-                                    variant={selectedTime === time ? 'default' : 'outline'}
-                                    className="py-2 h-auto"
-                                    onClick={() => setSelectedTime(time)}
-                                    >
-                                    {time}
-                                    </Button>
-                                ))}
-                                </div>
-                            </div>
-                        )}
-                    </>
-                ) : (
-                    <p className="text-center text-muted-foreground py-8">No slots available for this date.</p>
-                )}
+                <div>
+                    <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                        <Sun className="h-5 w-5 text-yellow-500" />
+                        Morning
+                    </h3>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {dummyMorningSlots.map(time => (
+                        <Button
+                            key={time}
+                            variant={selectedTime === time ? 'default' : 'outline'}
+                            className="py-2 h-auto"
+                            onClick={() => setSelectedTime(time)}
+                        >
+                            {time}
+                        </Button>
+                    ))}
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                        <Moon className="h-5 w-5 text-blue-500" />
+                        Evening
+                    </h3>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {dummyEveningSlots.map(time => (
+                        <Button
+                        key={time}
+                        variant={selectedTime === time ? 'default' : 'outline'}
+                        className="py-2 h-auto"
+                        onClick={() => setSelectedTime(time)}
+                        >
+                        {time}
+                        </Button>
+                    ))}
+                    </div>
+                </div>
             </div>
         )}
       </main>

@@ -76,7 +76,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Reschedule Appointment</DialogTitle>
           <DialogDescription>
@@ -88,7 +88,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
             <div>
                 <h3 className="font-bold text-lg mb-4">Choose a new date</h3>
                 <ScrollArea className="w-full whitespace-nowrap rounded-md -mx-1">
-                    <div className="flex gap-4 pb-4 px-1">
+                    <div className="flex gap-3 pb-4 px-1">
                         {sevenDaySlots.map(date => {
                             const isSelected = selectedDate?.toISOString().split('T')[0] === date.toISOString().split('T')[0];
                             return (
@@ -113,7 +113,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
             </div>
 
             {selectedDate && (
-                <div className="space-y-8">
+                <div className="space-y-6">
                     <div>
                         <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                             <Sun className="h-5 w-5 text-yellow-500" />

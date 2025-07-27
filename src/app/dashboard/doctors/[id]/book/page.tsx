@@ -113,9 +113,9 @@ export default function BookAppointmentPage() {
     return () => {
       if (!bookingCompleted.current && doctor) {
         addNotification({
-          title: `Still thinking about ${doctor.name}?`,
-          description: 'Your chosen time slot might not be available for long. Complete your booking now!',
-          type: 'info',
+          title: 'Booking Incomplete',
+          description: `Your appointment with ${doctor.name} was not confirmed. Please complete the booking process.`,
+          type: 'destructive',
         });
       }
     };
@@ -214,7 +214,7 @@ export default function BookAppointmentPage() {
                                     "flex flex-col items-center justify-center p-2 rounded-lg border w-16 h-20 transition-colors shrink-0",
                                     isSelected
                                     ? "bg-primary text-primary-foreground"
-                                    : "bg-background text-foreground hover:bg-accent"
+                                    : "bg-background text-foreground"
                                 )}
                             >
                                 <span className="text-2xl font-bold">{format(date, 'dd')}</span>

@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Sun, Moon } from 'lucide-react';
 import { findDoctorById } from '@/lib/data';
 import { addAppointment } from '@/lib/appointments';
 import { addNotification } from '@/lib/notifications';
@@ -203,10 +203,6 @@ export default function BookAppointmentPage() {
         <div>
             <div className="flex justify-between items-center mb-4">
                 <h3 className="font-semibold">Choose your slot</h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    <span>{selectedDate ? format(parseISO(selectedDate), 'MMMM, yyyy') : ''}</span>
-                </div>
             </div>
 
             <ScrollArea className="w-full whitespace-nowrap rounded-md">
@@ -305,7 +301,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
-    
-
-    

@@ -6,7 +6,9 @@ import { CalendarCheck, ChevronRight, Search, User, Stethoscope, Heart } from 'l
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAppointments, subscribe as subscribeAppointments } from '@/lib/appointments';
+import { getLoggedInUser, subscribe as subscribeUser } from '@/lib/user';
 import type { Appointment } from '@/lib/types';
+import type { User as PatientUser } from '@/lib/user';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -42,6 +44,7 @@ function AppointmentCard({ appointment }: { appointment: Appointment }) {
 
 export default function DashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [user, setUser] = useState<PatientUser | null>(null);
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
@@ -50,14 +53,21 @@ export default function DashboardPage() {
       setAppointments(getAppointments());
     };
 
+    const handleUserChange = () => {
+        setUser(getLoggedInUser());
+    }
+
     const unsubscribeAppointments = subscribeAppointments(handleAppointmentsChange);
+    const unsubscribeUser = subscribeUser(handleUserChange);
     
     handleAppointmentsChange(); // Initial fetch
+    handleUserChange(); // Initial user fetch
     
     setIsClient(true);
     
     return () => {
         unsubscribeAppointments();
+        unsubscribeUser();
     }
   }, []);
 
@@ -97,7 +107,7 @@ export default function DashboardPage() {
     <div className="flex flex-1 flex-col gap-6 p-4">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Hi, User!</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Hi, {user?.name?.split(' ')[0] || 'User'}!</h1>
           <p className="text-muted-foreground">How are you feeling today?</p>
         </div>
         <div className="relative">

@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
 import { createUser } from '@/lib/user';
+import { createUserWithEmail } from '@/lib/auth';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function SignupPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (phone.length !== 10) {
       toast({
@@ -53,7 +54,12 @@ export default function SignupPage() {
     }
     setIsLoading(true);
     try {
-      createUser({ name, email, password, phone });
+      // Step 1: Create user in Firebase Auth
+      const firebaseUser = await createUserWithEmail(email, password);
+
+      // Step 2: Create user in our local "database" with the Firebase UID
+      createUser({ id: firebaseUser.uid, name, email, password, phone });
+      
       toast({
         title: 'Account Created',
         description: 'Your account has been successfully created. Please log in.',

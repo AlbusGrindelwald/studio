@@ -5,6 +5,9 @@ import {
   signInWithPopup,
   User,
   AuthErrorCodes,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
 } from 'firebase/auth';
 import { auth } from './firebase';
 
@@ -41,3 +44,32 @@ export const signInWithGoogle = async (): Promise<User | null> => {
     throw error;
   }
 };
+
+
+export const createUserWithEmail = async (email: string, password_provided: string): Promise<User> => {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password_provided);
+        return userCredential.user;
+    } catch(error: any) {
+        if(error.code === 'auth/email-already-in-use') {
+            throw new Error('An account with this email already exists.');
+        }
+        throw error;
+    }
+}
+
+export const signInWithEmail = async (email: string, password_provided: string): Promise<User> => {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password_provided);
+        return userCredential.user;
+    } catch(error: any) {
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+            throw new Error('Invalid email or password.');
+        }
+        throw error;
+    }
+}
+
+export const signOutUser = async (): Promise<void> => {
+    await signOut(auth);
+}

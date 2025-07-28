@@ -1,4 +1,5 @@
 
+
 export interface User {
   id: string;
   name: string;
@@ -25,7 +26,7 @@ const saveUsers = (users: User[]) => {
   notifyListeners();
 };
 
-export const createUser = (newUser: Omit<User, 'id'>) => {
+export const createUser = (newUser: User) => {
   const users = getUsers();
   const existingUserByEmail = users.find(u => u.email === newUser.email);
   if (existingUserByEmail) {
@@ -38,10 +39,9 @@ export const createUser = (newUser: Omit<User, 'id'>) => {
     }
   }
 
-  const user: User = { ...newUser, id: `user_${Date.now()}` };
-  users.push(user);
+  users.push(newUser);
   saveUsers(users);
-  return user;
+  return newUser;
 };
 
 export const findUserByEmailOrPhone = (identifier: string): User | undefined => {

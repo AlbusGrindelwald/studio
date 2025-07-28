@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Link from 'next/link';
@@ -10,10 +11,10 @@ import { Label } from '@/components/ui/label';
 import GoogleIcon from '@/components/GoogleIcon';
 import { Logo } from '@/components/Logo';
 import { useEffect, useState } from 'react';
-import { signInWithGoogle } from '@/lib/auth';
+import { signInWithGoogle, signInWithEmail } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import { findUserByEmailOrPhone, createUser } from '@/lib/user';
+import { findUserByEmailOrPhone, createUser, loginUser } from '@/lib/user';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LoginPage() {
@@ -32,30 +33,31 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const user = findUserByEmailOrPhone(identifier);
     const isPhone = /^\d+$/.test(identifier.replace(/\s/g, ''));
     
-    if (user) {
-        if (isPhone) {
-             // In a real app, you'd send an OTP here.
+    if (isPhone) {
+        const user = findUserByEmailOrPhone(identifier);
+        if (user) {
             router.push(`/otp-verify?identifier=${encodeURIComponent(identifier)}&userId=${user.id}`);
-        } else { // Email login
-            if (user.password === password) {
-                router.push(`/otp-verify?identifier=${encodeURIComponent(user.phone || '')}&userId=${user.id}`);
-            } else {
-                 toast({
-                    title: "Invalid Credentials",
-                    description: "Please check your email and password.",
-                    variant: "destructive"
-                });
-            }
+        } else {
+            toast({
+                title: "User Not Found",
+                description: "No account is associated with this phone number.",
+                variant: "destructive"
+            });
         }
-    } else {
-         toast({
-            title: "User Not Found",
-            description: "No account is associated with this identifier. Please sign up.",
-            variant: "destructive"
-        });
+    } else { // Email login
+        try {
+            const firebaseUser = await signInWithEmail(identifier, password);
+            loginUser(firebaseUser.uid);
+            router.push('/dashboard');
+        } catch (error: any) {
+            toast({
+                title: "Login Failed",
+                description: error.message || "An error occurred.",
+                variant: "destructive"
+            });
+        }
     }
     
     setIsLoading(false);
@@ -67,16 +69,16 @@ export default function LoginPage() {
       if (googleUser && googleUser.email) {
         let appUser = findUserByEmailOrPhone(googleUser.email);
         
-        // If user doesn't exist, create a new one, but they'll need to enter phone on OTP page
         if (!appUser) {
            appUser = createUser({
+             id: googleUser.uid,
              name: googleUser.displayName || 'Google User',
              email: googleUser.email,
              password: `google-auth-${Date.now()}` // a dummy password
            })
         }
         
-        // Redirect to OTP page. If phone exists, pre-fill it.
+        loginUser(appUser.id);
         router.push(`/otp-verify?identifier=${encodeURIComponent(appUser.phone || '')}&userId=${appUser.id}&isGoogleSignIn=true`);
 
       }

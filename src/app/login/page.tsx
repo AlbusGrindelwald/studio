@@ -58,7 +58,7 @@ export default function LoginPage() {
             } else {
                  toast({
                     title: "Login Failed",
-                    description: "Could not find associated user profile.",
+                    description: "Your account exists but is missing profile information. Please try signing up again.",
                     variant: "destructive"
                 });
                 setIsLoading(false);
@@ -80,6 +80,7 @@ export default function LoginPage() {
       if (googleUser && googleUser.email) {
         let appUser = findUserById(googleUser.uid);
         
+        // If the user authenticates with Google but doesn't have a local profile, create one.
         if (!appUser) {
            appUser = createUser({
              id: googleUser.uid,

@@ -11,13 +11,14 @@ import { ArrowLeft } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { updateUserWithPhone, findUserById, loginUser } from '@/lib/user';
 import { Label } from '@/components/ui/label';
+import { sendOtp, verifyOtp } from '@/lib/auth';
+import type { ConfirmationResult } from 'firebase/auth';
 
 function OtpVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialIdentifier = searchParams.get('identifier');
   const userId = searchParams.get('userId');
-  const isGoogleSignIn = searchParams.get('isGoogleSignIn') === 'true';
 
   const { toast } = useToast();
   const [otp, setOtp] = useState<string[]>(['', '', '', '', '', '']);
@@ -26,7 +27,12 @@ function OtpVerificationForm() {
   const [isClient, setIsClient] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const [otpSent, setOtpSent] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Effect for non-Google sign-in or when phone number is already present
   useEffect(() => {
@@ -45,7 +51,7 @@ function OtpVerificationForm() {
     }
   }, [otpSent, resendTimer]);
 
-  const handleSendOtp = (showToast = true) => {
+  const handleSendOtp = async (showToast = true) => {
     if (phone.length !== 10) {
       toast({
         title: 'Invalid Mobile Number',
@@ -55,14 +61,27 @@ function OtpVerificationForm() {
       return;
     }
     
-    if(showToast) {
-        toast({
-        title: "OTP 'Sent'",
-        description: "Check console for mock OTP. Use 123456 to verify.",
-        });
+    setIsLoading(true);
+    try {
+      const result = await sendOtp(`+1${phone}`, 'recaptcha-container');
+      setConfirmationResult(result);
+      if(showToast) {
+          toast({
+          title: "OTP Sent!",
+          description: "An OTP has been sent to your mobile number.",
+          });
+      }
+      setOtpSent(true);
+      setResendTimer(55);
+    } catch(error: any) {
+      toast({
+        title: 'Failed to send OTP',
+        description: error.message || 'Please try again later.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setOtpSent(true);
-    setResendTimer(55);
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,9 +120,20 @@ function OtpVerificationForm() {
       return;
     }
 
+    if (!confirmationResult) {
+       toast({
+        title: 'Verification Error',
+        description: 'OTP was not sent. Please try sending it again.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      if (otpCode === "123456" && userId) {
+      await verifyOtp(confirmationResult, otpCode);
+      
+      if (userId) {
         const user = findUserById(userId);
         if (user) {
           if (!user.phone) {
@@ -118,12 +148,12 @@ function OtpVerificationForm() {
         });
         router.push('/dashboard');
       } else {
-        throw new Error('Invalid OTP or user missing. Please try again.');
+        throw new Error('User session not found. Please log in again.');
       }
     } catch (error: any) {
       toast({
         title: 'Verification Failed',
-        description: error.message,
+        description: error.message || 'The OTP is incorrect. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -131,10 +161,6 @@ function OtpVerificationForm() {
     }
   };
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  
   if (!isClient) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-background p-4">
@@ -161,6 +187,7 @@ function OtpVerificationForm() {
       </header>
 
       <main className="flex flex-col items-center justify-center text-center p-4 flex-grow">
+        <div id="recaptcha-container" className="my-4"></div>
         <p className="text-muted-foreground mb-2">
           {showPhoneInput && !otpSent
             ? 'Enter your mobile number to get an OTP'
@@ -168,18 +195,19 @@ function OtpVerificationForm() {
         </p>
         
         { !showPhoneInput ? (
-             <p className="font-bold mb-8">{phone}</p>
+             <p className="font-bold mb-8">+1 {phone}</p>
         ) : (
             <div className="w-full max-w-sm mb-8 space-y-4">
                <div className="flex items-center gap-2">
+                  <span className="flex h-10 w-12 items-center justify-center rounded-l-md border border-r-0 border-input bg-background px-3 text-sm">+1</span>
                   <Input
                       id="phone-number"
                       type="tel"
-                      placeholder="Your 10-digit mobile number"
+                      placeholder="Your 10-digit mobile"
                       value={phone}
                       onChange={handlePhoneChange}
                       disabled={isLoading || otpSent}
-                      className="text-center"
+                      className="rounded-l-none text-center"
                       maxLength={10}
                   />
                   <Button onClick={() => handleSendOtp()} disabled={otpSent || isLoading || phone.length !== 10}>Send</Button>
@@ -209,8 +237,16 @@ function OtpVerificationForm() {
             </div>
 
             <div className='flex justify-center items-center gap-1'>
-              <p className="text-muted-foreground text-sm">Resend code in</p>
-              <p className='text-sm text-primary font-semibold'>{resendTimer > 0 ? `00:${resendTimer.toString().padStart(2, '0')}` : "00:00"}</p>
+              {resendTimer > 0 ? (
+                 <>
+                  <p className="text-muted-foreground text-sm">Resend code in</p>
+                  <p className='text-sm text-primary font-semibold'>{`00:${resendTimer.toString().padStart(2, '0')}`}</p>
+                 </>
+              ) : (
+                <Button variant="link" onClick={() => handleSendOtp()} disabled={isLoading}>
+                  Resend OTP
+                </Button>
+              )}
             </div>
 
             <Button type="submit" className="w-full rounded-full py-6 text-lg" disabled={isLoading}>

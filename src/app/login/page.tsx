@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { signInWithGoogle, signInWithEmail } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import { findUserByEmailOrPhone, createUser, loginUser, findUserById } from '@/lib/user';
+import { findUserByEmailOrPhone, createUser, findUserById } from '@/lib/user';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LoginPage() {
@@ -50,19 +50,22 @@ export default function LoginPage() {
     } else { // Email login
         try {
             const firebaseUser = await signInWithEmail(identifier, password);
-            const user = findUserById(firebaseUser.uid);
-            if (user) {
-                // Don't log in here, just redirect to OTP with user info
-                const phoneIdentifier = user.phone ? `&identifier=${encodeURIComponent(user.phone)}` : '';
-                router.push(`/otp-verify?userId=${user.id}${phoneIdentifier}`);
-            } else {
-                 toast({
-                    title: "Login Failed",
-                    description: "Your account exists but is missing profile information. Please try signing up again.",
-                    variant: "destructive"
+            let user = findUserById(firebaseUser.uid);
+            
+            // If user exists in Firebase but not locally, create a local profile.
+            if (!user) {
+                console.log("Local user not found, creating one.");
+                user = createUser({
+                    id: firebaseUser.uid,
+                    name: firebaseUser.displayName || identifier.split('@')[0], // Fallback name
+                    email: identifier,
                 });
-                setIsLoading(false);
             }
+
+            // Redirect to OTP with user info
+            const phoneIdentifier = user.phone ? `&identifier=${encodeURIComponent(user.phone)}` : '';
+            router.push(`/otp-verify?userId=${user.id}${phoneIdentifier}`);
+
         } catch (error: any) {
             toast({
                 title: "Login Failed",

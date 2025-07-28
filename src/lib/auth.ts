@@ -113,6 +113,9 @@ export const sendOtp = async (phoneNumber: string, containerId: string): Promise
      if (error.code === 'auth/invalid-phone-number') {
         throw new Error('Invalid phone number provided. Please check the format.');
      }
+     if (error.code === 'auth/billing-not-enabled') {
+        throw new Error("Phone Authentication requires a billing-enabled Firebase project. Please upgrade to the Blaze plan in the Google Cloud Console.");
+     }
      console.error("Error sending OTP: ", error);
      throw new Error("Failed to send OTP. Please try again.");
   }

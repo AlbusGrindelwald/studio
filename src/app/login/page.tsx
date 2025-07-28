@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { signInWithGoogle, signInWithEmail } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import { findUserByEmailOrPhone, createUser, findUserById, User } from '@/lib/user';
+import { findUserByEmailOrPhone, createUser, findUserById, User, updateUserWithPhone } from '@/lib/user';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
@@ -168,16 +168,26 @@ export default function LoginPage() {
       }
     } catch (error: any) {
       console.error(error);
-      toast({
-        title: 'Sign In Failed',
-        description: error.message || 'An unexpected error occurred. Please try again.',
-        variant: 'destructive',
-      });
+       if (error.code === 'auth/unauthorized-domain') {
+          toast({
+            title: 'Domain Not Authorized',
+            description: "This app's domain is not authorized for Google Sign-In. Please add it to the Firebase Console's authorized domains list.",
+            variant: 'destructive',
+            duration: 9000,
+          });
+        } else {
+           toast({
+            title: 'Sign In Failed',
+            description: error.message || 'An unexpected error occurred. Please try again.',
+            variant: 'destructive',
+          });
+        }
     }
   };
 
   const handlePhoneSubmitForGoogleUser = (phone: string) => {
     if (googleUser) {
+        updateUserWithPhone(googleUser.id, phone);
         router.push(`/otp-verify?userId=${googleUser.id}&identifier=${encodeURIComponent(phone)}&isGoogleSignIn=true`);
     }
     setIsPhoneDialogOpen(false);
@@ -307,5 +317,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    

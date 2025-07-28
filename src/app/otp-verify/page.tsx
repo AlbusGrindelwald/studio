@@ -76,7 +76,7 @@ function OtpVerificationForm() {
     if (otpCode === '123456') {
       if (userId) {
         // If user logged in with Google/Email and is now adding a phone number
-        if (!identifier && phone) {
+        if (isGoogleSignIn && phone) {
             updateUserWithPhone(userId, phone);
         }
         loginUser(userId);
@@ -139,22 +139,9 @@ function OtpVerificationForm() {
       
       <main className="flex flex-col items-center justify-center text-center p-4 flex-grow">
           <p className="text-muted-foreground mb-2">
-            {showPhoneInput ? "Enter your mobile to continue" : "Code has been sent to"}
+            Code has been sent to
           </p>
-          <p className="font-bold mb-8">{!showPhoneInput ? `+1 ${identifier}` : ""}</p>
-          
-          {showPhoneInput ? (
-             <div className="w-full max-w-sm mb-8">
-                 <Label htmlFor="phone-number" className="sr-only">Mobile Number</Label>
-                 <Input 
-                    id="phone-number"
-                    type="tel"
-                    placeholder="Your 10-digit mobile"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                 />
-             </div>
-          ) : null}
+          <p className="font-bold mb-8">{`+1 ${phone}`}</p>
 
           <form onSubmit={handleSubmit} className="space-y-8 w-full max-w-sm">
             <div className="flex justify-center gap-2 sm:gap-3">
@@ -171,7 +158,7 @@ function OtpVerificationForm() {
                         onChange={(e) => handleOtpChange(index, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(index, e)}
                         className="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold border-2 focus:border-primary focus:ring-primary rounded-lg"
-                        disabled={isLoading || (showPhoneInput && phone.length !== 10)}
+                        disabled={isLoading}
                     />
                 ))}
             </div>
@@ -185,7 +172,7 @@ function OtpVerificationForm() {
                 )}
             </div>
 
-            <Button type="submit" className="w-full rounded-full py-6 text-lg" disabled={isLoading || otp.join('').length < 6 || (showPhoneInput && phone.length !== 10)}>
+            <Button type="submit" className="w-full rounded-full py-6 text-lg" disabled={isLoading || otp.join('').length < 6}>
                 {isLoading ? "Verifying..." : "Verify"}
             </Button>
           </form>

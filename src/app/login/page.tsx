@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { signInWithGoogle, signInWithEmail } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import { findUserByEmailOrPhone, createUser, loginUser } from '@/lib/user';
+import { findUserByEmailOrPhone, createUser, loginUser, findUserById } from '@/lib/user';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function LoginPage() {
@@ -33,7 +33,7 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const isPhone = /^\d+$/.test(identifier.replace(/\s/g, ''));
+    const isPhone = /^\d{10}$/.test(identifier.replace(/\s/g, ''));
     
     if (isPhone) {
         const user = findUserByEmailOrPhone(identifier);
@@ -45,11 +45,16 @@ export default function LoginPage() {
                 description: "No account is associated with this phone number.",
                 variant: "destructive"
             });
+             setIsLoading(false);
         }
     } else { // Email login
         try {
             const firebaseUser = await signInWithEmail(identifier, password);
             loginUser(firebaseUser.uid);
+            toast({
+                title: "Login Successful!",
+                description: `Welcome back!`,
+            });
             router.push('/dashboard');
         } catch (error: any) {
             toast({
@@ -57,17 +62,16 @@ export default function LoginPage() {
                 description: error.message || "An error occurred.",
                 variant: "destructive"
             });
+            setIsLoading(false);
         }
     }
-    
-    setIsLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
     try {
       const googleUser = await signInWithGoogle();
       if (googleUser && googleUser.email) {
-        let appUser = findUserByEmailOrPhone(googleUser.email);
+        let appUser = findUserById(googleUser.uid);
         
         if (!appUser) {
            appUser = createUser({
@@ -79,7 +83,12 @@ export default function LoginPage() {
         }
         
         loginUser(appUser.id);
-        router.push(`/otp-verify?identifier=${encodeURIComponent(appUser.phone || '')}&userId=${appUser.id}&isGoogleSignIn=true`);
+        
+        if (appUser.phone) {
+             router.push(`/otp-verify?identifier=${encodeURIComponent(appUser.phone)}&userId=${appUser.id}&isGoogleSignIn=true`);
+        } else {
+             router.push(`/otp-verify?userId=${appUser.id}&isGoogleSignIn=true`);
+        }
 
       }
     } catch (error: any) {

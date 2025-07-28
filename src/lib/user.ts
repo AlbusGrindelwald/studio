@@ -1,10 +1,9 @@
 
 
 export interface User {
-  id: string;
+  id: string; // This will be the Firebase UID
   name: string;
   email: string;
-  password?: string;
   phone?: string;
 }
 
@@ -26,13 +25,16 @@ const saveUsers = (users: User[]) => {
   notifyListeners();
 };
 
-export const createUser = (newUser: User) => {
+export const createUser = (newUser: Omit<User, 'password'>) => {
   const users = getUsers();
-  const existingUserByEmail = users.find(u => u.email === newUser.email);
-  if (existingUserByEmail) {
-    throw new Error('An account with this email already exists.');
+  // Firebase already handles email uniqueness, so we primarily check here to avoid local data conflicts.
+  const existingUser = users.find(u => u.id === newUser.id || u.email === newUser.email);
+  if (existingUser) {
+    console.warn('User already exists in local storage.');
+    return existingUser;
   }
-   if (newUser.phone) {
+  
+  if (newUser.phone) {
     const existingUserByPhone = users.find(u => u.phone === newUser.phone);
     if (existingUserByPhone) {
         throw new Error('An account with this phone number already exists.');
@@ -65,6 +67,11 @@ export const updateUserWithPhone = (id: string, phone: string) => {
 
 export const loginUser = (userId: string) => {
   if (typeof window === 'undefined') return;
+  const user = findUserById(userId);
+  if (!user) {
+    console.error("Attempted to log in a user that doesn't exist in local storage:", userId);
+    return;
+  }
   localStorage.setItem(LOGGED_IN_USER_KEY, userId);
   notifyListeners();
 };

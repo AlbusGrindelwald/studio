@@ -58,7 +58,7 @@ export default function SignupPage() {
       const firebaseUser = await createUserWithEmail(email, password);
 
       // Step 2: Create user in our local "database" with the Firebase UID
-      createUser({ id: firebaseUser.uid, name, email, password, phone });
+      createUser({ id: firebaseUser.uid, name, email, phone });
       
       toast({
         title: 'Account Created',

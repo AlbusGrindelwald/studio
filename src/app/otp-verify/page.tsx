@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -29,10 +30,10 @@ function OtpVerificationForm() {
 
   // Effect for non-Google sign-in or when phone number is already present
   useEffect(() => {
-    if (isClient && !isGoogleSignIn && initialIdentifier) {
+    if (isClient && initialIdentifier) {
       handleSendOtp(false); // don't show toast for regular login
     }
-  }, [isClient, isGoogleSignIn, initialIdentifier]);
+  }, [isClient, initialIdentifier]);
 
   // Effect for countdown timer
   useEffect(() => {
@@ -105,7 +106,7 @@ function OtpVerificationForm() {
       if (otpCode === "123456" && userId) {
         const user = findUserById(userId);
         if (user) {
-          if (isGoogleSignIn && !user.phone) {
+          if (!user.phone) {
              updateUserWithPhone(user.id, phone);
           }
           loginUser(user.id);
@@ -148,7 +149,7 @@ function OtpVerificationForm() {
     );
   }
 
-  const showPhoneInput = isGoogleSignIn && !initialIdentifier;
+  const showPhoneInput = !initialIdentifier;
 
   return (
     <div className="flex flex-col h-screen bg-background">

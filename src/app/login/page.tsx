@@ -50,12 +50,19 @@ export default function LoginPage() {
     } else { // Email login
         try {
             const firebaseUser = await signInWithEmail(identifier, password);
-            loginUser(firebaseUser.uid);
-            toast({
-                title: "Login Successful!",
-                description: `Welcome back!`,
-            });
-            router.push('/dashboard');
+            const user = findUserById(firebaseUser.uid);
+            if (user) {
+                // Don't log in here, just redirect to OTP with user info
+                const phoneIdentifier = user.phone ? `&identifier=${encodeURIComponent(user.phone)}` : '';
+                router.push(`/otp-verify?userId=${user.id}${phoneIdentifier}`);
+            } else {
+                 toast({
+                    title: "Login Failed",
+                    description: "Could not find associated user profile.",
+                    variant: "destructive"
+                });
+                setIsLoading(false);
+            }
         } catch (error: any) {
             toast({
                 title: "Login Failed",
@@ -78,11 +85,8 @@ export default function LoginPage() {
              id: googleUser.uid,
              name: googleUser.displayName || 'Google User',
              email: googleUser.email,
-             password: `google-auth-${Date.now()}` // a dummy password
            })
         }
-        
-        loginUser(appUser.id);
         
         if (appUser.phone) {
              router.push(`/otp-verify?identifier=${encodeURIComponent(appUser.phone)}&userId=${appUser.id}&isGoogleSignIn=true`);
@@ -174,7 +178,7 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading || /^\d+$/.test(identifier.replace(/\s/g, ''))}
+                  disabled={isLoading || /^\d{10}$/.test(identifier.replace(/\s/g, ''))}
                 />
               </div>
 

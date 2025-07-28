@@ -9,9 +9,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  ConfirmationResult
 } from 'firebase/auth';
 import { auth } from './firebase';
 
@@ -76,60 +73,4 @@ export const signInWithEmail = async (email: string, password_provided: string):
 
 export const signOutUser = async (): Promise<void> => {
     await signOut(auth);
-}
-
-const setupRecaptcha = (containerId: string): RecaptchaVerifier => {
-  if (typeof window === 'undefined') {
-    throw new Error("reCAPTCHA can only be set up in the browser.");
-  }
-  // Clear any existing verifier
-  if ((window as any).recaptchaVerifier) {
-    (window as any).recaptchaVerifier.clear();
-  }
-
-  const recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
-    size: 'invisible',
-    callback: (response: any) => {
-      // reCAPTCHA solved, allow signInWithPhoneNumber.
-      console.log("reCAPTCHA solved");
-    },
-    'expired-callback': () => {
-      // Response expired. Ask user to solve reCAPTCHA again.
-      console.log("reCAPTCHA expired");
-    }
-  });
-
-  (window as any).recaptchaVerifier = recaptchaVerifier;
-  return recaptchaVerifier;
-}
-
-export const sendOtp = async (phoneNumber: string, containerId: string): Promise<ConfirmationResult> => {
-  const appVerifier = setupRecaptcha(containerId);
-  try {
-    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-    (window as any).confirmationResult = confirmationResult;
-    return confirmationResult;
-  } catch (error: any) {
-     if (error.code === 'auth/invalid-phone-number') {
-        throw new Error('Invalid phone number provided. Please check the format.');
-     }
-     if (error.code === 'auth/billing-not-enabled') {
-        throw new Error("Phone Authentication requires a billing-enabled Firebase project. Please upgrade to the Blaze plan in the Google Cloud Console.");
-     }
-     console.error("Error sending OTP: ", error);
-     throw new Error("Failed to send OTP. Please try again.");
-  }
-}
-
-export const verifyOtp = async (confirmationResult: ConfirmationResult, code: string): Promise<User> => {
-    try {
-        const result = await confirmationResult.confirm(code);
-        return result.user;
-    } catch(error: any) {
-        if(error.code === 'auth/invalid-verification-code') {
-            throw new Error('The verification code is invalid. Please try again.');
-        }
-        console.error("Error verifying OTP: ", error);
-        throw new Error("Failed to verify OTP.");
-    }
 }

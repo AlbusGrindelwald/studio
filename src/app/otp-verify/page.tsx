@@ -29,7 +29,11 @@ function OtpVerificationForm() {
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    const user = findUserById(userId || '');
+    if(user && user.phone) {
+        setPhone(user.phone)
+    }
+  }, [userId]);
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -141,7 +145,7 @@ function OtpVerificationForm() {
           <p className="text-muted-foreground mb-2">
             Code has been sent to
           </p>
-          <p className="font-bold mb-8">{`+1 ${phone}`}</p>
+          <p className="font-bold mb-8">{`+91 ${phone}`}</p>
 
           <form onSubmit={handleSubmit} className="space-y-8 w-full max-w-sm">
             <div className="flex justify-center gap-2 sm:gap-3">

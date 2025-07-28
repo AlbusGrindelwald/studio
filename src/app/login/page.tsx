@@ -92,11 +92,8 @@ export default function LoginPage() {
            })
         }
         
-        if (appUser.phone) {
-             router.push(`/otp-verify?identifier=${encodeURIComponent(appUser.phone)}&userId=${appUser.id}&isGoogleSignIn=true`);
-        } else {
-             router.push(`/otp-verify?userId=${appUser.id}&isGoogleSignIn=true`);
-        }
+        // Always go to OTP verify page to confirm/enter phone number
+        router.push(`/otp-verify?userId=${appUser.id}&isGoogleSignIn=true`);
 
       }
     } catch (error: any) {

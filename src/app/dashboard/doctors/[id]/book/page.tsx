@@ -87,7 +87,7 @@ export default function BookAppointmentPage() {
   const { toast } = useToast();
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(startOfDay(new Date()));
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -317,5 +317,3 @@ export default function BookAppointmentPage() {
     </div>
   );
 }
-
-    

@@ -14,8 +14,76 @@ import { useEffect, useState } from 'react';
 import { signInWithGoogle, signInWithEmail } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
-import { findUserByEmailOrPhone, createUser, findUserById } from '@/lib/user';
+import { findUserByEmailOrPhone, createUser, findUserById, User } from '@/lib/user';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+
+function PhoneEntryDialog({ 
+    open, 
+    onOpenChange, 
+    onPhoneSubmit 
+}: { 
+    open: boolean, 
+    onOpenChange: (open: boolean) => void,
+    onPhoneSubmit: (phone: string) => void,
+}) {
+    const [phone, setPhone] = useState('');
+    const { toast } = useToast();
+
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (/^\d*$/.test(value) && value.length <= 10) {
+            setPhone(value);
+        }
+    };
+
+    const handleSubmit = () => {
+        if (phone.length === 10) {
+            onPhoneSubmit(phone);
+        } else {
+            toast({
+                title: 'Invalid Phone Number',
+                description: 'Please enter a valid 10-digit phone number.',
+                variant: 'destructive',
+            });
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Enter Your Mobile Number</DialogTitle>
+                    <DialogDescription>
+                        A verification code will be sent to this number to complete your sign-in.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="py-4">
+                    <Label htmlFor="phone-dialog">Mobile Number</Label>
+                    <Input
+                        id="phone-dialog"
+                        type="tel"
+                        placeholder="Your 10-digit mobile"
+                        value={phone}
+                        onChange={handlePhoneChange}
+                        maxLength={10}
+                    />
+                </div>
+                <DialogFooter>
+                    <Button onClick={handleSubmit} disabled={phone.length !== 10}>Continue</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,6 +92,9 @@ export default function LoginPage() {
   const [identifier, setIdentifier] = useState(''); // Can be email or phone
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isPhoneDialogOpen, setIsPhoneDialogOpen] = useState(false);
+  const [googleUser, setGoogleUser] = useState<User | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -79,21 +150,20 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const googleUser = await signInWithGoogle();
-      if (googleUser && googleUser.email) {
-        let appUser = findUserById(googleUser.uid);
+      const gUser = await signInWithGoogle();
+      if (gUser && gUser.email) {
+        let appUser = findUserById(gUser.uid);
         
-        // If the user authenticates with Google but doesn't have a local profile, create one.
         if (!appUser) {
            appUser = createUser({
-             id: googleUser.uid,
-             name: googleUser.displayName || 'Google User',
-             email: googleUser.email,
+             id: gUser.uid,
+             name: gUser.displayName || 'Google User',
+             email: gUser.email,
            })
         }
         
-        // Always go to OTP verify page to confirm/enter phone number
-        router.push(`/otp-verify?userId=${appUser.id}&isGoogleSignIn=true`);
+        setGoogleUser(appUser);
+        setIsPhoneDialogOpen(true);
 
       }
     } catch (error: any) {
@@ -105,6 +175,14 @@ export default function LoginPage() {
       });
     }
   };
+
+  const handlePhoneSubmitForGoogleUser = (phone: string) => {
+    if (googleUser) {
+        router.push(`/otp-verify?userId=${googleUser.id}&identifier=${encodeURIComponent(phone)}&isGoogleSignIn=true`);
+    }
+    setIsPhoneDialogOpen(false);
+  };
+
 
   if (!isClient) {
     return (
@@ -221,6 +299,13 @@ export default function LoginPage() {
             </Link>
             </div>
       </div>
+      <PhoneEntryDialog 
+        open={isPhoneDialogOpen}
+        onOpenChange={setIsPhoneDialogOpen}
+        onPhoneSubmit={handlePhoneSubmitForGoogleUser}
+      />
     </div>
   );
 }
+
+    

@@ -175,6 +175,16 @@ export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'comple
     saveAppointments();
 };
 
+export const clearCanceledAppointments = () => {
+    appointments = appointments.filter(app => app.status !== 'canceled');
+    addNotification({
+        title: 'History Cleared',
+        description: 'Your canceled appointment history has been cleared.',
+        type: 'info'
+    });
+    saveAppointments();
+}
+
 export const rescheduleAppointment = (id: string, newDate: string, newTime: string) => {
     const appointment = appointments.find(app => app.id === id);
     if (!appointment) return;

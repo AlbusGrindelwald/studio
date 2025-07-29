@@ -12,20 +12,23 @@ import {
   Users,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { getLoggedInUser, logoutUser, subscribe } from '@/lib/user';
+import { getLoggedInUser, logoutUser, subscribe, updateUser } from '@/lib/user';
 import type { User } from '@/lib/user';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleUserChange = () => {
@@ -48,6 +51,29 @@ export default function ProfilePage() {
   const handleLogout = () => {
     logoutUser();
     router.push('/login');
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && user) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const newImage = reader.result as string;
+            const updatedUser = updateUser(user.id, { image: newImage });
+            if(updatedUser){
+                setUser(updatedUser);
+                 toast({
+                    title: 'Profile Updated',
+                    description: 'Your profile picture has been changed.',
+                });
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditClick = () => {
+    fileInputRef.current?.click();
   };
 
   if (!isClient) {
@@ -99,11 +125,29 @@ export default function ProfilePage() {
       <main className="flex-1 overflow-y-auto pt-20 p-4 space-y-6">
         <Card className="p-4">
           <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16">
-              <AvatarFallback>
-                <UserIcon className="h-8 w-8" />
-              </AvatarFallback>
-            </Avatar>
+             <div className="relative">
+                <Avatar className="h-16 w-16">
+                    <AvatarImage src={user?.image || ''} alt={user?.name || 'User'} />
+                    <AvatarFallback>
+                        <UserIcon className="h-8 w-8" />
+                    </AvatarFallback>
+                </Avatar>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-background"
+                    onClick={handleEditClick}
+                >
+                    <Pencil className="h-4 w-4 text-primary" />
+                </Button>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    accept="image/*"
+                />
+            </div>
             <div className="flex-1">
               <p className="font-bold text-lg">{user?.name || 'User'}</p>
               <p className="text-sm text-muted-foreground">
@@ -113,9 +157,6 @@ export default function ProfilePage() {
                 {user?.phone || 'No phone number'}
               </p>
             </div>
-            <Button variant="ghost" size="icon">
-              <Pencil className="h-5 w-5 text-primary" />
-            </Button>
           </div>
         </Card>
 

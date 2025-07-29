@@ -56,7 +56,7 @@ function AppointmentCard({
   };
   
   const handleBookAgain = () => {
-    router.push(`/dashboard/doctors/${appointment.doctor.id}/book`);
+    router.push(`/dashboard/doctors/${appointment.doctor.id}`);
   };
 
   return (

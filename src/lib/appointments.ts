@@ -20,6 +20,33 @@ const mockAppointments: Appointment[] = [
     status: 'completed',
     token: '1234',
   },
+  {
+    id: 'A2',
+    doctor: doctors[0],
+    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    date: '2024-07-15',
+    time: '09:00 AM',
+    status: 'completed',
+    token: '5678',
+  },
+  {
+    id: 'A3',
+    doctor: doctors[1],
+    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    date: '2024-06-25',
+    time: '02:30 PM',
+    status: 'completed',
+    token: '9101',
+  },
+  {
+    id: 'A4',
+    doctor: doctors[3],
+    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    date: '2024-08-25',
+    time: '11:00 AM',
+    status: 'upcoming',
+    token: '1121',
+  },
 ];
 
 

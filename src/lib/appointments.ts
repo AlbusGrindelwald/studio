@@ -1,6 +1,6 @@
 
 import type { Appointment, Doctor } from './types';
-import { doctors, appointments as mockAppointments, findUserByEmail, findUserById } from './data';
+import { doctors, findUserById } from './data';
 import { addNotification } from './notifications';
 import { format, parseISO } from 'date-fns';
 import { User } from './user';
@@ -9,15 +9,35 @@ const APPOINTMENTS_KEY = 'shedula_appointments';
 let appointments: Appointment[] = [];
 const listeners: (() => void)[] = [];
 
+// Hardcoded initial data
+const mockAppointments: Appointment[] = [
+  {
+    id: 'A1',
+    doctor: doctors[2],
+    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    date: '2024-08-20',
+    time: '10:00 AM',
+    status: 'completed',
+    token: '1234',
+  },
+];
+
+
 const loadAppointments = () => {
     if (typeof window === 'undefined') return;
-    const stored = localStorage.getItem(APPOINTMENTS_KEY);
-    if (stored) {
-        appointments = JSON.parse(stored);
-    } else {
-        // If nothing is in localStorage, initialize with mock data
-        appointments = [...mockAppointments];
-        saveAppointments();
+    try {
+        const stored = localStorage.getItem(APPOINTMENTS_KEY);
+        // If there's data in local storage, use it. Otherwise, use mock data.
+        if (stored && JSON.parse(stored).length > 0) {
+            appointments = JSON.parse(stored);
+        } else {
+            appointments = mockAppointments;
+            saveAppointments();
+        }
+    } catch(e) {
+        console.error("Failed to parse appointments from localStorage", e);
+        // Fallback to mock data if parsing fails
+        appointments = mockAppointments;
     }
 };
 
@@ -80,7 +100,7 @@ export const addAppointment = (newAppointment: {
   }
 
   const appointment: Appointment = {
-    id: `A${appointments.length + 1}`,
+    id: `A${Date.now()}`, // Ensure unique ID
     doctor,
     user,
     date: newAppointment.date,

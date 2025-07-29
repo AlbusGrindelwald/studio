@@ -88,15 +88,7 @@ const allUsers = getUsers();
 const patientUser = allUsers.find(u => u.email === 'patient@shedula.com') || allUsers[0];
 
 export const appointments: Appointment[] = [
-  {
-    id: 'A3',
-    doctor: doctors[1],
-    user: patientUser,
-    date: '2024-07-20',
-    time: '01:30 PM',
-    status: 'completed',
-    token: '7890',
-  },
+  // This is now handled in appointments.ts to avoid data conflicts
 ];
 
 export const findDoctorById = (id: string): Doctor | undefined => {

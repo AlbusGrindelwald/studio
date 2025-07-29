@@ -196,7 +196,7 @@ export default function AppointmentsPage() {
         <TabsContent value="canceled">
             <div className="space-y-4 pt-4">
                 {filterAppointments('canceled').length > 0 ? filterAppointments('canceled').map(app => (
-                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} onReschedule={handleRescheduleAppointment} />
+                    <AppointmentCard key={app.token} appointment={app} onCancel={handleCancelAppointment} onReschedule={handleRescheduleAppointment} />
                 )) : (
                     <p className="text-center text-muted-foreground py-8">No canceled appointments.</p>
                 )}

@@ -11,6 +11,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
+import { googleAI } from '@genkit-ai/googleai';
 
 const GetFaqAnswerInputSchema = z.object({
   question: z.string().describe('The user\'s question about the Shedula app.'),
@@ -32,6 +33,7 @@ const prompt = ai.definePrompt({
   name: 'getFaqAnswerPrompt',
   input: { schema: GetFaqAnswerInputSchema },
   output: { schema: GetFaqAnswerOutputSchema },
+  model: googleAI.model('gemini-2.0-flash'),
   prompt: `You are a friendly and helpful support agent for an appointment scheduling app called "Shedula".
   Your role is to answer user questions clearly and concisely.
 

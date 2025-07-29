@@ -1,6 +1,6 @@
 
 import type { Appointment, Doctor } from './types';
-import { doctors, appointments as mockAppointments, findUserByEmail, findUserById } from './data';
+import { doctors, findUserById } from './data';
 import { addNotification } from './notifications';
 import { format, parseISO } from 'date-fns';
 import { User } from './user';
@@ -9,15 +9,70 @@ const APPOINTMENTS_KEY = 'shedula_appointments';
 let appointments: Appointment[] = [];
 const listeners: (() => void)[] = [];
 
+// Hardcoded initial data
+const mockAppointments: Appointment[] = [
+  {
+    id: 'A1',
+    doctor: doctors[2],
+    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    date: '2024-08-20',
+    time: '10:00 AM',
+    status: 'completed',
+    token: '1234',
+  },
+  {
+    id: 'A2',
+    doctor: doctors[0],
+    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    date: '2024-07-15',
+    time: '09:00 AM',
+    status: 'completed',
+    token: '5678',
+  },
+  {
+    id: 'A3',
+    doctor: doctors[1],
+    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    date: '2024-06-25',
+    time: '02:30 PM',
+    status: 'completed',
+    token: '9101',
+  },
+  {
+    id: 'A4',
+    doctor: doctors[3],
+    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    date: '2024-08-25',
+    time: '11:00 AM',
+    status: 'upcoming',
+    token: '1121',
+  },
+];
+
+
 const loadAppointments = () => {
     if (typeof window === 'undefined') return;
-    const stored = localStorage.getItem(APPOINTMENTS_KEY);
-    if (stored) {
-        appointments = JSON.parse(stored);
-    } else {
-        // If nothing is in localStorage, initialize with mock data
-        appointments = [...mockAppointments];
-        saveAppointments();
+    // For this fix, we will clear the local storage ONCE to ensure no bad data persists.
+    // In a real app, this might be handled by a versioning system.
+    if (!localStorage.getItem('shedula_data_migrated_v1')) {
+        localStorage.removeItem(APPOINTMENTS_KEY);
+        localStorage.setItem('shedula_data_migrated_v1', 'true');
+    }
+
+    try {
+        const stored = localStorage.getItem(APPOINTMENTS_KEY);
+        // If there's no data in local storage, initialize it with our mock data.
+        if (!stored || JSON.parse(stored).length === 0) {
+            appointments = mockAppointments;
+            saveAppointments();
+        } else {
+             // Otherwise, load the existing data.
+            appointments = JSON.parse(stored);
+        }
+    } catch(e) {
+        console.error("Failed to parse appointments from localStorage", e);
+        // Fallback to mock data if parsing fails
+        appointments = mockAppointments;
     }
 };
 
@@ -80,7 +135,7 @@ export const addAppointment = (newAppointment: {
   }
 
   const appointment: Appointment = {
-    id: `A${appointments.length + 1}`,
+    id: `A${Date.now()}`, // Ensure unique ID
     doctor,
     user,
     date: newAppointment.date,
@@ -119,6 +174,16 @@ export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'comple
 
     saveAppointments();
 };
+
+export const clearCanceledAppointments = () => {
+    appointments = appointments.filter(app => app.status !== 'canceled');
+    addNotification({
+        title: 'History Cleared',
+        description: 'Your canceled appointment history has been cleared.',
+        type: 'info'
+    });
+    saveAppointments();
+}
 
 export const rescheduleAppointment = (id: string, newDate: string, newTime: string) => {
     const appointment = appointments.find(app => app.id === id);

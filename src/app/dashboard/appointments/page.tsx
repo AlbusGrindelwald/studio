@@ -7,6 +7,7 @@ import {
   rescheduleAppointment,
   updateAppointmentStatus,
   subscribe,
+  clearCanceledAppointments,
 } from '@/lib/appointments';
 import type { Appointment } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ import {
 import { RescheduleDialog } from '@/components/appointments/RescheduleDialog';
 import { ReviewDialog } from '@/components/appointments/ReviewDialog';
 import { useRouter } from 'next/navigation';
+import { Trash2 } from 'lucide-react';
 
 function AppointmentCard({
   appointment,
@@ -56,7 +58,7 @@ function AppointmentCard({
   };
   
   const handleBookAgain = () => {
-    router.push(`/dashboard/doctors/${appointment.doctor.id}/book`);
+    router.push(`/dashboard/doctors/${appointment.doctor.id}`);
   };
 
   return (
@@ -155,9 +157,15 @@ export default function AppointmentsPage() {
   const handleRescheduleAppointment = (id: string, newDate: string, newTime: string) => {
     rescheduleAppointment(id, newDate, newTime);
   };
+  
+  const handleClearCanceled = () => {
+    clearCanceledAppointments();
+  }
 
   const filterAppointments = (status: Appointment['status']) =>
     appointments.filter(app => app.status === status);
+    
+  const canceledAppointments = filterAppointments('canceled');
 
   if (!isClient) {
     return null;
@@ -194,9 +202,33 @@ export default function AppointmentsPage() {
             </div>
         </TabsContent>
         <TabsContent value="canceled">
+            {canceledAppointments.length > 0 && (
+                <div className="text-right mb-4">
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Clear All
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Clear Canceled History?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                This will permanently delete all your canceled appointments. This action cannot be undone.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Go Back</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleClearCanceled}>Confirm Clear</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
+            )}
             <div className="space-y-4 pt-4">
-                {filterAppointments('canceled').length > 0 ? filterAppointments('canceled').map(app => (
-                    <AppointmentCard key={app.id} appointment={app} onCancel={handleCancelAppointment} onReschedule={handleRescheduleAppointment} />
+                {canceledAppointments.length > 0 ? canceledAppointments.map(app => (
+                    <AppointmentCard key={app.token} appointment={app} onCancel={handleCancelAppointment} onReschedule={handleRescheduleAppointment} />
                 )) : (
                     <p className="text-center text-muted-foreground py-8">No canceled appointments.</p>
                 )}

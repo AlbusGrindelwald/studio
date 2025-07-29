@@ -76,7 +76,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-lg max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Reschedule Appointment</DialogTitle>
           <DialogDescription>
@@ -84,7 +84,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4 space-y-8">
+        <div className="py-4 space-y-8 overflow-y-auto px-1">
             <div>
                 <h3 className="font-bold text-lg mb-4">Choose a new date</h3>
                 <ScrollArea className="w-full whitespace-nowrap rounded-md -mx-1">
@@ -119,7 +119,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
                             <Sun className="h-5 w-5 text-yellow-500" />
                             Morning Slots
                         </h3>
-                        <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                         {dummyMorningSlots.map(time => (
                             <Button
                                 key={time}
@@ -138,7 +138,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
                             <Moon className="h-5 w-5 text-blue-500" />
                             Evening Slots
                         </h3>
-                        <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                         {dummyEveningSlots.map(time => (
                             <Button
                             key={time}
@@ -155,7 +155,7 @@ export function RescheduleDialog({ doctor, trigger, open, onOpenChange, onResche
             )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="mt-auto pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

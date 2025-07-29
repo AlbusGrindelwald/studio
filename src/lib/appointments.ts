@@ -52,14 +52,22 @@ const mockAppointments: Appointment[] = [
 
 const loadAppointments = () => {
     if (typeof window === 'undefined') return;
+    // For this fix, we will clear the local storage ONCE to ensure no bad data persists.
+    // In a real app, this might be handled by a versioning system.
+    if (!localStorage.getItem('shedula_data_migrated_v1')) {
+        localStorage.removeItem(APPOINTMENTS_KEY);
+        localStorage.setItem('shedula_data_migrated_v1', 'true');
+    }
+
     try {
         const stored = localStorage.getItem(APPOINTMENTS_KEY);
-        // If there's data in local storage, use it. Otherwise, use mock data.
-        if (stored && JSON.parse(stored).length > 0) {
-            appointments = JSON.parse(stored);
-        } else {
+        // If there's no data in local storage, initialize it with our mock data.
+        if (!stored || JSON.parse(stored).length === 0) {
             appointments = mockAppointments;
             saveAppointments();
+        } else {
+             // Otherwise, load the existing data.
+            appointments = JSON.parse(stored);
         }
     } catch(e) {
         console.error("Failed to parse appointments from localStorage", e);

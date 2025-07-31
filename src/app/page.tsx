@@ -3,11 +3,14 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit, Stethoscope, Menu, X, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit, Stethoscope, Menu, X, Facebook, Twitter, Instagram, Youtube, Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const StatCard = ({ icon, value, label }: { icon: React.ReactNode, value: string, label: string }) => (
     <motion.div 
@@ -63,6 +66,13 @@ export default function LandingPage() {
         setIsMenuOpen(false);
     };
 
+    const handleContactSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // In a real app, you would handle form submission here.
+        alert('Thank you for your message! We will get back to you soon.');
+        (e.target as HTMLFormElement).reset();
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 text-white overflow-x-hidden">
             <style jsx global>{`
@@ -83,6 +93,7 @@ export default function LandingPage() {
                         <a href="#services" onClick={(e) => handleScrollTo(e, 'services')} className="text-sm font-medium hover:text-primary transition-colors">Services</a>
                         <a href="#reviews" onClick={(e) => handleScrollTo(e, 'reviews')} className="text-sm font-medium hover:text-primary transition-colors">Reviews</a>
                         <a href="#about" onClick={(e) => handleScrollTo(e, 'about')} className="text-sm font-medium hover:text-primary transition-colors">About</a>
+                         <a href="#contact" onClick={(e) => handleScrollTo(e, 'contact')} className="text-sm font-medium hover:text-primary transition-colors">Contact</a>
                     </nav>
                     <div className="hidden md:flex">
                          <Button onClick={() => router.push('/login-options')} variant="outline" className="bg-white text-black border-white/50 hover:bg-white/90 transition-colors">
@@ -105,6 +116,7 @@ export default function LandingPage() {
                             <a href="#services" onClick={(e) => handleScrollTo(e, 'services')} className="text-sm font-medium hover:text-primary transition-colors">Services</a>
                             <a href="#reviews" onClick={(e) => handleScrollTo(e, 'reviews')} className="text-sm font-medium hover:text-primary transition-colors">Reviews</a>
                             <a href="#about" onClick={(e) => handleScrollTo(e, 'about')} className="text-sm font-medium hover:text-primary transition-colors">About</a>
+                            <a href="#contact" onClick={(e) => handleScrollTo(e, 'contact')} className="text-sm font-medium hover:text-primary transition-colors">Contact</a>
                             <Button onClick={() => router.push('/login-options')} variant="outline" className="bg-white text-black border-white/50 hover:bg-white/90 transition-colors mt-2">
                                 Sign In
                             </Button>
@@ -229,6 +241,86 @@ export default function LandingPage() {
                                 review="I love the online consultation feature. It saved me a trip to the clinic, and the doctor was just as thorough as an in-person visit. Highly recommend!"
                                 image="https://images.unsplash.com/photo-1580489944761-15a19d654956"
                             />
+                        </div>
+                    </div>
+                </motion.section>
+
+                {/* Contact Us Section */}
+                <motion.section
+                    id="contact"
+                    className="py-16"
+                    variants={fadeIn}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.3 }}
+                >
+                    <div className="container mx-auto px-6">
+                        <motion.h2 variants={fadeIn} className="text-3xl md:text-4xl font-bold text-center mb-2">Contact Us</motion.h2>
+                        <motion.p variants={fadeIn} className="text-lg text-white/80 text-center max-w-3xl mx-auto mb-12">
+                            Have questions about our services? Our team is here to help. Reach out to us through any of the channels below.
+                        </motion.p>
+                        <div className="grid md:grid-cols-5 gap-8 items-start">
+                            <div className="md:col-span-2 space-y-6">
+                                <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 flex gap-4 items-start">
+                                    <Phone className="h-6 w-6 mt-1 text-primary"/>
+                                    <div>
+                                        <h3 className="font-semibold text-lg">Phone</h3>
+                                        <p className="text-white/80">(555) 123-4567</p>
+                                        <p className="text-xs text-white/60">Mon-Fri: 9am-6pm EST</p>
+                                    </div>
+                                </div>
+                                 <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 flex gap-4 items-start">
+                                    <Mail className="h-6 w-6 mt-1 text-primary"/>
+                                    <div>
+                                        <h3 className="font-semibold text-lg">Email</h3>
+                                        <p className="text-white/80">contact@shedula.com</p>
+                                        <p className="text-xs text-white/60">We'll respond within 24 hours</p>
+                                    </div>
+                                </div>
+                                 <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20 flex gap-4 items-start">
+                                    <MapPin className="h-6 w-6 mt-1 text-primary"/>
+                                    <div>
+                                        <h3 className="font-semibold text-lg">Office</h3>
+                                        <p className="text-white/80">123 Health St, Wellness City</p>
+                                        <p className="text-xs text-white/60">New York, NY 10001</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="md:col-span-3 bg-white/10 backdrop-blur-sm p-8 rounded-xl border border-white/20">
+                                <form className="space-y-6" onSubmit={handleContactSubmit}>
+                                    <div className="grid sm:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label htmlFor="name" className="text-sm font-medium">Name</label>
+                                            <Input id="name" name="name" placeholder="Your name" required className="bg-white/10 border-white/20 focus:ring-primary text-white placeholder:text-white/50" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="email" className="text-sm font-medium">Email</label>
+                                            <Input id="email" name="email" type="email" placeholder="Your email" required className="bg-white/10 border-white/20 focus:ring-primary text-white placeholder:text-white/50" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="subject" className="text-sm font-medium">Subject</label>
+                                         <Select name="subject" required>
+                                            <SelectTrigger className="w-full bg-white/10 border-white/20 focus:ring-primary text-white">
+                                                <SelectValue placeholder="Select an inquiry type" />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-gray-800 text-white border-white/20">
+                                                <SelectItem value="general">General Question</SelectItem>
+                                                <SelectItem value="support">Technical Support</SelectItem>
+                                                <SelectItem value="booking">Booking Help</SelectItem>
+                                                <SelectItem value="feedback">Feedback</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="message" className="text-sm font-medium">Message</label>
+                                        <Textarea id="message" name="message" placeholder="Your message" rows={5} required className="bg-white/10 border-white/20 focus:ring-primary text-white placeholder:text-white/50" />
+                                    </div>
+                                    <div>
+                                        <Button type="submit" className="w-full bg-white text-black hover:bg-white/90">Send Message</Button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </motion.section>

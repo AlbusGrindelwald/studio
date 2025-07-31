@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit } from 'lucide-react';
+import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { useRouter } from 'next/navigation';

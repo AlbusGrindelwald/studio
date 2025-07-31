@@ -108,7 +108,7 @@ export default function LandingPage() {
                             alt="Patient having a video consultation with a doctor using the Shedula app"
                             width={1200}
                             height={600}
-                            className="rounded-2xl mx-auto shadow-2xl shadow-primary/20 border-2 border-primary/20 object-cover aspect-video"
+                            className="rounded-2xl mx-auto shadow-2xl shadow-primary/20 border-2 border-primary/20 object-contain"
                             data-ai-hint="telemedicine consultation"
                         />
                     </motion.div>

@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Image from 'next/image';
 
 const StatCard = ({ icon, value, label }: { icon: React.ReactNode, value: string, label: string }) => (
     <motion.div 
@@ -45,12 +46,6 @@ const ReviewCard = ({ name, role, review, image }: { name: string, role: string,
 export default function LandingPage() {
     const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isClient, setIsClient] = useState(false);
-
-    React.useEffect(() => {
-        setIsClient(true);
-    }, []);
-
 
     const fadeIn = {
         hidden: { opacity: 0, y: 20 },
@@ -112,7 +107,7 @@ export default function LandingPage() {
                         </Button>
                     </div>
                 </div>
-                 {isClient && isMenuOpen && (
+                 {isMenuOpen && (
                     <motion.div 
                         className="md:hidden bg-black/50 backdrop-blur-lg"
                         initial={{ opacity: 0, y: -10 }}
@@ -159,9 +154,11 @@ export default function LandingPage() {
                             variants={fadeIn} 
                             className="mt-12 w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border border-primary/20"
                         >
-                             <img
+                             <Image
                                 src="/Gemini_Generated_Image_wlx8orwlx8orwlx8.jpg"
                                 alt="Shedula App Interface"
+                                width={1024}
+                                height={640}
                                 className="w-full h-auto object-contain"
                             />
                         </motion.div>

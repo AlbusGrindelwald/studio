@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit, Stethoscope, Menu, X } from 'lucide-react';
+import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit, Stethoscope, Menu, X, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { useRouter } from 'next/navigation';
@@ -257,12 +257,16 @@ export default function LandingPage() {
                                 <li className="mb-2"><a href="#" className="hover:text-primary">Contact Us</a></li>
                                 <li className="mb-2"><a href="#" className="hover:text-primary">Terms of Service</a></li>
                                 <li className="mb-2"><a href="#" className="hover:text-primary">Privacy Policy</a></li>
+                                <li className="mb-2"><a href="#" className="hover:text-primary">Cookies</a></li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="font-semibold text-white mb-4">Follow Us</h4>
                             <div className="flex space-x-4">
-                                {/* Add social icons here if needed */}
+                                <a href="#" className="hover:text-primary"><Facebook className="h-6 w-6" /></a>
+                                <a href="#" className="hover:text-primary"><Twitter className="h-6 w-6" /></a>
+                                <a href="#" className="hover:text-primary"><Instagram className="h-6 w-6" /></a>
+                                <a href="#" className="hover:text-primary"><Youtube className="h-6 w-6" /></a>
                             </div>
                         </div>
                     </div>

@@ -103,12 +103,12 @@ export default function LandingPage() {
                         className="mt-12"
                     >
                          <Image
-                            src="https://placehold.co/1200x600.png"
+                            src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d"
                             alt="Shedula App Dashboard"
                             width={1200}
                             height={600}
-                            className="rounded-2xl mx-auto shadow-2xl shadow-primary/20 border-2 border-primary/20"
-                            data-ai-hint="app dashboard"
+                            className="rounded-2xl mx-auto shadow-2xl shadow-primary/20 border-2 border-primary/20 object-cover"
+                            data-ai-hint="health dashboard"
                         />
                     </motion.div>
                 </section>

@@ -1,176 +1,230 @@
 
 'use client';
 
-import Link from 'next/link';
-import { CalendarCheck, ChevronRight, User, Stethoscope, Heart } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getAppointments, subscribe as subscribeAppointments } from '@/lib/appointments';
-import { getLoggedInUser, subscribe as subscribeUser } from '@/lib/user';
-import type { Appointment } from '@/lib/types';
-import type { User as PatientUser } from '@/lib/user';
-import { useEffect, useState } from 'react';
+import { Logo } from '@/components/Logo';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { Skeleton } from '@/components/ui/skeleton';
 
-function AppointmentCard({ appointment }: { appointment: Appointment }) {
-  const router = useRouter();
-  return (
-    <div className="flex items-center justify-between rounded-lg border bg-card p-3">
-      <div className="flex items-center gap-4">
-        <Image 
-          src={appointment.doctor.image}
-          alt={appointment.doctor.name}
-          width={48}
-          height={48}
-          className="rounded-full object-cover"
-          data-ai-hint="doctor portrait"
-        />
-        <div>
-          <p className="font-semibold">{appointment.doctor.name}</p>
-          <p className="text-sm text-muted-foreground">{appointment.doctor.specialty}</p>
-          <p className="text-xs text-muted-foreground mt-1">{new Date(appointment.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}, {appointment.time}</p>
+const StatCard = ({ icon, value, label }: { icon: React.ReactNode, value: string, label: string }) => (
+    <motion.div 
+        className="bg-white/10 backdrop-blur-sm p-6 rounded-xl text-center text-white border border-white/20"
+        whileHover={{ scale: 1.05, boxShadow: "0px 10px 30px rgba(0,0,0,0.1)" }}
+    >
+        <div className="flex justify-center mb-3">{icon}</div>
+        <p className="text-3xl font-bold">{value}</p>
+        <p className="text-sm text-white/80">{label}</p>
+    </motion.div>
+);
+
+const ReviewCard = ({ name, role, review, image }: { name: string, role: string, review: string, image: string }) => (
+    <motion.div 
+        className="bg-white/10 backdrop-blur-sm p-6 rounded-xl text-white border border-white/20 flex flex-col h-full"
+        whileHover={{ y: -5 }}
+    >
+        <div className="flex items-center mb-4">
+            <img src={image} alt={name} className="w-12 h-12 rounded-full object-cover border-2 border-primary" data-ai-hint="person portrait"/>
+            <div className="ml-4">
+                <p className="font-bold">{name}</p>
+                <p className="text-sm text-white/80">{role}</p>
+            </div>
         </div>
-      </div>
-       <Button variant="ghost" size="icon" onClick={() => router.push('/dashboard/appointments')}>
-        <ChevronRight className="h-5 w-5" />
-      </Button>
-    </div>
-  );
-}
+        <p className="text-white/90 flex-grow">"{review}"</p>
+        <div className="flex mt-4">
+            {[...Array(5)].map((_, i) => <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />)}
+        </div>
+    </motion.div>
+);
 
+export default function LandingPage() {
+    const router = useRouter();
 
-export default function DashboardPage() {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [user, setUser] = useState<PatientUser | null>(null);
-  const [isClient, setIsClient] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    const handleAppointmentsChange = () => {
-      setAppointments(getAppointments());
+    const fadeIn = {
+        hidden: { opacity: 0, y: 20 },
+        visible: (i: number = 1) => ({
+            opacity: 1,
+            y: 0,
+            transition: { staggerChildren: 0.2, delayChildren: i * 0.1, duration: 0.6, ease: 'easeOut' },
+        }),
     };
 
-    const handleUserChange = () => {
-        setUser(getLoggedInUser());
-    }
-
-    const unsubscribeAppointments = subscribeAppointments(handleAppointmentsChange);
-    const unsubscribeUser = subscribeUser(handleUserChange);
-    
-    handleAppointmentsChange(); // Initial fetch
-    handleUserChange(); // Initial user fetch
-    
-    setIsClient(true);
-    
-    return () => {
-        unsubscribeAppointments();
-        unsubscribeUser();
-    }
-  }, []);
-
-  const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').slice(0, 1);
-
-  if (!isClient) {
     return (
-        <div className="flex flex-1 flex-col gap-6 p-4">
-            <header className="flex justify-between items-center">
-                <div>
-                    <Skeleton className="h-8 w-32 mb-2" />
-                    <Skeleton className="h-4 w-48" />
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-x-hidden">
+            {/* Header */}
+            <motion.header 
+                className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-lg"
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+            >
+                <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <Logo className="text-white" />
+                    <Button onClick={() => router.push('/login-options')} variant="outline" className="text-white border-white/50 hover:bg-white hover:text-black transition-colors">
+                        Sign In <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
                 </div>
-                <Skeleton className="h-10 w-10 rounded-full" />
-            </header>
-            <Skeleton className="h-12 w-full rounded-full" />
-            <div className="grid grid-cols-2 gap-4">
-                <Skeleton className="h-28 w-full" />
-                <Skeleton className="h-28 w-full" />
-            </div>
-            <div>
-                <div className="flex justify-between items-center mb-3">
-                    <Skeleton className="h-6 w-48" />
-                    <Skeleton className="h-4 w-16" />
+            </motion.header>
+
+            <main>
+                {/* Hero Section */}
+                <motion.section 
+                    className="pt-32 pb-16 text-center bg-grid-white/[0.05]"
+                    variants={fadeIn}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <div className="container mx-auto px-6">
+                        <motion.h1 variants={fadeIn} className="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">
+                            Your Health, <br />
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-300 to-cyan-400">Perfectly Scheduled.</span>
+                        </motion.h1>
+                        <motion.p variants={fadeIn} className="text-lg md:text-xl text-white/80 max-w-3xl mx-auto mb-8">
+                            Shedula is a seamless, AI-powered platform that connects you with top-tier doctors. Book appointments, get recommendations, and manage your health journey effortlessly.
+                        </motion.p>
+                        <motion.div variants={fadeIn} className="flex justify-center gap-4">
+                            <Button onClick={() => router.push('/login-options')} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-base px-8 py-6 rounded-full">
+                                Get Started
+                            </Button>
+                            <Button size="lg" variant="ghost" className="text-white/80 hover:bg-white/10 hover:text-white text-base px-8 py-6 rounded-full">
+                                Learn More
+                            </Button>
+                        </motion.div>
+                        <motion.div 
+                            variants={fadeIn} 
+                            className="mt-12 w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border border-primary/20"
+                        >
+                            <img
+                                src="/Gemini_Generated_Image_wlx8orwlx8orwlx8.jpg"
+                                alt="Shedula App Interface"
+                                className="w-full h-auto object-contain"
+                            />
+                        </motion.div>
+                    </div>
+                </motion.section>
+
+                {/* Stats Section */}
+                <motion.section 
+                    className="py-16 bg-white/5"
+                    variants={fadeIn}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.3 }}
+                >
+                    <div className="container mx-auto px-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                        <StatCard icon={<Heart className="h-8 w-8" />} value="10,000+" label="Happy Patients" />
+                        <StatCard icon={<Stethoscope className="h-8 w-8" />} value="200+" label="Verified Doctors" />
+                        <StatCard icon={<Calendar className="h-8 w-8" />} value="50,000+" label="Appointments Booked" />
+                        <StatCard icon={<ShieldCheck className="h-8 w-8" />} value="99.8%" label="Service Uptime" />
+                    </div>
+                    </div>
+                </motion.section>
+
+                {/* Services Section */}
+                <motion.section 
+                    className="py-16"
+                    variants={fadeIn}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.3 }}
+                >
+                    <div className="container mx-auto px-6">
+                        <motion.h2 variants={fadeIn} className="text-3xl md:text-4xl font-bold text-center mb-12">What We Offer</motion.h2>
+                        <div className="grid md:grid-cols-3 gap-8">
+                            <motion.div variants={fadeIn} className="bg-white/5 p-8 rounded-xl border border-white/10 text-center">
+                                <BrainCircuit className="h-10 w-10 mx-auto mb-4 text-primary" />
+                                <h3 className="font-bold text-xl mb-2">AI Recommendations</h3>
+                                <p className="text-white/70">Our intelligent system analyzes your symptoms to suggest the best specialists for your needs.</p>
+                            </motion.div>
+                             <motion.div variants={fadeIn} className="bg-white/5 p-8 rounded-xl border border-white/10 text-center">
+                                <Calendar className="h-10 w-10 mx-auto mb-4 text-primary" />
+                                <h3 className="font-bold text-xl mb-2">Easy Scheduling</h3>
+                                <p className="text-white/70">Find available doctors and book your appointments in just a few taps, 24/7.</p>
+                            </motion.div>
+                             <motion.div variants={fadeIn} className="bg-white/5 p-8 rounded-xl border border-white/10 text-center">
+                                <Stethoscope className="h-10 w-10 mx-auto mb-4 text-primary" />
+                                <h3 className="font-bold text-xl mb-2">Verified Specialists</h3>
+                                <p className="text-white/70">Access a curated network of board-certified doctors across various specializations.</p>
+                            </motion.div>
+                        </div>
+                    </div>
+                </motion.section>
+
+                {/* Reviews Section */}
+                <motion.section 
+                    className="py-16 bg-white/5"
+                     variants={fadeIn}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.3 }}
+                >
+                    <div className="container mx-auto px-6">
+                        <motion.h2 variants={fadeIn} className="text-3xl md:text-4xl font-bold text-center mb-12">Loved by Patients</motion.h2>
+                        <div className="grid md:grid-cols-3 gap-8">
+                             <ReviewCard 
+                                name="Sarah L." 
+                                role="Working Professional"
+                                review="Shedula made finding a cardiologist so simple. The AI recommendation was spot on, and I booked an appointment for the next day. A real lifesaver!"
+                                image="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+                            />
+                            <ReviewCard 
+                                name="David C." 
+                                role="Parent"
+                                review="Managing my kids' pediatrician appointments used to be a headache. With Shedula, it's all in one place. The reminders are incredibly helpful."
+                                image="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6"
+                            />
+                            <ReviewCard 
+                                name="Emily R." 
+                                role="Remote Worker"
+                                review="I love the online consultation feature. It saved me a trip to the clinic, and the doctor was just as thorough as an in-person visit. Highly recommend!"
+                                image="https://images.unsplash.com/photo-1580489944761-15a19d654956"
+                            />
+                        </div>
+                    </div>
+                </motion.section>
+            </main>
+
+            {/* Footer */}
+            <footer className="bg-gray-900 text-white/70">
+                <div className="container mx-auto px-6 py-12">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        <div>
+                            <Logo className="text-white mb-4" />
+                            <p className="max-w-xs">Your health journey, simplified. Find doctors, book appointments, and stay on top of your well-being.</p>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold text-white mb-4">Company</h4>
+                            <ul>
+                                <li className="mb-2"><a href="#" className="hover:text-primary">About Us</a></li>
+                                <li className="mb-2"><a href="#" className="hover:text-primary">Careers</a></li>
+                                <li className="mb-2"><a href="#" className="hover:text-primary">Press</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold text-white mb-4">Support</h4>
+                            <ul>
+                                <li className="mb-2"><a href="#" className="hover:text-primary">Help Center</a></li>
+                                <li className="mb-2"><a href="#" className="hover:text-primary">Contact Us</a></li>
+                                <li className="mb-2"><a href="#" className="hover:text-primary">Terms of Service</a></li>
+                                <li className="mb-2"><a href="#" className="hover:text-primary">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="font-semibold text-white mb-4">Follow Us</h4>
+                            <div className="flex space-x-4">
+                                {/* Add social icons here if needed */}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="border-t border-white/10 mt-8 pt-8 text-center text-sm">
+                        <p>&copy; {new Date().getFullYear()} Shedula. All rights reserved.</p>
+                    </div>
                 </div>
-                <Skeleton className="h-24 w-full" />
-            </div>
-             <div>
-                <Skeleton className="h-6 w-40 mb-3" />
-                <Skeleton className="h-36 w-full" />
-            </div>
+            </footer>
         </div>
     );
-  }
-
-  return (
-    <div className="flex flex-1 flex-col gap-6 p-4">
-      <header className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Hi, {user?.name?.split(' ')[0] || 'User'}!</h1>
-          <p className="text-muted-foreground">How are you feeling today?</p>
-        </div>
-        <div className="relative">
-            <Button variant="outline" size="icon" className="rounded-full" onClick={() => router.push('/dashboard/wishlist')}>
-                <Heart className="h-5 w-5" />
-            </Button>
-        </div>
-      </header>
-
-       <div className="grid grid-cols-2 gap-4">
-        <Card className="flex flex-col items-center justify-center p-4 text-center bg-blue-50 border-blue-200" onClick={() => router.push('/dashboard/doctors')}>
-          <div className="p-3 bg-blue-100 rounded-full mb-2">
-             <Stethoscope className="h-6 w-6 text-blue-600" />
-          </div>
-          <p className="font-semibold text-sm">Doctors</p>
-          <p className="text-xs text-muted-foreground">Find a specialist</p>
-        </Card>
-        <Card className="flex flex-col items-center justify-center p-4 text-center bg-purple-50 border-purple-200" onClick={() => router.push('/dashboard/appointments')}>
-          <div className="p-3 bg-purple-100 rounded-full mb-2">
-            <CalendarCheck className="h-6 w-6 text-purple-600" />
-          </div>
-          <p className="font-semibold text-sm">Appointments</p>
-          <p className="text-xs text-muted-foreground">Manage bookings</p>
-        </Card>
-      </div>
-
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-lg font-semibold tracking-tight">Upcoming Appointment</h2>
-          <Link href="/dashboard/appointments" className="text-sm text-primary font-medium">See All</Link>
-        </div>
-        <div className="space-y-4">
-          {upcomingAppointments.length > 0 ? (
-            upcomingAppointments.map(app => <AppointmentCard key={app.id} appointment={app} />)
-          ) : (
-            <Card>
-              <CardContent className="p-6 text-center text-muted-foreground">
-                You have no upcoming appointments.
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
-
-       <div>
-        <h2 className="text-lg font-semibold tracking-tight mb-3">AI Recommendation</h2>
-          <Card className="bg-teal-50 border-teal-200">
-            <CardHeader className="flex flex-row items-center gap-4">
-              <div className="p-3 bg-teal-100 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-teal-600"><path d="M12 2a10 10 0 1 0 10 10c0-4.42-2.87-8.17-7-9.58"/><path d="M16 11.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/><path d="M12 3v2"/><path d="M21 12h-2"/><path d="M12 21v-2"/><path d="M3 12H1"/><path d="m19.07 4.93-1.41 1.41"/><path d="m4.93 19.07-1.41-1.41"/><path d="m19.07 19.07-1.41-1.41"/><path d="m4.93 4.93-1.41 1.41"/></svg>
-              </div>
-              <div>
-                <CardTitle className="text-base">Feeling Unwell?</CardTitle>
-                <CardDescription className="text-xs">Get doctor recommendations based on your symptoms.</CardDescription>
-              </div>
-            </CardHeader>
-             <CardContent>
-               <Link href="/dashboard/recommend" passHref>
-                  <Button className="w-full bg-teal-500 hover:bg-teal-600">Get Recommendation</Button>
-              </Link>
-             </CardContent>
-          </Card>
-      </div>
-
-    </div>
-  );
 }
+
+    

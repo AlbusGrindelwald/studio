@@ -85,7 +85,7 @@ export default function LandingPage() {
                         <a href="#about" onClick={(e) => handleScrollTo(e, 'about')} className="text-sm font-medium hover:text-primary transition-colors">About</a>
                     </nav>
                     <div className="hidden md:flex">
-                        <Button onClick={() => router.push('/login-options')} variant="outline" className="border-white/50 bg-white/10 hover:bg-white hover:text-primary transition-colors">
+                         <Button onClick={() => router.push('/login-options')} variant="outline" className="bg-white text-black border-white/50 hover:bg-white/90 transition-colors">
                             Sign In <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                     </div>
@@ -141,7 +141,7 @@ export default function LandingPage() {
                             variants={fadeIn} 
                             className="mt-12 w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border border-primary/20"
                         >
-                            <img
+                             <img
                                 src="/Gemini_Generated_Image_wlx8orwlx8orwlx8.jpg"
                                 alt="Shedula App Interface"
                                 className="w-full h-auto object-contain"
@@ -180,18 +180,18 @@ export default function LandingPage() {
                     <div className="container mx-auto px-6">
                         <motion.h2 variants={fadeIn} className="text-3xl md:text-4xl font-bold text-center mb-12">What We Offer</motion.h2>
                         <div className="grid md:grid-cols-3 gap-8">
-                            <motion.div variants={fadeIn} className="bg-white/5 p-8 rounded-xl border border-white/10 text-center">
-                                <BrainCircuit className="h-10 w-10 mx-auto mb-4 text-primary" />
+                            <motion.div variants={fadeIn} className="bg-white/5 p-8 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                                <BrainCircuit className="h-10 w-10 mb-4 text-primary" />
                                 <h3 className="font-bold text-xl mb-2">AI Recommendations</h3>
                                 <p className="text-white/70">Our intelligent system analyzes your symptoms to suggest the best specialists for your needs.</p>
                             </motion.div>
-                             <motion.div variants={fadeIn} className="bg-white/5 p-8 rounded-xl border border-white/10 text-center">
-                                <Calendar className="h-10 w-10 mx-auto mb-4 text-primary" />
+                             <motion.div variants={fadeIn} className="bg-white/5 p-8 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                                <Calendar className="h-10 w-10 mb-4 text-primary" />
                                 <h3 className="font-bold text-xl mb-2">Easy Scheduling</h3>
                                 <p className="text-white/70">Find available doctors and book your appointments in just a few taps, 24/7.</p>
                             </motion.div>
-                             <motion.div variants={fadeIn} className="bg-white/5 p-8 rounded-xl border border-white/10 text-center">
-                                <Stethoscope className="h-10 w-10 mx-auto mb-4 text-primary" />
+                             <motion.div variants={fadeIn} className="bg-white/5 p-8 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                                <Stethoscope className="h-10 w-10 mb-4 text-primary" />
                                 <h3 className="font-bold text-xl mb-2">Verified Specialists</h3>
                                 <p className="text-white/70">Access a curated network of board-certified doctors across various specializations.</p>
                             </motion.div>

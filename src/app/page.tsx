@@ -103,12 +103,12 @@ export default function LandingPage() {
                         className="mt-12"
                     >
                          <Image
-                            src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d"
-                            alt="Shedula App Dashboard"
+                            src="https://storage.googleapis.com/project-1-426115.appspot.com/a2d5e954-4bd3-41e9-bd25-c63795325816.jpeg"
+                            alt="Patient having a video consultation with a doctor using the Shedula app"
                             width={1200}
                             height={600}
                             className="rounded-2xl mx-auto shadow-2xl shadow-primary/20 border-2 border-primary/20 object-cover"
-                            data-ai-hint="health dashboard"
+                            data-ai-hint="telemedicine consultation"
                         />
                     </motion.div>
                 </section>

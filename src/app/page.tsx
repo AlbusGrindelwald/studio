@@ -254,7 +254,6 @@ export default function LandingPage() {
                             <h4 className="font-semibold text-white mb-4">Support</h4>
                             <ul>
                                 <li className="mb-2"><a href="#" className="hover:text-primary">Help Center</a></li>
-                                <li className="mb-2"><a href="#" className="hover:text-primary">Contact Us</a></li>
                                 <li className="mb-2"><a href="#" className="hover:text-primary">Terms of Service</a></li>
                                 <li className="mb-2"><a href="#" className="hover:text-primary">Privacy Policy</a></li>
                                 <li className="mb-2"><a href="#" className="hover:text-primary">Cookies</a></li>

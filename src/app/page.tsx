@@ -54,7 +54,7 @@ export default function LandingPage() {
     const router = useRouter();
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-primary-foreground">
+        <div className="min-h-screen bg-gradient-to-br from-blue-700 via-purple-700 to-pink-700 text-primary-foreground">
             <div className="absolute inset-0 h-full w-full bg-transparent bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:36px_36px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
 
             <header className="fixed top-0 left-0 right-0 z-50 p-4 backdrop-blur-lg border-b border-white/10">
@@ -210,4 +210,5 @@ export default function LandingPage() {
             </main>
         </div>
     );
-}
+
+    

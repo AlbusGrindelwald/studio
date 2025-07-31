@@ -64,7 +64,7 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#0B1D35] to-[#7C3AED] text-white overflow-x-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 text-white overflow-x-hidden">
             <style jsx global>{`
                 html {
                     scroll-behavior: smooth;
@@ -85,7 +85,7 @@ export default function LandingPage() {
                         <a href="#about" onClick={(e) => handleScrollTo(e, 'about')} className="text-sm font-medium hover:text-primary transition-colors">About</a>
                     </nav>
                     <div className="hidden md:flex">
-                        <Button onClick={() => router.push('/login-options')} variant="outline" className="border-white/50 hover:bg-white text-white hover:text-black transition-colors">
+                        <Button onClick={() => router.push('/login-options')} variant="outline" className="border-white/50 bg-white/10 hover:bg-white hover:text-primary transition-colors">
                             Sign In <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                     </div>

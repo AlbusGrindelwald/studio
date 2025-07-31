@@ -105,7 +105,7 @@ export default function LandingPage() {
                             <a href="#services" onClick={(e) => handleScrollTo(e, 'services')} className="text-sm font-medium hover:text-primary transition-colors">Services</a>
                             <a href="#reviews" onClick={(e) => handleScrollTo(e, 'reviews')} className="text-sm font-medium hover:text-primary transition-colors">Reviews</a>
                             <a href="#about" onClick={(e) => handleScrollTo(e, 'about')} className="text-sm font-medium hover:text-primary transition-colors">About</a>
-                            <Button onClick={() => router.push('/login-options')} variant="outline" className="text-white border-white/50 hover:bg-white hover:text-black transition-colors mt-2">
+                            <Button onClick={() => router.push('/login-options')} variant="outline" className="bg-white text-black border-white/50 hover:bg-white/90 transition-colors mt-2">
                                 Sign In
                             </Button>
                         </nav>

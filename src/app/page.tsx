@@ -1,51 +1,49 @@
 
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Stethoscope, User } from 'lucide-react';
-import { Logo } from '@/components/Logo';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default function RoleSelectionPage() {
-  const router = useRouter();
+const LandingPage = dynamic(() => import('./landing-page'), {
+  ssr: false,
+  loading: () => <LandingPageSkeleton />,
+});
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
-      <div className="w-full max-w-md text-center">
-        <Logo className="mx-auto mb-2 text-4xl" />
-        <p className="text-muted-foreground mb-8">Your Health, Your Schedule.</p>
-        
-        <h1 className="text-2xl font-bold mb-6">Continue as a...</h1>
-        
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <Card 
-            className="cursor-pointer transition-all hover:shadow-lg hover:border-primary"
-            onClick={() => router.push('/login')}
-          >
-            <CardContent className="p-6 flex flex-col items-center justify-center gap-4">
-              <div className="p-4 bg-primary/10 rounded-full">
-                <User className="h-10 w-10 text-primary" />
-              </div>
-              <h2 className="text-xl font-semibold">Patient</h2>
-              <p className="text-sm text-muted-foreground">Book and manage your appointments.</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="cursor-pointer transition-all hover:shadow-lg hover:border-primary"
-            onClick={() => router.push('/doctor/login')}
-          >
-            <CardContent className="p-6 flex flex-col items-center justify-center gap-4">
-               <div className="p-4 bg-primary/10 rounded-full">
-                <Stethoscope className="h-10 w-10 text-primary" />
-              </div>
-              <h2 className="text-xl font-semibold">Doctor</h2>
-              <p className="text-sm text-muted-foreground">Manage your schedule and patients.</p>
-            </CardContent>
-          </Card>
+function LandingPageSkeleton() {
+    return (
+        <div className="min-h-screen bg-gray-900 text-white overflow-x-hidden p-6 space-y-8">
+            <header className="flex justify-between items-center">
+                <Skeleton className="h-8 w-24" />
+                <div className="hidden md:flex items-center gap-6">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                </div>
+                <Skeleton className="h-10 w-24 rounded-md" />
+            </header>
+            <main className="text-center pt-24 space-y-6">
+                <Skeleton className="h-12 w-3/4 mx-auto" />
+                <Skeleton className="h-8 w-1/2 mx-auto" />
+                <Skeleton className="h-6 w-full max-w-3xl mx-auto" />
+                <Skeleton className="h-6 w-full max-w-2xl mx-auto" />
+                 <div className="flex justify-center gap-4">
+                    <Skeleton className="h-14 w-40 rounded-full" />
+                    <Skeleton className="h-14 w-40 rounded-full" />
+                </div>
+                 <Skeleton className="mt-12 w-full max-w-4xl h-96 mx-auto rounded-2xl" />
+            </main>
         </div>
-      </div>
-    </div>
-  );
+    );
+}
+
+export default function Page() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  return isClient ? <LandingPage /> : <LandingPageSkeleton />;
 }

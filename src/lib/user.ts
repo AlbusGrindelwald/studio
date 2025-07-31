@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   phone?: string;
+  image?: string; // To store the profile image URL
 }
 
 // This is a simple in-memory "database" using localStorage.
@@ -64,13 +65,19 @@ export const findUserById = (id: string): User | undefined => {
   return currentUsers.find(u => u.id === id);
 };
 
-export const updateUserWithPhone = (id: string, phone: string) => {
+export const updateUser = (id: string, updates: Partial<Omit<User, 'id'>>) => {
     let currentUsers = getUsers();
     const userIndex = currentUsers.findIndex(u => u.id === id);
     if(userIndex > -1) {
-        currentUsers[userIndex].phone = phone;
+        currentUsers[userIndex] = { ...currentUsers[userIndex], ...updates };
         saveUsers(currentUsers);
+        return currentUsers[userIndex];
     }
+    return null;
+}
+
+export const updateUserWithPhone = (id: string, phone: string) => {
+    updateUser(id, { phone });
 };
 
 export const loginUser = (userId: string) => {

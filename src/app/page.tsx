@@ -100,14 +100,15 @@ export default function LandingPage() {
                         initial={{ opacity: 0, y: 50, scale: 0.8 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{ duration: 0.8, delay: 0.3, ease: "backOut" }}
-                        className="mt-12"
+                        className="mt-12 w-full max-w-5xl mx-auto"
                     >
                          <Image
+                            priority
                             src="https://storage.googleapis.com/project-1-426115.appspot.com/a2d5e954-4bd3-41e9-bd25-c63795325816.jpeg"
                             alt="Patient having a video consultation with a doctor using the Shedula app"
                             width={1200}
                             height={600}
-                            className="rounded-2xl mx-auto shadow-2xl shadow-primary/20 border-2 border-primary/20 object-cover"
+                            className="rounded-2xl mx-auto shadow-2xl shadow-primary/20 border-2 border-primary/20 object-cover aspect-video"
                             data-ai-hint="telemedicine consultation"
                         />
                     </motion.div>

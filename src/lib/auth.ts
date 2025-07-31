@@ -17,6 +17,7 @@ export const signInWithGoogle = async (): Promise<User | null> => {
   const provider = new GoogleAuthProvider();
 
   try {
+    console.log('Attempting Google Sign-In with auth domain:', auth.config.authDomain);
     const result = await signInWithPopup(auth, provider);
     return result.user;
   } catch (error: any) {

@@ -45,6 +45,12 @@ const ReviewCard = ({ name, role, review, image }: { name: string, role: string,
 export default function LandingPage() {
     const router = useRouter();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isClient, setIsClient] = useState(false);
+
+    React.useEffect(() => {
+        setIsClient(true);
+    }, []);
+
 
     const fadeIn = {
         hidden: { opacity: 0, y: 20 },
@@ -106,7 +112,7 @@ export default function LandingPage() {
                         </Button>
                     </div>
                 </div>
-                 {isMenuOpen && (
+                 {isClient && isMenuOpen && (
                     <motion.div 
                         className="md:hidden bg-black/50 backdrop-blur-lg"
                         initial={{ opacity: 0, y: -10 }}

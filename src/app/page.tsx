@@ -1,12 +1,13 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit, Stethoscope } from 'lucide-react';
+import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit, Stethoscope, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const StatCard = ({ icon, value, label }: { icon: React.ReactNode, value: string, label: string }) => (
     <motion.div 
@@ -40,6 +41,7 @@ const ReviewCard = ({ name, role, review, image }: { name: string, role: string,
 
 export default function LandingPage() {
     const router = useRouter();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const fadeIn = {
         hidden: { opacity: 0, y: 20 },
@@ -50,8 +52,24 @@ export default function LandingPage() {
         }),
     };
 
+    const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+        e.preventDefault();
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        setIsMenuOpen(false);
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-x-hidden">
+            <style jsx global>{`
+                html {
+                    scroll-behavior: smooth;
+                }
+            `}</style>
             {/* Header */}
             <motion.header 
                 className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-lg"
@@ -61,10 +79,38 @@ export default function LandingPage() {
             >
                 <div className="container mx-auto px-6 py-4 flex justify-between items-center">
                     <Logo className="text-white" />
-                    <Button onClick={() => router.push('/login-options')} variant="outline" className="text-white border-white/50 hover:bg-white hover:text-black transition-colors">
-                        Sign In <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <nav className="hidden md:flex items-center gap-6">
+                        <a href="#services" onClick={(e) => handleScrollTo(e, 'services')} className="text-sm font-medium hover:text-primary transition-colors">Services</a>
+                        <a href="#reviews" onClick={(e) => handleScrollTo(e, 'reviews')} className="text-sm font-medium hover:text-primary transition-colors">Reviews</a>
+                        <a href="#about" onClick={(e) => handleScrollTo(e, 'about')} className="text-sm font-medium hover:text-primary transition-colors">About</a>
+                    </nav>
+                    <div className="hidden md:flex">
+                        <Button onClick={() => router.push('/login-options')} variant="outline" className="text-white border-white/50 hover:bg-white hover:text-black transition-colors">
+                            Sign In <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </div>
+                    <div className="md:hidden">
+                        <Button onClick={() => setIsMenuOpen(!isMenuOpen)} variant="ghost" size="icon">
+                            {isMenuOpen ? <X/> : <Menu />}
+                        </Button>
+                    </div>
                 </div>
+                 {isMenuOpen && (
+                    <motion.div 
+                        className="md:hidden bg-black/50 backdrop-blur-lg"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                    >
+                        <nav className="flex flex-col items-center gap-4 py-4">
+                            <a href="#services" onClick={(e) => handleScrollTo(e, 'services')} className="text-sm font-medium hover:text-primary transition-colors">Services</a>
+                            <a href="#reviews" onClick={(e) => handleScrollTo(e, 'reviews')} className="text-sm font-medium hover:text-primary transition-colors">Reviews</a>
+                            <a href="#about" onClick={(e) => handleScrollTo(e, 'about')} className="text-sm font-medium hover:text-primary transition-colors">About</a>
+                            <Button onClick={() => router.push('/login-options')} variant="outline" className="text-white border-white/50 hover:bg-white hover:text-black transition-colors mt-2">
+                                Sign In
+                            </Button>
+                        </nav>
+                    </motion.div>
+                )}
             </motion.header>
 
             <main>
@@ -95,7 +141,7 @@ export default function LandingPage() {
                             variants={fadeIn} 
                             className="mt-12 w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 border border-primary/20"
                         >
-                            <img
+                             <img
                                 src="/Gemini_Generated_Image_wlx8orwlx8orwlx8.jpg"
                                 alt="Shedula App Interface"
                                 className="w-full h-auto object-contain"
@@ -124,6 +170,7 @@ export default function LandingPage() {
 
                 {/* Services Section */}
                 <motion.section 
+                    id="services"
                     className="py-16"
                     variants={fadeIn}
                     initial="hidden"
@@ -154,6 +201,7 @@ export default function LandingPage() {
 
                 {/* Reviews Section */}
                 <motion.section 
+                    id="reviews"
                     className="py-16 bg-white/5"
                      variants={fadeIn}
                     initial="hidden"
@@ -187,7 +235,7 @@ export default function LandingPage() {
             </main>
 
             {/* Footer */}
-            <footer className="bg-gray-900 text-white/70">
+            <footer id="about" className="bg-gray-900 text-white/70">
                 <div className="container mx-auto px-6 py-12">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                         <div>
@@ -226,5 +274,3 @@ export default function LandingPage() {
         </div>
     );
 }
-
-    

@@ -104,7 +104,7 @@ export default function LandingPage() {
                     >
                          <Image
                             priority
-                            src="https://storage.googleapis.com/project-1-426115.appspot.com/a2d5e954-4bd3-41e9-bd25-c63795325816.jpeg"
+                            src="/Gemini_Generated_Image_wlx8orwlx8orwlx8.jpg"
                             alt="Patient having a video consultation with a doctor using the Shedula app"
                             width={1200}
                             height={600}

@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, Heart, ShieldCheck, Star, BrainCircuit, Stethoscope, Menu, X, Facebook, Twitter, Instagram, Youtube, Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';

@@ -10,6 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import { googleAI } from '@genkit-ai/googleai';
 import {z} from 'genkit';
 
 const RecommendDoctorsInputSchema = z.object({
@@ -38,6 +39,7 @@ const prompt = ai.definePrompt({
   name: 'recommendDoctorsPrompt',
   input: {schema: RecommendDoctorsInputSchema},
   output: {schema: RecommendDoctorsOutputSchema},
+  model: googleAI.model('gemini-2.0-flash'),
   prompt: `You are an AI assistant helping users find the best doctors based on their symptoms.
 
   Given the following symptoms:

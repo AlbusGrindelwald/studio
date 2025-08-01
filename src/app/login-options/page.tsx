@@ -14,7 +14,7 @@ export default function RoleSelectionPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center p-4">
       <Image
-        src="/login-bg.jpg"
+        src="/Flux_Dev_Scene_Description1_Empty_Waiting_Area_Seating_45_unoc_2.jpg"
         alt="A modern, clean doctor's waiting room with comfortable chairs and plants."
         layout="fill"
         objectFit="cover"

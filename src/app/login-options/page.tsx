@@ -14,12 +14,12 @@ export default function RoleSelectionPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center p-4">
       <Image
-        src="https://images.unsplash.com/photo-1576091160550-2173dba999ef"
-        alt="Medical background"
+        src="https://storage.googleapis.com/ember-vigil-427113.appspot.com/6c207920-5349-436f-8703-a1f107954b80"
+        alt="Doctor's waiting room"
         layout="fill"
         objectFit="cover"
-        className="z-0 blur-sm brightness-50"
-        data-ai-hint="medical background"
+        className="z-0 brightness-75"
+        data-ai-hint="waiting room"
       />
       <div className="absolute inset-0 bg-black/30 z-10"></div>
       

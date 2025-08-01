@@ -32,7 +32,7 @@ export default function RoleSelectionPage() {
         
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <Card 
-            className="cursor-pointer transition-all hover:shadow-lg hover:border-primary bg-background/20 backdrop-blur-sm border-white/20 text-white"
+            className="cursor-pointer transition-all hover:shadow-lg hover:border-primary bg-black/40 border-white/30 text-white"
             onClick={() => router.push('/login')}
           >
             <CardContent className="p-6 flex flex-col items-center justify-center gap-4">
@@ -45,7 +45,7 @@ export default function RoleSelectionPage() {
           </Card>
 
           <Card 
-            className="cursor-pointer transition-all hover:shadow-lg hover:border-primary bg-background/20 backdrop-blur-sm border-white/20 text-white"
+            className="cursor-pointer transition-all hover:shadow-lg hover:border-primary bg-black/40 border-white/30 text-white"
             onClick={() => router.push('/doctor/login')}
           >
             <CardContent className="p-6 flex flex-col items-center justify-center gap-4">

@@ -6,6 +6,7 @@ export interface User {
   email: string;
   phone?: string;
   image?: string; // To store the profile image URL
+  lastVisit?: string;
 }
 
 // This is a simple in-memory "database" using localStorage.
@@ -18,7 +19,19 @@ const LOGGED_IN_USER_KEY = 'shedula_logged_in_user';
 let users: User[] = [];
 if (typeof window !== 'undefined') {
   const usersJson = localStorage.getItem(USERS_KEY);
-  users = usersJson ? JSON.parse(usersJson) : [];
+  if (usersJson) {
+      try {
+        const parsedUsers = JSON.parse(usersJson);
+        // Add mock lastVisit data if it doesn't exist
+        users = parsedUsers.map((u: User, index: number) => ({
+            ...u,
+            lastVisit: u.lastVisit || `2024-07-${15 - index}`
+        }));
+      } catch (e) {
+        console.error("Failed to parse users, initializing empty.", e);
+        users = [];
+      }
+  }
 }
 
 

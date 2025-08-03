@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,38 @@ import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
 import { createDoctor, loginDoctor } from '@/lib/doctor-auth';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function SignupSkeleton() {
+    return (
+        <div className="w-full max-w-md space-y-6">
+            <div className="text-center">
+                <Skeleton className="h-8 w-24 mx-auto mb-4" />
+            </div>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-7 w-48 mb-2" />
+                    <Skeleton className="h-4 w-64" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                     <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                    <Skeleton className="h-10 w-full" />
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
 
 export default function DoctorSignupPage() {
   const router = useRouter();
@@ -19,6 +51,11 @@ export default function DoctorSignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,6 +80,10 @@ export default function DoctorSignupPage() {
       setIsLoading(false);
     }
   };
+  
+  if (!isClient) {
+    return <SignupSkeleton />;
+  }
 
   return (
     <div className="w-full max-w-md space-y-6">

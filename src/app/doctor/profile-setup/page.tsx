@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { getLoggedInDoctor } from '@/lib/doctor-auth';
+import { getLoggedInDoctor, DoctorUser } from '@/lib/doctor-auth';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
@@ -50,7 +50,13 @@ export default function ProfileSetupPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const doctor = getLoggedInDoctor(); // In a real app, you'd fetch this properly after login/signup
+  const [doctor, setDoctor] = useState<DoctorUser | null>(null);
+
+  useEffect(() => {
+    // This code runs only on the client, after the initial render.
+    const loggedInDoctor = getLoggedInDoctor();
+    setDoctor(loggedInDoctor);
+  }, []);
 
   const { control, handleSubmit, formState: { errors } } = useForm<ProfileStep1Values>({
     resolver: zodResolver(profileStep1Schema),

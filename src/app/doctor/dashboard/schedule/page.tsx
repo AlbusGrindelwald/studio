@@ -102,8 +102,69 @@ export default function ScheduleManagementPage() {
         </Button>
       </header>
 
-      <main className="flex-1 p-6 overflow-y-auto flex flex-col md:flex-row gap-6">
-        <div className="flex-[2] space-y-6">
+      <main className="flex-1 p-6 overflow-y-auto space-y-6">
+        <Card>
+            <CardHeader>
+              <CardTitle>Block Dates</CardTitle>
+              <CardDescription>Block specific dates when you're unavailable.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <div className="space-y-4">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {newBlockedDate ? newBlockedDate.toLocaleDateString() : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={newBlockedDate}
+                        onSelect={setNewBlockedDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <Input
+                    placeholder="Reason (optional)"
+                    value={newBlockedReason}
+                    onChange={e => setNewBlockedReason(e.target.value)}
+                  />
+                  <Button onClick={addBlockedDate} className="w-full">
+                    <Plus className="mr-2 h-4 w-4" /> Block Date
+                  </Button>
+                </div>
+                <div className="md:col-span-2">
+                  {blockedDates.length > 0 ? (
+                    <div className="space-y-2 pt-4 md:pt-0">
+                        <h4 className="font-medium text-sm">Blocked Dates:</h4>
+                        <div className="grid sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-2">
+                          {blockedDates.map(bd => (
+                            <div key={bd.date.toString()} className="flex items-center justify-between bg-muted p-2 rounded-md text-sm">
+                                <div>
+                                <p className="font-semibold">{bd.date.toLocaleDateString()}</p>
+                                {bd.reason && <p className="text-xs text-muted-foreground">{bd.reason}</p>}
+                                </div>
+                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeBlockedDate(bd.date)}>
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                          ))}
+                        </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-sm text-muted-foreground bg-muted/50 rounded-md">
+                        No dates blocked.
+                    </div>
+                  )}
+                </div>
+            </CardContent>
+          </Card>
+        
           <Card>
             <CardHeader>
               <CardTitle>Weekly Schedule</CardTitle>
@@ -154,62 +215,6 @@ export default function ScheduleManagementPage() {
               ))}
             </CardContent>
           </Card>
-        </div>
-
-        <div className="flex-1 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Block Dates</CardTitle>
-              <CardDescription>Block specific dates when you're unavailable.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {newBlockedDate ? newBlockedDate.toLocaleDateString() : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={newBlockedDate}
-                    onSelect={setNewBlockedDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <Input
-                placeholder="Reason (optional)"
-                value={newBlockedReason}
-                onChange={e => setNewBlockedReason(e.target.value)}
-              />
-              <Button onClick={addBlockedDate} className="w-full">
-                <Plus className="mr-2 h-4 w-4" /> Block Date
-              </Button>
-              
-              {blockedDates.length > 0 && (
-                <div className="space-y-2 pt-4">
-                    <h4 className="font-medium text-sm">Blocked Dates:</h4>
-                    {blockedDates.map(bd => (
-                       <div key={bd.date.toString()} className="flex items-center justify-between bg-muted p-2 rounded-md text-sm">
-                           <div>
-                            <p className="font-semibold">{bd.date.toLocaleDateString()}</p>
-                            {bd.reason && <p className="text-xs text-muted-foreground">{bd.reason}</p>}
-                           </div>
-                           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeBlockedDate(bd.date)}>
-                                <X className="h-4 w-4" />
-                           </Button>
-                       </div>
-                    ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
       </main>
     </div>
   );

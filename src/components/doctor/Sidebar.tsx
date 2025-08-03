@@ -12,6 +12,7 @@ import {
   Stethoscope,
   CalendarCheck,
   CalendarClock,
+  BarChart,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/Logo';
@@ -34,6 +35,7 @@ const navItems = [
   { href: '/doctor/dashboard/appointments', label: 'Appointments', icon: CalendarCheck },
   { href: '/doctor/dashboard/schedule', label: 'Schedule', icon: CalendarClock },
   { href: '/doctor/dashboard/patients', label: 'My Patients', icon: Users },
+  { href: '/doctor/dashboard/analytics', label: 'Analytics', icon: BarChart },
 ];
 
 function NavItem({ href, label, icon: Icon }: (typeof navItems)[0]) {

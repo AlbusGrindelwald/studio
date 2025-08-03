@@ -39,7 +39,7 @@ const navItems = [
 
 function NavItem({ href, label, icon: Icon }: (typeof navItems)[0]) {
   const pathname = usePathname();
-  const isActive = pathname.startsWith(href) && (href !== '/doctor/dashboard' || pathname === href);
+  const isActive = pathname === href;
   return (
     <Link href={href} passHref>
       <Button

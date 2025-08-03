@@ -4,7 +4,7 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import type { Appointment } from '@/lib/types';
 import { useMemo } from 'react';
-import { format, parseISO, subMonths } from 'date-fns';
+import { format, parseISO, subMonths, addMonths } from 'date-fns';
 
 interface MonthlyAppointmentsChartProps {
     appointments: Appointment[];

@@ -11,6 +11,7 @@ import {
   LogOut,
   Stethoscope,
   CalendarCheck,
+  CalendarClock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/Logo';
@@ -31,6 +32,7 @@ import type { DoctorUser } from '@/lib/doctor-auth';
 const navItems = [
   { href: '/doctor/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/doctor/dashboard/appointments', label: 'Appointments', icon: CalendarCheck },
+  { href: '/doctor/dashboard/schedule', label: 'Schedule', icon: CalendarClock },
   { href: '/doctor/dashboard/patients', label: 'My Patients', icon: Users },
   { href: '/doctor/dashboard/profile', label: 'Edit Profile', icon: User },
 ];

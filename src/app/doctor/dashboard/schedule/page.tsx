@@ -101,8 +101,8 @@ export default function ScheduleManagementPage() {
         </Button>
       </header>
 
-      <main className="flex-1 p-6 overflow-y-auto grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-6">
+      <main className="flex-1 p-6 overflow-y-auto flex flex-col md:flex-row gap-6">
+        <div className="flex-[2] space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Weekly Schedule</CardTitle>
@@ -145,7 +145,7 @@ export default function ScheduleManagementPage() {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="flex-1 space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Block Dates</CardTitle>

@@ -73,19 +73,49 @@ export default function SchedulePage() {
     if (doctor && selectedDate) {
       const dateKey = format(selectedDate, 'yyyy-MM-dd');
       setTimeSlots(doctor.availability[dateKey] || []);
+    } else {
+      setTimeSlots([]);
     }
   }, [doctor, selectedDate]);
   
+  const formatTime = (timeString: string) => {
+    if (!timeString) return '';
+    const [hours, minutes] = timeString.split(':');
+    const h = parseInt(hours, 10);
+    const m = parseInt(minutes, 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const formattedHours = h % 12 === 0 ? 12 : h % 12;
+    const formattedMinutes = m < 10 ? `0${m}` : m;
+    return `${formattedHours}:${formattedMinutes} ${ampm}`;
+  }
+
   const handleAddTime = () => {
-    if (!selectedDate || !newTime.match(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]\s(AM|PM)$/i)) {
+    if (!selectedDate || !newTime) {
       toast({
         title: 'Invalid Time',
-        description: 'Please enter time in HH:MM AM/PM format (e.g., 02:30 PM).',
+        description: 'Please select a time to add.',
         variant: 'destructive',
       });
       return;
     }
-    const updatedSlots = [...timeSlots, newTime.toUpperCase()].sort();
+    
+    const formattedTime = formatTime(newTime);
+    
+    if (timeSlots.includes(formattedTime)) {
+        toast({
+            title: 'Duplicate Slot',
+            description: 'This time slot already exists for this date.',
+            variant: 'destructive',
+        });
+        return;
+    }
+
+    const updatedSlots = [...timeSlots, formattedTime].sort((a, b) => {
+        const timeA = new Date(`1970-01-01 ${a}`).getTime();
+        const timeB = new Date(`1970-01-01 ${b}`).getTime();
+        return timeA - timeB;
+    });
+
     setTimeSlots(updatedSlots);
     setNewTime('');
   };
@@ -128,6 +158,7 @@ export default function SchedulePage() {
                             mode="single"
                             selected={selectedDate}
                             onSelect={setSelectedDate}
+                            disabled={{ before: new Date() }}
                             className="rounded-md border"
                         />
                     </CardContent>
@@ -144,7 +175,7 @@ export default function SchedulePage() {
                              <CardDescription>Add or remove time slots for the selected date.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="space-y-3">
+                            <div className="space-y-3 max-h-60 overflow-y-auto">
                                 {timeSlots.map(time => (
                                     <div key={time} className="flex items-center justify-between bg-muted p-2 rounded-md">
                                         <div className='flex items-center gap-2'>
@@ -161,8 +192,7 @@ export default function SchedulePage() {
 
                             <div className="flex gap-2">
                                 <Input 
-                                    type="text"
-                                    placeholder="e.g., 02:30 PM"
+                                    type="time"
                                     value={newTime}
                                     onChange={e => setNewTime(e.target.value)}
                                 />

@@ -104,9 +104,6 @@ export default function PatientsPage() {
     <div className="flex flex-col flex-1 h-screen">
         <header className="bg-background p-4 border-b sticky top-0 z-10">
             <div className="flex items-center gap-4 mb-4">
-                 <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => router.back()}>
-                    <ArrowLeft className="h-4 w-4" />
-                </Button>
                 <div>
                     <h1 className="text-xl font-bold">Patient Records</h1>
                     <p className="text-sm text-muted-foreground">Manage your patient information</p>

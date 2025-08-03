@@ -88,9 +88,6 @@ export default function ScheduleManagementPage() {
     <div className="flex flex-col flex-1 h-screen bg-muted/40">
       <header className="bg-background p-4 border-b sticky top-0 z-10 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.back()}>
-            <ArrowLeft />
-          </Button>
           <div>
             <h1 className="text-xl font-bold tracking-tight">Schedule Management</h1>
             <p className="text-sm text-muted-foreground">Manage your availability and working hours</p>

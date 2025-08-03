@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ArrowLeft, CalendarIcon, Edit2, Plus, Save, Trash2, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 type DaySchedule = {
   isEnabled: boolean;
@@ -110,33 +111,43 @@ export default function ScheduleManagementPage() {
             </CardHeader>
             <CardContent className="grid sm:grid-cols-2 gap-4">
               {Object.entries(weeklySchedule).map(([day, schedule]) => (
-                <Card key={day} className={!schedule.isEnabled ? 'bg-muted/50' : ''}>
+                <Card key={day} className={cn(!schedule.isEnabled ? 'bg-muted/50' : '', 'flex flex-col')}>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-lg">{day}</CardTitle>
-                    <Switch
-                      checked={schedule.isEnabled}
-                      onCheckedChange={(checked) => handleDayToggle(day, checked)}
-                    />
+                    <div className="flex items-center gap-3">
+                      <Switch
+                        id={`switch-${day}`}
+                        checked={schedule.isEnabled}
+                        onCheckedChange={(checked) => handleDayToggle(day, checked)}
+                      />
+                      <label htmlFor={`switch-${day}`} className="text-lg font-medium">{day}</label>
+                    </div>
+                     {schedule.isEnabled ? (
+                        <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50">Available</Badge>
+                     ) : (
+                        <Badge variant="destructive">Closed</Badge>
+                     )}
                   </CardHeader>
-                  <CardContent className="space-y-3 pt-2">
+                  <CardContent className="space-y-3 pt-2 flex-grow flex flex-col justify-between">
                     {schedule.isEnabled ? (
                       <>
-                        <div className="text-sm text-muted-foreground">
-                          <p>{schedule.startTime} - {schedule.endTime} (Break: {schedule.breakTime.start} - {schedule.breakTime.end})</p>
-                          <p>{schedule.slots.length} slots available (30 min each)</p>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {schedule.slots.slice(0, 6).map(slot => (
-                            <Badge key={slot} variant="outline" className="text-primary border-primary">{slot}</Badge>
-                          ))}
-                           {schedule.slots.length > 6 && <Badge variant="outline">+{schedule.slots.length - 6} more</Badge>}
+                        <div>
+                          <p className="text-sm text-muted-foreground">{schedule.startTime} - {schedule.endTime} (Break: {schedule.breakTime.start} - {schedule.breakTime.end})</p>
+                          <p className="text-sm text-muted-foreground">{schedule.slots.length} slots available (30 min each)</p>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {schedule.slots.slice(0, 6).map(slot => (
+                              <Badge key={slot} variant="outline" className="text-primary border-primary">{slot}</Badge>
+                            ))}
+                            {schedule.slots.length > 6 && <Badge variant="outline">+{schedule.slots.length - 6} more</Badge>}
+                          </div>
                         </div>
                         <Button variant="outline" size="sm" className="w-full mt-2">
                             <Edit2 className="mr-2 h-3.5 w-3.5" /> Edit Day
                         </Button>
                       </>
                     ) : (
-                      <p className="text-sm text-muted-foreground text-center py-10">Unavailable</p>
+                      <div className="flex items-center justify-center flex-grow">
+                         <p className="text-sm text-muted-foreground text-center py-10">Unavailable</p>
+                      </div>
                     )}
                   </CardContent>
                 </Card>

@@ -86,7 +86,7 @@ export default function SchedulePage() {
     const ampm = h >= 12 ? 'PM' : 'AM';
     const formattedHours = h % 12 === 0 ? 12 : h % 12;
     const formattedMinutes = m < 10 ? `0${m}` : m;
-    return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    return `${String(formattedHours).padStart(2, '0')}:${String(formattedMinutes).padStart(2, '0')} ${ampm}`;
   }
 
   const handleAddTime = () => {
@@ -158,7 +158,7 @@ export default function SchedulePage() {
                             mode="single"
                             selected={selectedDate}
                             onSelect={setSelectedDate}
-                            disabled={{ before: new Date() }}
+                            disabled={(date) => date < new Date(new Date().setDate(new Date().getDate() -1))}
                             className="rounded-md border"
                         />
                     </CardContent>

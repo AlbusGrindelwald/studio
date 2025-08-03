@@ -34,7 +34,6 @@ const navItems = [
   { href: '/doctor/dashboard/appointments', label: 'Appointments', icon: CalendarCheck },
   { href: '/doctor/dashboard/schedule', label: 'Schedule', icon: CalendarClock },
   { href: '/doctor/dashboard/patients', label: 'My Patients', icon: Users },
-  { href: '/doctor/dashboard/profile', label: 'Edit Profile', icon: User },
 ];
 
 function NavItem({ href, label, icon: Icon }: (typeof navItems)[0]) {

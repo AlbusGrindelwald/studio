@@ -67,19 +67,12 @@ export default function ProfileSetupPage() {
     console.log('Profile Step 1 Data:', { doctorId: doctor?.id, ...data });
 
     // Here you would save the data and move to the next step
-    // For now, we'll just show a toast and simulate completion
     toast({
       title: 'Profile Details Saved',
       description: 'Moving to the next step...',
     });
-
-    // Example of navigating to next step (if it existed)
-    // router.push('/doctor/profile-setup/step-2');
-
-    // For now, let's go to the dashboard
-    setTimeout(() => {
-        router.push('/doctor/dashboard/profile');
-    }, 1000);
+    
+    router.push('/doctor/profile-setup/medical-registration');
   };
 
   return (

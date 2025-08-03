@@ -42,14 +42,14 @@ export function RevenueTrendChart({ appointments }: RevenueTrendChartProps) {
             <ResponsiveContainer>
                 <BarChart data={data} layout="vertical" margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                     <XAxis type="number" hide domain={[0, maxRevenue > 0 ? maxRevenue : 1]} />
-                    <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af' }}/>
+                    <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))' }}/>
                     <Tooltip
-                        cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
+                        cursor={{ fill: 'hsl(var(--accent))' }}
                         contentStyle={{
-                            background: '#334155',
-                            border: '1px solid #475569',
+                            background: 'hsl(var(--background))',
+                            border: '1px solid hsl(var(--border))',
                             borderRadius: '0.5rem',
-                            color: '#e2e8f0',
+                            color: 'hsl(var(--foreground))',
                         }}
                         formatter={(value) => `$${Number(value).toLocaleString()}`}
                     />

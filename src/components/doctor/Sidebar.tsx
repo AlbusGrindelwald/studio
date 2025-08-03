@@ -111,7 +111,7 @@ export function Sidebar() {
     return null;
   }
   
-  const isSchedulePage = pathname === '/doctor/dashboard/schedule';
+  const isSpecialLayoutPage = pathname === '/doctor/dashboard/schedule' || pathname === '/doctor/dashboard/analytics';
 
   return (
     <div className="hidden border-r bg-background md:block w-64">
@@ -120,7 +120,7 @@ export function Sidebar() {
           <Logo />
         </div>
         
-        {isSchedulePage && (
+        {isSpecialLayoutPage && (
             <div className="p-4 border-b">
                  <UserProfileDropdown doctor={doctor} onLogout={handleLogout} />
             </div>
@@ -134,7 +134,7 @@ export function Sidebar() {
           </nav>
         </div>
 
-        {!isSchedulePage && (
+        {!isSpecialLayoutPage && (
             <div className="mt-auto p-4 border-t">
                 <UserProfileDropdown doctor={doctor} onLogout={handleLogout} />
             </div>

@@ -13,7 +13,6 @@ import { Users, Calendar, DollarSign, Activity } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RevenueTrendChart } from '@/components/doctor/charts/RevenueTrendChart';
 import { MonthlyAppointmentsChart } from '@/components/doctor/charts/MonthlyAppointmentsChart';
-import { addMonths } from 'date-fns';
 
 const AnalyticsSkeleton = () => (
     <div className="flex-1 space-y-6 p-6">
@@ -83,6 +82,7 @@ export default function AnalyticsPage() {
                         <SelectContent className="bg-background text-foreground">
                             <SelectItem value="30">Last 30 days</SelectItem>
                             <SelectItem value="90">Last 90 days</SelectItem>
+                            <SelectItem value="180">Last 180 days</SelectItem>
                             <SelectItem value="365">Last year</SelectItem>
                         </SelectContent>
                     </Select>

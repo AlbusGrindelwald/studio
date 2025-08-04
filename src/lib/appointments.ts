@@ -63,35 +63,30 @@ const mockAppointments: Appointment[] = [
 
 const loadAppointments = () => {
     if (typeof window === 'undefined') return;
-    // For this fix, we will clear the local storage ONCE to ensure no bad data persists.
-    // In a real app, this might be handled by a versioning system.
-    if (!localStorage.getItem('shedula_data_migrated_v2')) {
-        localStorage.removeItem(APPOINTMENTS_KEY);
-        localStorage.setItem('shedula_data_migrated_v2', 'true');
-    }
 
     try {
         const stored = localStorage.getItem(APPOINTMENTS_KEY);
-        // If there's no data in local storage, initialize it with our mock data.
-        if (!stored || JSON.parse(stored).length === 0) {
+        if (!stored) {
+            // If nothing is in storage, initialize with mock data.
             appointments = mockAppointments;
             saveAppointments();
         } else {
-             // Otherwise, load the existing data.
+            // If data exists, parse it and ensure it's in the correct structure.
             const loadedAppointments = JSON.parse(stored);
-            // Quick check to see if user/doctor objects are populated
-            if (loadedAppointments.length > 0 && (!loadedAppointments[0].user || !loadedAppointments[0].doctor)) {
-                 appointments = mockAppointments;
-                 saveAppointments();
-            } else {
-                appointments = loadedAppointments;
-            }
+            // Re-hydrate the doctor and user objects to ensure they are complete.
+            appointments = loadedAppointments.map((app: any) => ({
+                ...app,
+                doctor: doctors.find(d => d.id === app.doctor.id) || app.doctor,
+                user: getUsers().find(u => u.id === app.user.id) || app.user,
+            }));
         }
     } catch(e) {
         console.error("Failed to parse appointments from localStorage", e);
         // Fallback to mock data if parsing fails
         appointments = mockAppointments;
+        saveAppointments();
     }
+    notifyListeners();
 };
 
 const saveAppointments = () => {
@@ -110,14 +105,17 @@ if (typeof window !== 'undefined') {
 }
 
 export const getAppointments = (): Appointment[] => {
+  loadAppointments(); // Ensure we have the latest data
   return appointments;
 };
 
 export const getAppointmentsForUser = (userId: string): Appointment[] => {
+    loadAppointments(); // Ensure latest data
     return appointments.filter(app => app.user.id === userId);
 };
 
 export const getAppointmentsForDoctor = (doctorEmail: string): Appointment[] => {
+    loadAppointments(); // Ensure latest data
     return appointments.filter(app => app.doctor.email === doctorEmail);
 }
 

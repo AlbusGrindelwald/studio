@@ -20,7 +20,7 @@ const initialDoctorUsers: DoctorUser[] = [
 ];
 
 const getDoctorUsers = (): DoctorUser[] => {
-  if (typeof window === 'undefined') return [];
+  if (typeof window === 'undefined') return initialDoctorUsers;
   const usersJson = localStorage.getItem(DOCTOR_USERS_KEY);
   if (!usersJson) {
       // Initialize with hardcoded data if none exists

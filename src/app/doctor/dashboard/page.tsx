@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getLoggedInDoctor } from '@/lib/doctor-auth';
 import { useEffect, useState, useMemo } from 'react';
 import type { DoctorUser } from '@/lib/doctor-auth';
-import { getAppointmentsForDoctor } from '@/lib/appointments';
+import { getAppointmentsForDoctor, subscribe } from '@/lib/appointments';
 import type { Appointment } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DoctorAppointmentCard } from '@/components/doctor/AppointmentCard';
@@ -54,6 +54,14 @@ export default function DoctorDashboardPage() {
       setAppointments(getAppointmentsForDoctor(loggedInDoctor.email));
     }
     setIsClient(true);
+    
+    const unsubscribe = subscribe(() => {
+         if (loggedInDoctor) {
+            setAppointments(getAppointmentsForDoctor(loggedInDoctor.email));
+         }
+    });
+
+    return () => unsubscribe();
   }, []);
 
 

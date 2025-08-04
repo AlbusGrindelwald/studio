@@ -63,7 +63,7 @@ export function DetailedAppointmentCard({ appointment, onStatusUpdate }: Detaile
             </div>
              <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4" />
-                <span>{appointment.user.phone || '+1 (555) 123-4567'}</span>
+                <span>{appointment.user.phone || 'N/A'}</span>
             </div>
             <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4" />
@@ -92,4 +92,3 @@ export function DetailedAppointmentCard({ appointment, onStatusUpdate }: Detaile
     </Card>
   );
 }
-

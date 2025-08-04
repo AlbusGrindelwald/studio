@@ -17,6 +17,35 @@ const LOGGED_IN_USER_KEY = 'shedula_logged_in_user';
 
 // Initialize users from localStorage on client-side
 let users: User[] = [];
+
+const initialUsers: User[] = [
+    {
+        id: 'user1',
+        name: 'John Doe',
+        email: 'patient@shedula.com',
+        phone: '1112223333',
+        image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6',
+        lastVisit: '2024-07-10',
+    },
+    {
+        id: 'user2',
+        name: 'Jane Smith',
+        email: 'jane.smith@example.com',
+        phone: '4445556666',
+        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
+        lastVisit: '2024-06-22',
+    },
+     {
+        id: 'user3',
+        name: 'Peter Jones',
+        email: 'peter.jones@example.com',
+        phone: '7778889999',
+        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
+        lastVisit: '2024-05-15',
+    },
+];
+
+
 if (typeof window !== 'undefined') {
   const usersJson = localStorage.getItem(USERS_KEY);
   if (usersJson) {
@@ -28,9 +57,13 @@ if (typeof window !== 'undefined') {
             lastVisit: u.lastVisit || `2024-07-${15 - index}`
         }));
       } catch (e) {
-        console.error("Failed to parse users, initializing empty.", e);
-        users = [];
+        console.error("Failed to parse users, initializing with default.", e);
+        users = initialUsers;
       }
+  } else {
+    // If no users in local storage, initialize with the mock data
+    users = initialUsers;
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
   }
 }
 

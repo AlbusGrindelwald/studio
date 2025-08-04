@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import {
-  getAppointments,
+  getAppointmentsForUser,
   rescheduleAppointment,
   updateAppointmentStatus,
   subscribe,
@@ -31,6 +31,8 @@ import { RescheduleDialog } from '@/components/appointments/RescheduleDialog';
 import { ReviewDialog } from '@/components/appointments/ReviewDialog';
 import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
+import { getLoggedInUser } from '@/lib/user';
+import type { User } from '@/lib/user';
 
 function AppointmentCard({
   appointment,
@@ -136,18 +138,21 @@ function AppointmentCard({
 export default function AppointmentsPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const handleAppointmentsChange = () => {
-      setAppointments(getAppointments());
-    };
+    const loggedInUser = getLoggedInUser();
+    setUser(loggedInUser);
 
-    const unsubscribe = subscribe(handleAppointmentsChange);
-    handleAppointmentsChange(); // Initial fetch
-
-    setIsClient(true);
-    
-    return () => unsubscribe();
+    if (loggedInUser) {
+        const handleAppointmentsChange = () => {
+            setAppointments(getAppointmentsForUser(loggedInUser.id));
+        };
+        const unsubscribe = subscribe(handleAppointmentsChange);
+        handleAppointmentsChange(); // Initial fetch
+        setIsClient(true);
+        return () => unsubscribe();
+    }
   }, []);
 
   const handleCancelAppointment = (id: string) => {

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { CalendarCheck, ChevronRight, User, Stethoscope, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getAppointments, subscribe as subscribeAppointments } from '@/lib/appointments';
+import { getAppointmentsForUser, subscribe as subscribeAppointments } from '@/lib/appointments';
 import { getLoggedInUser, subscribe as subscribeUser } from '@/lib/user';
 import type { Appointment } from '@/lib/types';
 import type { User as PatientUser } from '@/lib/user';
@@ -48,18 +48,25 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const handleAppointmentsChange = () => {
-      setAppointments(getAppointments());
-    };
-
     const handleUserChange = () => {
-        setUser(getLoggedInUser());
+        const loggedInUser = getLoggedInUser();
+        setUser(loggedInUser);
+        
+        // Fetch appointments once we have the user
+        if (loggedInUser) {
+            setAppointments(getAppointmentsForUser(loggedInUser.id));
+        }
     }
 
-    const unsubscribeAppointments = subscribeAppointments(handleAppointmentsChange);
-    const unsubscribeUser = subscribeUser(handleUserChange);
+    const handleAppointmentsChange = () => {
+        if(user) {
+            setAppointments(getAppointmentsForUser(user.id));
+        }
+    };
     
-    handleAppointmentsChange(); // Initial fetch
+    const unsubscribeUser = subscribeUser(handleUserChange);
+    const unsubscribeAppointments = subscribeAppointments(handleAppointmentsChange);
+    
     handleUserChange(); // Initial user fetch
     
     setIsClient(true);
@@ -68,7 +75,7 @@ export default function DashboardPage() {
         unsubscribeAppointments();
         unsubscribeUser();
     }
-  }, []);
+  }, [user?.id]);
 
   const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').slice(0, 1);
 

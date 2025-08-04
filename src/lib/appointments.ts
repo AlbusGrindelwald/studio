@@ -1,20 +1,22 @@
 
+
 import type { Appointment, Doctor } from './types';
 import { doctors, findUserById } from './data';
 import { addNotification } from './notifications';
 import { format, parseISO } from 'date-fns';
-import { User } from './user';
+import { User, getUsers } from './user';
 
 const APPOINTMENTS_KEY = 'shedula_appointments';
 let appointments: Appointment[] = [];
 const listeners: (() => void)[] = [];
 
+const allUsers = getUsers();
 // Hardcoded initial data
 const mockAppointments: Appointment[] = [
   {
     id: 'A1',
-    doctor: doctors[2],
-    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    doctor: doctors[2], // Dr. Lena Petrova
+    user: allUsers[0] || { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
     date: '2024-08-20',
     time: '10:00 AM',
     status: 'completed',
@@ -22,8 +24,8 @@ const mockAppointments: Appointment[] = [
   },
   {
     id: 'A2',
-    doctor: doctors[0],
-    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    doctor: doctors[0], // Dr. Evelyn Reed
+    user: allUsers[1] || { id: 'user2', name: 'Jane Smith', email: 'jane.smith@example.com' },
     date: '2024-07-15',
     time: '09:00 AM',
     status: 'completed',
@@ -31,8 +33,8 @@ const mockAppointments: Appointment[] = [
   },
   {
     id: 'A3',
-    doctor: doctors[1],
-    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    doctor: doctors[0], // Dr. Evelyn Reed
+    user: allUsers[0] || { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
     date: '2024-06-25',
     time: '02:30 PM',
     status: 'completed',
@@ -40,12 +42,21 @@ const mockAppointments: Appointment[] = [
   },
   {
     id: 'A4',
-    doctor: doctors[3],
-    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
+    doctor: doctors[3], // Dr. Samuel Chen
+    user: allUsers[2] || { id: 'user3', name: 'Peter Jones', email: 'peter.jones@example.com' },
     date: '2024-08-25',
     time: '11:00 AM',
     status: 'upcoming',
     token: '1121',
+  },
+   {
+    id: 'A5',
+    doctor: doctors[0], // Dr. Evelyn Reed
+    user: allUsers[2] || { id: 'user3', name: 'Peter Jones', email: 'peter.jones@example.com' },
+    date: '2024-08-28',
+    time: '02:00 PM',
+    status: 'upcoming',
+    token: '1122',
   },
 ];
 
@@ -54,9 +65,9 @@ const loadAppointments = () => {
     if (typeof window === 'undefined') return;
     // For this fix, we will clear the local storage ONCE to ensure no bad data persists.
     // In a real app, this might be handled by a versioning system.
-    if (!localStorage.getItem('shedula_data_migrated_v1')) {
+    if (!localStorage.getItem('shedula_data_migrated_v2')) {
         localStorage.removeItem(APPOINTMENTS_KEY);
-        localStorage.setItem('shedula_data_migrated_v1', 'true');
+        localStorage.setItem('shedula_data_migrated_v2', 'true');
     }
 
     try {
@@ -67,7 +78,14 @@ const loadAppointments = () => {
             saveAppointments();
         } else {
              // Otherwise, load the existing data.
-            appointments = JSON.parse(stored);
+            const loadedAppointments = JSON.parse(stored);
+            // Quick check to see if user/doctor objects are populated
+            if (loadedAppointments.length > 0 && (!loadedAppointments[0].user || !loadedAppointments[0].doctor)) {
+                 appointments = mockAppointments;
+                 saveAppointments();
+            } else {
+                appointments = loadedAppointments;
+            }
         }
     } catch(e) {
         console.error("Failed to parse appointments from localStorage", e);
@@ -95,21 +113,28 @@ export const getAppointments = (): Appointment[] => {
   return appointments;
 };
 
+export const getAppointmentsForUser = (userId: string): Appointment[] => {
+    return appointments.filter(app => app.user.id === userId);
+};
+
 export const getAppointmentsForDoctor = (doctorEmail: string): Appointment[] => {
     return appointments.filter(app => app.doctor.email === doctorEmail);
 }
 
 export const getPatientsForDoctor = (doctorEmail: string): User[] => {
     const doctorAppointments = getAppointmentsForDoctor(doctorEmail);
-    const patientIds = new Set(doctorAppointments.map(app => app.user.id));
-    const uniquePatients: User[] = [];
-    patientIds.forEach(id => {
-        const user = findUserById(id);
-        if (user) {
-            uniquePatients.push(user);
+    const patientMap = new Map<string, User>();
+    doctorAppointments.forEach(app => {
+        if (app.user && !patientMap.has(app.user.id)) {
+             const lastVisit = doctorAppointments
+                .filter(a => a.user.id === app.user.id)
+                .map(a => parseISO(a.date))
+                .sort((a,b) => b.getTime() - a.getTime())[0];
+            
+            patientMap.set(app.user.id, { ...app.user, lastVisit: lastVisit ? format(lastVisit, 'yyyy-MM-dd') : 'N/A' });
         }
     });
-    return uniquePatients;
+    return Array.from(patientMap.values());
 }
 
 export const addAppointment = (newAppointment: {

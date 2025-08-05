@@ -13,7 +13,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DoctorCard } from '@/components/doctors/DoctorCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Doctor } from '@/lib/types';
-import { doctors as allDoctors } from '@/lib/data';
+import { getDoctors } from '@/lib/data';
 
 const formSchema = z.object({
   symptoms: z.string().min(10, 'Please describe your symptoms in at least 10 characters.'),
@@ -25,6 +25,7 @@ export default function RecommendPage() {
   const [recommendations, setRecommendations] = useState<Doctor[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const allDoctors = getDoctors();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

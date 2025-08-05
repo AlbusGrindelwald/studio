@@ -1,7 +1,7 @@
 
 
 import type { Appointment, Doctor } from './types';
-import { doctors, findUserById, findDoctorById } from './data';
+import { findUserById, findDoctorById, getDoctors } from './data';
 import { addNotification } from './notifications';
 import { format, parseISO } from 'date-fns';
 import { User, getUsers } from './user';
@@ -13,67 +13,12 @@ const listeners: (() => void)[] = [];
 
 let isLoaded = false;
 
-const allUsers = getUsers();
-// Hardcoded initial data
-const mockAppointments: Appointment[] = [
-  {
-    id: 'A1',
-    doctor: doctors[2], // Dr. Lena Petrova
-    user: allUsers[0] || { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
-    date: '2024-08-20',
-    time: '10:00 AM',
-    status: 'completed',
-    token: '1234',
-  },
-  {
-    id: 'A2',
-    doctor: doctors[0], // Dr. Evelyn Reed
-    user: allUsers[1] || { id: 'user2', name: 'Jane Smith', email: 'jane.smith@example.com' },
-    date: '2024-07-15',
-    time: '09:00 AM',
-    status: 'completed',
-    token: '5678',
-  },
-  {
-    id: 'A3',
-    doctor: doctors[0], // Dr. Evelyn Reed
-    user: allUsers[0] || { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
-    date: '2024-06-25',
-    time: '02:30 PM',
-    status: 'completed',
-    token: '9101',
-  },
-  {
-    id: 'A4',
-    doctor: doctors[3], // Dr. Samuel Chen
-    user: allUsers[2] || { id: 'user3', name: 'Peter Jones', email: 'peter.jones@example.com' },
-    date: '2024-08-25',
-    time: '11:00 AM',
-    status: 'upcoming',
-    token: '1121',
-  },
-   {
-    id: 'A5',
-    doctor: doctors[0], // Dr. Evelyn Reed
-    user: allUsers[2] || { id: 'user3', name: 'Peter Jones', email: 'peter.jones@example.com' },
-    date: '2024-08-28',
-    time: '02:00 PM',
-    status: 'upcoming',
-    token: '1122',
-  },
-];
-
-
 const loadAppointments = () => {
     if (typeof window === 'undefined' || isLoaded) return;
 
     try {
         const stored = localStorage.getItem(APPOINTMENTS_KEY);
-        if (!stored) {
-            // If nothing is in storage, initialize with mock data.
-            appointments = mockAppointments;
-            saveAppointments();
-        } else {
+        if (stored) {
             // If data exists, parse it and ensure it's in the correct structure.
             const loadedAppointments = JSON.parse(stored);
             // Re-hydrate the doctor and user objects to ensure they are complete.
@@ -86,7 +31,7 @@ const loadAppointments = () => {
     } catch(e) {
         console.error("Failed to parse appointments from localStorage", e);
         // Fallback to mock data if parsing fails
-        appointments = mockAppointments;
+        appointments = [];
     }
     isLoaded = true;
 };

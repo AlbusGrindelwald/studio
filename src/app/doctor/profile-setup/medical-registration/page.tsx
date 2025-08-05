@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { getLoggedInDoctor, completeDoctorProfile } from '@/lib/doctor-auth';
+import type { DoctorUser } from '@/lib/doctor-auth';
 
 const registrationSchema = z.object({
   registrationNumber: z.string().min(1, 'Registration number is required'),
@@ -58,13 +60,34 @@ function RegistrationSkeleton() {
 
 export default function MedicalRegistrationPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [doctor, setDoctor] = useState<DoctorUser | null>(null);
+  
+  // Store profile data from the previous step
+  const [profileData, setProfileData] = useState<any>(null);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    const loggedInDoctor = getLoggedInDoctor();
+    if (!loggedInDoctor) {
+        toast({ title: "Session Expired", description: "Please log in again.", variant: 'destructive' });
+        router.push('/doctor/login');
+        return;
+    }
+    setDoctor(loggedInDoctor);
+
+    const data = searchParams.get('data');
+    if (data) {
+        setProfileData(JSON.parse(data));
+    } else {
+        toast({ title: "Missing Information", description: "Profile details are missing. Please start over.", variant: 'destructive' });
+        router.push('/doctor/profile-setup');
+    }
+
+  }, [router, searchParams, toast]);
 
   const { control, handleSubmit, formState: { errors } } = useForm<RegistrationValues>({
     resolver: zodResolver(registrationSchema),
@@ -76,11 +99,25 @@ export default function MedicalRegistrationPage() {
   });
 
   const onSubmit = (data: RegistrationValues) => {
+    if (!doctor || !profileData) {
+        toast({ title: 'Error', description: 'Session data is missing.', variant: 'destructive' });
+        return;
+    }
     setIsLoading(true);
-    console.log('Medical Registration Data:', data);
+
+    const fullProfile = {
+        ...profileData,
+        email: doctor.email,
+        ...data
+    };
+
+    console.log('Completing Profile with Data:', fullProfile);
+
+    // This function will create the public profile and link it to the doctor user
+    completeDoctorProfile(doctor.id, fullProfile);
 
     toast({
-      title: 'Registration Complete!',
+      title: 'Profile Complete!',
       description: 'Your profile has been created. Please log in to continue.',
     });
     

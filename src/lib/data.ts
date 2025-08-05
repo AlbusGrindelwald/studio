@@ -2,7 +2,7 @@
 import type { Appointment, Doctor } from './types';
 import { User, getUsers } from './user';
 
-export let doctors: Doctor[] = [
+let doctors: Doctor[] = [
   {
     id: '1',
     name: 'Dr. Evelyn Reed',
@@ -130,4 +130,30 @@ export const updateDoctorAvailability = (doctorId: string, date: string, slots: 
         throw new Error('Doctor not found');
     }
     return updatedDoctor;
+}
+
+
+export const createPublicDoctorProfile = (data: any): Doctor => {
+    const newPublicId = `doc_pub_${Date.now()}`;
+    const newDoctor: Doctor = {
+        id: newPublicId,
+        name: `${data.title} ${data.name}`,
+        email: data.email, // This should come from the logged-in doctor user.
+        specialty: data.specialization,
+        location: data.city,
+        rating: 4.5, // Default rating
+        reviews: 0, // Starts with 0 reviews
+        image: 'https://placehold.co/128x128.png?text=Dr',
+        description: `A dedicated ${data.specialization.toLowerCase()} based in ${data.city}.`,
+        availability: {}, // Starts with empty availability
+        specialities: [data.specialization],
+        fees: 200, // Default fee
+        appointmentTypes: ['in-person'],
+    };
+
+    doctors = [...doctors, newDoctor];
+    // In a real app, you'd save this to a persistent database.
+    // For this demo, it's just in memory for the session.
+    
+    return newDoctor;
 }

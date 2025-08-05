@@ -1,14 +1,17 @@
 
 
 import type { Appointment, Doctor } from './types';
-import { doctors, findUserById } from './data';
+import { doctors, findUserById, findDoctorById } from './data';
 import { addNotification } from './notifications';
 import { format, parseISO } from 'date-fns';
 import { User, getUsers } from './user';
+import { getLoggedInDoctor } from './doctor-auth';
 
 const APPOINTMENTS_KEY = 'shedula_appointments';
 let appointments: Appointment[] = [];
 const listeners: (() => void)[] = [];
+
+let isLoaded = false;
 
 const allUsers = getUsers();
 // Hardcoded initial data
@@ -62,7 +65,7 @@ const mockAppointments: Appointment[] = [
 
 
 const loadAppointments = () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || isLoaded) return;
 
     try {
         const stored = localStorage.getItem(APPOINTMENTS_KEY);
@@ -76,16 +79,16 @@ const loadAppointments = () => {
             // Re-hydrate the doctor and user objects to ensure they are complete.
             appointments = loadedAppointments.map((app: any) => ({
                 ...app,
-                doctor: doctors.find(d => d.id === app.doctor.id) || app.doctor,
-                user: getUsers().find(u => u.id === app.user.id) || app.user,
+                doctor: findDoctorById(app.doctor.id) || app.doctor,
+                user: findUserById(app.user.id) || app.user,
             }));
         }
     } catch(e) {
         console.error("Failed to parse appointments from localStorage", e);
         // Fallback to mock data if parsing fails
         appointments = mockAppointments;
-        saveAppointments();
     }
+    isLoaded = true;
 };
 
 const saveAppointments = () => {
@@ -99,9 +102,7 @@ const notifyListeners = () => {
 };
 
 // Initialize appointments on load
-if (typeof window !== 'undefined') {
-  loadAppointments();
-}
+loadAppointments();
 
 export const getAppointments = (): Appointment[] => {
   return appointments;
@@ -138,7 +139,7 @@ export const addAppointment = (newAppointment: {
   userId: string;
   token: string;
 }) => {
-  const doctor = doctors.find(d => d.id === newAppointment.doctorId);
+  const doctor = findDoctorById(newAppointment.doctorId);
   if (!doctor) {
     throw new Error('Doctor not found');
   }

@@ -1,4 +1,6 @@
 
+import { createPublicDoctorProfile } from './data';
+
 export interface DoctorUser {
   id: string;
   name: string;
@@ -40,7 +42,7 @@ const notifyDoctorListeners = () => {
   doctorListeners.forEach(listener => listener());
 };
 
-export const createDoctor = (newDoctor: Omit<DoctorUser, 'id'>) => {
+export const createDoctor = (newDoctor: Omit<DoctorUser, 'id' | 'publicId'>) => {
   const doctors = getDoctorUsers();
   if (doctors.find(d => d.email === newDoctor.email)) {
     throw new Error('A doctor with this email already exists.');
@@ -69,6 +71,17 @@ export const updateDoctor = (id: string, updates: Partial<Omit<DoctorUser, 'id'>
     
     saveDoctorUsers(newDoctors);
     return updatedDoctor;
+}
+
+export const completeDoctorProfile = (doctorId: string, profileData: any) => {
+    let doctor = findDoctorById(doctorId);
+    if (!doctor) throw new Error("Doctor not found");
+
+    const publicProfile = createPublicDoctorProfile(profileData);
+    
+    updateDoctor(doctorId, { publicId: publicProfile.id });
+
+    return publicProfile;
 }
 
 export const findDoctorByEmail = (email: string): DoctorUser | undefined => {

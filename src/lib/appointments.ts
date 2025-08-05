@@ -86,7 +86,6 @@ const loadAppointments = () => {
         appointments = mockAppointments;
         saveAppointments();
     }
-    notifyListeners();
 };
 
 const saveAppointments = () => {
@@ -105,17 +104,14 @@ if (typeof window !== 'undefined') {
 }
 
 export const getAppointments = (): Appointment[] => {
-  loadAppointments(); // Ensure we have the latest data
   return appointments;
 };
 
 export const getAppointmentsForUser = (userId: string): Appointment[] => {
-    loadAppointments(); // Ensure latest data
     return appointments.filter(app => app.user.id === userId);
 };
 
 export const getAppointmentsForDoctor = (doctorEmail: string): Appointment[] => {
-    loadAppointments(); // Ensure latest data
     return appointments.filter(app => app.doctor.email === doctorEmail);
 }
 

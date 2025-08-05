@@ -84,16 +84,13 @@ let doctors: Doctor[] = [
 // Re-exporting from user.ts to avoid circular dependencies
 export { findUserById, findUserByEmailOrPhone, getUsers } from './user';
 
-const allUsers = getUsers();
-const patientUser = allUsers.find(u => u.email === 'patient@shedula.com') || allUsers[0];
-
-export const appointments: Appointment[] = [
-  // This is now handled in appointments.ts to avoid data conflicts
-];
-
 export const findDoctorById = (id: string): Doctor | undefined => {
   return doctors.find(doctor => doctor.id === id);
 }
+
+export const getDoctors = (): Doctor[] => {
+    return doctors;
+};
 
 export const updatePublicDoctor = (id: string, updatedData: Partial<Doctor>): Doctor => {
   let updatedDoctor: Doctor | undefined;

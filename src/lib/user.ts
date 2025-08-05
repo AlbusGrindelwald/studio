@@ -15,7 +15,7 @@ const listeners: (() => void)[] = [];
 const USERS_KEY = 'shedula_users';
 const LOGGED_IN_USER_KEY = 'shedula_logged_in_user';
 
-// Initialize users from localStorage on client-side
+let isLoaded = false;
 let users: User[] = [];
 
 const initialUsers: User[] = [
@@ -45,28 +45,23 @@ const initialUsers: User[] = [
     },
 ];
 
-
-if (typeof window !== 'undefined') {
-  const usersJson = localStorage.getItem(USERS_KEY);
-  if (usersJson) {
-      try {
-        const parsedUsers = JSON.parse(usersJson);
-        // Add mock lastVisit data if it doesn't exist
-        users = parsedUsers.map((u: User, index: number) => ({
-            ...u,
-            lastVisit: u.lastVisit || `2024-07-${15 - index}`
-        }));
-      } catch (e) {
-        console.error("Failed to parse users, initializing with default.", e);
+const loadUsers = () => {
+    if (typeof window === 'undefined' || isLoaded) return;
+    const usersJson = localStorage.getItem(USERS_KEY);
+    if (usersJson) {
+        try {
+            users = JSON.parse(usersJson);
+        } catch (e) {
+            console.error("Failed to parse users, initializing with default.", e);
+            users = initialUsers;
+        }
+    } else {
         users = initialUsers;
-      }
-  } else {
-    // If no users in local storage, initialize with the mock data
-    users = initialUsers;
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-  }
-}
+    }
+    isLoaded = true;
+};
 
+loadUsers();
 
 export const getUsers = (): User[] => {
   return users;

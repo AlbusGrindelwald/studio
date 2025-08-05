@@ -30,7 +30,7 @@ const loadAppointments = () => {
         }
     } catch(e) {
         console.error("Failed to parse appointments from localStorage", e);
-        // Fallback to mock data if parsing fails
+        // Fallback to empty array if parsing fails
         appointments = [];
     }
     isLoaded = true;
@@ -54,11 +54,11 @@ export const getAppointments = (): Appointment[] => {
 };
 
 export const getAppointmentsForUser = (userId: string): Appointment[] => {
-    return appointments.filter(app => app.user.id === userId);
+    return appointments.filter(app => app.user && app.user.id === userId);
 };
 
 export const getAppointmentsForDoctor = (doctorEmail: string): Appointment[] => {
-    return appointments.filter(app => app.doctor.email === doctorEmail);
+    return appointments.filter(app => app.doctor && app.doctor.email === doctorEmail);
 }
 
 export const getPatientsForDoctor = (doctorEmail: string): User[] => {

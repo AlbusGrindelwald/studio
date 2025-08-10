@@ -11,16 +11,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DoctorAppointmentCard } from '@/components/doctor/AppointmentCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Users, CalendarCheck, CircleX } from 'lucide-react';
+import { Users, Calendar, DollarSign, MessageSquareWarning } from 'lucide-react';
+import { format } from 'date-fns';
 
 function DoctorDashboardSkeleton() {
     return (
-        <div className="flex flex-col flex-1">
-            <header className="bg-background p-4 flex items-center justify-between border-b sticky top-0 z-10 h-16">
-                 <Skeleton className="h-8 w-48" />
+        <div className="flex flex-col flex-1 p-6">
+            <header className="mb-6">
+                <Skeleton className="h-8 w-64 mb-2" />
+                <Skeleton className="h-4 w-48" />
             </header>
-            <main className="flex-1 p-4 md:p-6">
-                <div className="grid gap-4 md:grid-cols-3 mb-6">
+            <main className="flex-1">
+                <div className="grid gap-4 md:grid-cols-4 mb-6">
+                    <Skeleton className="h-28 w-full" />
                     <Skeleton className="h-28 w-full" />
                     <Skeleton className="h-28 w-full" />
                     <Skeleton className="h-28 w-full" />
@@ -40,6 +43,35 @@ function DoctorDashboardSkeleton() {
     );
 }
 
+function DoctorDashboardHeader({ doctor }: { doctor: DoctorUser }) {
+    const [time, setTime] = useState(new Date());
+    const [greeting, setGreeting] = useState('');
+
+    useEffect(() => {
+        const timer = setInterval(() => setTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    useEffect(() => {
+        const hour = time.getHours();
+        if (hour < 12) setGreeting('Good Morning');
+        else if (hour < 18) setGreeting('Good Afternoon');
+        else setGreeting('Good Evening');
+    }, [time]);
+
+    return (
+        <header className="flex justify-between items-start mb-6">
+            <div>
+                <h1 className="text-2xl font-bold text-primary">{greeting}, {doctor.name}!</h1>
+                <p className="text-muted-foreground">{format(time, 'EEEE, MMMM d, yyyy')}</p>
+            </div>
+            <div className="text-right">
+                <p className="text-2xl font-bold">{format(time, 'h:mm:ss a')}</p>
+                <p className="text-sm text-muted-foreground">Current Time</p>
+            </div>
+        </header>
+    );
+}
 
 export default function DoctorDashboardPage() {
   const router = useRouter();
@@ -52,17 +84,19 @@ export default function DoctorDashboardPage() {
     if (loggedInDoctor) {
       setDoctor(loggedInDoctor);
       setAppointments(getAppointmentsForDoctor(loggedInDoctor.email));
+    } else {
+      router.push('/doctor/login');
     }
-    setIsClient(true);
     
     const unsubscribe = subscribe(() => {
          if (loggedInDoctor) {
             setAppointments(getAppointmentsForDoctor(loggedInDoctor.email));
          }
     });
-
+    
+    setIsClient(true);
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
 
   const filteredAppointments = useMemo(() => {
@@ -72,46 +106,80 @@ export default function DoctorDashboardPage() {
       canceled: appointments.filter(a => a.status === 'canceled'),
     };
   }, [appointments]);
+  
+  const stats = useMemo(() => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const todaysAppointments = appointments.filter(a => a.date === today).length;
+    const totalPatients = new Set(appointments.map(a => a.user.id)).size;
+    
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+
+    const monthlyRevenue = appointments
+        .filter(a => a.status === 'completed' && new Date(a.date) >= startOfMonth)
+        .reduce((sum, a) => sum + (a.doctor.fees || 0), 0);
+
+    return {
+        todaysAppointments,
+        totalPatients,
+        pendingReviews: 3, // mock data
+        monthlyRevenue
+    };
+  }, [appointments]);
+
 
   if (!isClient || !doctor) {
     return <DoctorDashboardSkeleton />;
   }
-  
-  const totalPatients = new Set(appointments.map(a => a.user.id)).size;
 
   return (
     <div className="flex flex-col flex-1">
-        <header className="bg-background p-4 flex items-center justify-between border-b sticky top-0 z-10 h-16">
-            <h1 className="text-xl font-bold tracking-tight">Dashboard</h1>
-        </header>
-
         <main className="flex-1 p-4 md:p-6">
-            <div className="grid gap-4 md:grid-cols-3 mb-6">
+            <DoctorDashboardHeader doctor={doctor} />
+            
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{totalPatients}</div>
+                    <CardContent className="p-4 flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Today's Appointments</p>
+                            <p className="text-3xl font-bold">{stats.todaysAppointments}</p>
+                        </div>
+                        <div className="p-3 bg-blue-100 rounded-lg">
+                            <Calendar className="h-6 w-6 text-blue-500" />
+                        </div>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Upcoming Appointments</CardTitle>
-                        <CalendarCheck className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{filteredAppointments.upcoming.length}</div>
+                 <Card>
+                    <CardContent className="p-4 flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Total Patients</p>
+                            <p className="text-3xl font-bold">{stats.totalPatients}</p>
+                        </div>
+                        <div className="p-3 bg-green-100 rounded-lg">
+                            <Users className="h-6 w-6 text-green-500" />
+                        </div>
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Canceled Appointments</CardTitle>
-                        <CircleX className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{filteredAppointments.canceled.length}</div>
+                 <Card>
+                    <CardContent className="p-4 flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Pending Reviews</p>
+                            <p className="text-3xl font-bold">{stats.pendingReviews}</p>
+                        </div>
+                        <div className="p-3 bg-orange-100 rounded-lg">
+                            <MessageSquareWarning className="h-6 w-6 text-orange-500" />
+                        </div>
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardContent className="p-4 flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Monthly Revenue</p>
+                            <p className="text-3xl font-bold">${stats.monthlyRevenue.toLocaleString()}</p>
+                        </div>
+                        <div className="p-3 bg-purple-100 rounded-lg">
+                            <DollarSign className="h-6 w-6 text-purple-500" />
+                        </div>
                     </CardContent>
                 </Card>
             </div>

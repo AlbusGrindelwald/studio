@@ -78,6 +78,12 @@ export default function DoctorDashboardPage() {
   const [doctor, setDoctor] = useState<DoctorUser | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [stats, setStats] = useState({
+    todaysAppointments: 0,
+    totalPatients: 0,
+    pendingReviews: 0,
+    monthlyRevenue: 0,
+  });
 
   useEffect(() => {
     const loggedInDoctor = getLoggedInDoctor();
@@ -93,6 +99,14 @@ export default function DoctorDashboardPage() {
             setAppointments(getAppointmentsForDoctor(loggedInDoctor.email));
          }
     });
+
+    // Generate random stats on client mount
+    setStats({
+        todaysAppointments: Math.floor(Math.random() * 15) + 1,
+        totalPatients: Math.floor(Math.random() * 150) + 50,
+        pendingReviews: Math.floor(Math.random() * 10),
+        monthlyRevenue: Math.floor(Math.random() * 20000) + 5000,
+    });
     
     setIsClient(true);
     return () => unsubscribe();
@@ -104,26 +118,6 @@ export default function DoctorDashboardPage() {
       upcoming: appointments.filter(a => a.status === 'upcoming'),
       completed: appointments.filter(a => a.status === 'completed'),
       canceled: appointments.filter(a => a.status === 'canceled'),
-    };
-  }, [appointments]);
-  
-  const stats = useMemo(() => {
-    const today = format(new Date(), 'yyyy-MM-dd');
-    const todaysAppointments = appointments.filter(a => a.date === today).length;
-    const totalPatients = new Set(appointments.map(a => a.user.id)).size;
-    
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-
-    const monthlyRevenue = appointments
-        .filter(a => a.status === 'completed' && new Date(a.date) >= startOfMonth)
-        .reduce((sum, a) => sum + (a.doctor.fees || 0), 0);
-
-    return {
-        todaysAppointments,
-        totalPatients,
-        pendingReviews: 3, // mock data
-        monthlyRevenue
     };
   }, [appointments]);
 

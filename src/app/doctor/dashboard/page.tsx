@@ -7,12 +7,13 @@ import { useEffect, useState, useMemo } from 'react';
 import type { DoctorUser } from '@/lib/doctor-auth';
 import { getAppointmentsForDoctor, subscribe } from '@/lib/appointments';
 import type { Appointment } from '@/lib/types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DoctorAppointmentCard } from '@/components/doctor/AppointmentCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Users, Calendar, DollarSign, MessageSquareWarning } from 'lucide-react';
-import { format } from 'date-fns';
+import { Card, CardContent } from '@/components/ui/card';
+import { Users, Calendar, DollarSign, MessageSquareWarning, ChevronRight } from 'lucide-react';
+import { format, isToday, parseISO } from 'date-fns';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
 function DoctorDashboardSkeleton() {
     return (
@@ -28,15 +29,16 @@ function DoctorDashboardSkeleton() {
                     <Skeleton className="h-28 w-full" />
                     <Skeleton className="h-28 w-full" />
                 </div>
-                <div className="grid w-full grid-cols-3 gap-2 mb-4">
-                    <Skeleton className="h-10" />
-                    <Skeleton className="h-10" />
-                    <Skeleton className="h-10" />
-                </div>
-                <div className="space-y-4 pt-4">
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-24 w-full" />
+                 <div className="mb-6">
+                    <div className="flex justify-between items-center mb-3">
+                        <Skeleton className="h-6 w-48" />
+                        <Skeleton className="h-5 w-20" />
+                    </div>
+                    <div className="space-y-4">
+                        <Skeleton className="h-20 w-full" />
+                        <Skeleton className="h-20 w-full" />
+                        <Skeleton className="h-20 w-full" />
+                    </div>
                 </div>
             </main>
         </div>
@@ -73,6 +75,31 @@ function DoctorDashboardHeader({ doctor }: { doctor: DoctorUser }) {
     );
 }
 
+function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
+    const isConfirmed = appointment.status === 'upcoming';
+    return (
+        <Card className="bg-card">
+            <CardContent className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Users className="h-5 w-5 text-blue-500" />
+                    </div>
+                    <div>
+                        <p className="font-semibold">{appointment.user.name}</p>
+                        <p className="text-sm text-muted-foreground">{appointment.type || 'Consultation'}</p>
+                    </div>
+                </div>
+                <div className="text-right">
+                    <p className="font-semibold">{appointment.time}</p>
+                    <Badge className={isConfirmed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
+                        {isConfirmed ? 'confirmed' : 'pending'}
+                    </Badge>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function DoctorDashboardPage() {
   const router = useRouter();
   const [doctor, setDoctor] = useState<DoctorUser | null>(null);
@@ -100,7 +127,6 @@ export default function DoctorDashboardPage() {
          }
     });
 
-    // Generate random stats on client mount
     setStats({
         todaysAppointments: Math.floor(Math.random() * 15) + 1,
         totalPatients: Math.floor(Math.random() * 150) + 50,
@@ -113,12 +139,8 @@ export default function DoctorDashboardPage() {
   }, [router]);
 
 
-  const filteredAppointments = useMemo(() => {
-    return {
-      upcoming: appointments.filter(a => a.status === 'upcoming'),
-      completed: appointments.filter(a => a.status === 'completed'),
-      canceled: appointments.filter(a => a.status === 'canceled'),
-    };
+  const todaysAppointments = useMemo(() => {
+    return appointments.filter(a => isToday(parseISO(a.date)));
   }, [appointments]);
 
 
@@ -136,7 +158,7 @@ export default function DoctorDashboardPage() {
                     <CardContent className="p-4 flex items-center justify-between">
                         <div>
                             <p className="text-sm text-muted-foreground">Today's Appointments</p>
-                            <p className="text-3xl font-bold">{stats.todaysAppointments}</p>
+                            <p className="text-3xl font-bold">{todaysAppointments.length}</p>
                         </div>
                         <div className="p-3 bg-blue-100 rounded-lg">
                             <Calendar className="h-6 w-6 text-blue-500" />
@@ -178,40 +200,24 @@ export default function DoctorDashboardPage() {
                 </Card>
             </div>
             
-            <Tabs defaultValue="upcoming" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="upcoming">Upcoming ({filteredAppointments.upcoming.length})</TabsTrigger>
-                    <TabsTrigger value="completed">Completed ({filteredAppointments.completed.length})</TabsTrigger>
-                    <TabsTrigger value="canceled">Canceled ({filteredAppointments.canceled.length})</TabsTrigger>
-                </TabsList>
-                <TabsContent value="upcoming">
-                    <div className="space-y-4 pt-4">
-                        {filteredAppointments.upcoming.length > 0 ? filteredAppointments.upcoming.map(app => (
-                            <DoctorAppointmentCard key={app.id} appointment={app} />
+            <div>
+                 <div className="flex justify-between items-center mb-3">
+                    <h2 className="text-xl font-bold">Today's Appointments</h2>
+                    <Link href="/doctor/dashboard/appointments" className="text-sm font-medium text-primary flex items-center">
+                        View All
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                    </Link>
+                </div>
+                <Card className="bg-muted/30 p-4">
+                     <div className="space-y-4">
+                        {todaysAppointments.length > 0 ? todaysAppointments.map(app => (
+                            <TodaysAppointmentCard key={app.id} appointment={app} />
                         )) : (
-                            <p className="text-center text-muted-foreground py-8">No upcoming appointments.</p>
+                            <p className="text-center text-muted-foreground py-8">No appointments scheduled for today.</p>
                         )}
                     </div>
-                </TabsContent>
-                <TabsContent value="completed">
-                    <div className="space-y-4 pt-4">
-                        {filteredAppointments.completed.length > 0 ? filteredAppointments.completed.map(app => (
-                            <DoctorAppointmentCard key={app.id} appointment={app} />
-                        )) : (
-                            <p className="text-center text-muted-foreground py-8">No completed appointments.</p>
-                        )}
-                    </div>
-                </TabsContent>
-                <TabsContent value="canceled">
-                     <div className="space-y-4 pt-4">
-                        {filteredAppointments.canceled.length > 0 ? filteredAppointments.canceled.map(app => (
-                            <DoctorAppointmentCard key={app.id} appointment={app} />
-                        )) : (
-                            <p className="text-center text-muted-foreground py-8">No canceled appointments.</p>
-                        )}
-                    </div>
-                </TabsContent>
-            </Tabs>
+                </Card>
+            </div>
         </main>
     </div>
   );

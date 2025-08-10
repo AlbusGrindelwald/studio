@@ -26,6 +26,7 @@ export interface Appointment {
   time: string;
   status: 'upcoming' | 'completed' | 'canceled';
   token: string;
+  type?: 'Consultation' | 'Follow-up' | 'Check-up';
 }
 
 export interface Notification {
@@ -36,4 +37,3 @@ export interface Notification {
   read: boolean;
   type: 'success' | 'destructive' | 'info';
 }
-

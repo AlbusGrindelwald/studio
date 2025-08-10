@@ -3,7 +3,7 @@
 import type { Appointment, Doctor } from './types';
 import { findUserById, findDoctorById, getDoctors } from './data';
 import { addNotification } from './notifications';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isToday } from 'date-fns';
 import { User, getUsers } from './user';
 import { getLoggedInDoctor } from './doctor-auth';
 
@@ -14,23 +14,35 @@ const listeners: (() => void)[] = [];
 let isLoaded = false;
 
 const loadAppointments = () => {
-    if (typeof window === 'undefined' || isLoaded) return;
+    if (typeof window === 'undefined') {
+        return;
+    }
+    if (isLoaded) return;
 
     try {
         const stored = localStorage.getItem(APPOINTMENTS_KEY);
         if (stored) {
-            // If data exists, parse it and ensure it's in the correct structure.
             const loadedAppointments = JSON.parse(stored);
-            // Re-hydrate the doctor and user objects to ensure they are complete.
             appointments = loadedAppointments.map((app: any) => ({
                 ...app,
                 doctor: findDoctorById(app.doctor.id) || app.doctor,
                 user: findUserById(app.user.id) || app.user,
             }));
+        } else {
+            // Seed with initial data if nothing is in localStorage
+            const todayStr = format(new Date(), 'yyyy-MM-dd');
+            appointments = [
+                { id: 'appt1', doctor: findDoctorById('1')!, user: findUserById('user1')!, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '1234' },
+                { id: 'appt2', doctor: findDoctorById('1')!, user: findUserById('user2')!, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '1235' },
+                { id: 'appt3', doctor: findDoctorById('1')!, user: findUserById('user3')!, date: todayStr, time: '02:00 PM', status: 'upcoming', type: 'Check-up', token: '1236' },
+                { id: 'appt4', doctor: findDoctorById('2')!, user: findUserById('user1')!, date: '2024-08-18', time: '01:00 PM', status: 'upcoming', type: 'Consultation', token: '1237' },
+                { id: 'appt5', doctor: findDoctorById('1')!, user: findUserById('user1')!, date: '2024-08-20', time: '03:00 PM', status: 'completed', type: 'Consultation', token: '1238' },
+                { id: 'appt6', doctor: findDoctorById('1')!, user: findUserById('user2')!, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1239' },
+            ];
+            saveAppointments();
         }
     } catch(e) {
         console.error("Failed to parse appointments from localStorage", e);
-        // Fallback to empty array if parsing fails
         appointments = [];
     }
     isLoaded = true;
@@ -46,7 +58,6 @@ const notifyListeners = () => {
   listeners.forEach(listener => listener());
 };
 
-// Initialize appointments on load
 loadAppointments();
 
 export const getAppointments = (): Appointment[] => {
@@ -94,19 +105,19 @@ export const addAppointment = (newAppointment: {
     throw new Error('User not found');
   }
 
-  // Simulate a booking failure for a specific doctor and time
-  if (doctor.id === '1' && newAppointment.time === '02:00 PM') {
+  if (doctor.id === '1' && newAppointment.time === '02:00 PM' && !isToday(parseISO(newAppointment.date))) {
     throw new Error('Booking Failed: This slot is no longer available.');
   }
 
   const appointment: Appointment = {
-    id: `A${Date.now()}`, // Ensure unique ID
+    id: `A${Date.now()}`,
     doctor,
     user,
     date: newAppointment.date,
     time: newAppointment.time,
     status: 'upcoming',
     token: newAppointment.token,
+    type: 'Consultation',
   };
 
   appointments = [appointment, ...appointments];
@@ -169,7 +180,6 @@ export const rescheduleAppointment = (id: string, newDate: string, newTime: stri
 
 export const subscribe = (listener: () => void) => {
   listeners.push(listener);
-  // Return an unsubscribe function
   return () => {
     const index = listeners.indexOf(listener);
     if (index > -1) {

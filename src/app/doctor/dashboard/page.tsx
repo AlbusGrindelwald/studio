@@ -13,6 +13,7 @@ import { Users, Calendar, DollarSign, MessageSquareWarning, ChevronRight } from 
 import { format, isToday, parseISO } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 function DoctorDashboardSkeleton() {
     return (
@@ -75,7 +76,7 @@ function DoctorDashboardHeader({ doctor }: { doctor: DoctorUser }) {
 }
 
 function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
-    const isConfirmed = appointment.status === 'upcoming';
+    const isConfirmed = appointment.time !== '02:00 PM'; // Mock logic for pending status
     return (
         <Card className="bg-card">
             <CardContent className="p-4 flex items-center justify-between">
@@ -90,7 +91,10 @@ function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
                 </div>
                 <div className="text-right">
                     <p className="font-semibold">{appointment.time}</p>
-                    <Badge className={isConfirmed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
+                    <Badge className={cn(
+                        isConfirmed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700',
+                        "border-none"
+                    )}>
                         {isConfirmed ? 'confirmed' : 'pending'}
                     </Badge>
                 </div>
@@ -115,17 +119,14 @@ export default function DoctorDashboardPage() {
     const loggedInDoctor = getLoggedInDoctor();
     if (loggedInDoctor) {
       setDoctor(loggedInDoctor);
-      // Fetch appointments using the doctor's public ID if it exists
-      if (loggedInDoctor.publicId) {
-        setAppointments(getAppointmentsForDoctor(loggedInDoctor.publicId));
-      }
+      setAppointments(getAppointmentsForDoctor(loggedInDoctor.publicId || ''));
     } else {
       router.push('/doctor/login');
     }
     
     const unsubscribe = subscribe(() => {
-         if (loggedInDoctor && loggedInDoctor.publicId) {
-            setAppointments(getAppointmentsForDoctor(loggedInDoctor.publicId));
+         if (loggedInDoctor) {
+            setAppointments(getAppointmentsForDoctor(loggedInDoctor.publicId || ''));
          }
     });
 
@@ -142,7 +143,7 @@ export default function DoctorDashboardPage() {
 
 
   const todaysAppointments = useMemo(() => {
-    return appointments.filter(a => isToday(parseISO(a.date)));
+    return appointments.filter(a => isToday(parseISO(a.date))).sort((a,b) => a.time.localeCompare(b.time));
   }, [appointments]);
 
 

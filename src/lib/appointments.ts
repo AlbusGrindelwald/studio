@@ -48,6 +48,18 @@ const loadAppointments = () => {
             const user2 = allUsers.find(u => u.id === 'user2');
             const user3 = allUsers.find(u => u.id === 'user3');
 
+            // Find new users from the image
+            const sarahJohnson = { id: 'user4', name: 'Sarah Johnson', email: 'sarah.j@example.com', phone: '1234567890'};
+            const michaelChen = { id: 'user5', name: 'Michael Chen', email: 'michael.c@example.com', phone: '0987654321'};
+            const emilyRodriguez = { id: 'user6', name: 'Emily Rodriguez', email: 'emily.r@example.com', phone: '1122334455'};
+            // We need to add these users to the user list if they dont exist
+            [sarahJohnson, michaelChen, emilyRodriguez].forEach(u => {
+                if(!findUserById(u.id)) {
+                    getUsers().push(u);
+                }
+            });
+
+
             appointments = [];
 
             if (evelynReed && user1) {
@@ -67,15 +79,21 @@ const loadAppointments = () => {
             }
 
             // Appointments for other users to ensure doctor's view is populated
+            if (evelynReed) {
+                appointments.push({ id: 'appt_sj', doctor: evelynReed, user: sarahJohnson, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '2001' });
+                appointments.push({ id: 'appt_mc', doctor: evelynReed, user: michaelChen, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '2002' });
+                appointments.push({ id: 'appt_er', doctor: evelynReed, user: emilyRodriguez, date: todayStr, time: '02:00 PM', status: 'upcoming', type: 'Check-up', token: '2003' });
+            }
             if (evelynReed && user2) {
-                 appointments.push({ id: 'appt2', doctor: evelynReed, user: user2, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '1235' });
+                 appointments.push({ id: 'appt2', doctor: evelynReed, user: user2, date: tomorrowStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '1235' });
             }
             if (evelynReed && user3) {
-                 appointments.push({ id: 'appt3', doctor: evelynReed, user: user3, date: todayStr, time: '02:00 PM', status: 'upcoming', type: 'Check-up', token: '1236' });
+                 appointments.push({ id: 'appt3', doctor: evelynReed, user: user3, date: tomorrowStr, time: '02:00 PM', status: 'upcoming', type: 'Check-up', token: '1236' });
             }
              if (evelynReed && user2) {
                 appointments.push({ id: 'appt6', doctor: evelynReed, user: user2, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1239' });
             }
+
 
             saveAppointments();
         }

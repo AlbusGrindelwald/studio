@@ -1,11 +1,21 @@
 
-import { createPublicDoctorProfile } from './data';
+'use client';
+
+import { createPublicDoctorProfile, findDoctorByPublicId } from './data';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User as FirebaseUser,
+} from 'firebase/auth';
+import { auth } from './firebase';
 
 export interface DoctorUser {
-  id: string;
+  id: string; // This will be the Firebase UID
   name: string;
   email: string;
-  password?: string;
   publicId?: string; // Links to the public Doctor profile
 }
 
@@ -15,21 +25,26 @@ let doctorListeners: (() => void)[] = [];
 
 // Initial hardcoded doctor users linked to public profiles
 const initialDoctorUsers: DoctorUser[] = [
-    { id: 'doc_auth_1', name: 'Dr. Evelyn Reed', email: 'evelyn.reed@shedula.com', password: 'password', publicId: '1' },
-    { id: 'doc_auth_2', name: 'Dr. Marcus Thorne', email: 'marcus.thorne@shedula.com', password: 'password', publicId: '2' },
-    { id: 'doc_auth_3', name: 'Dr. Lena Petrova', email: 'lena.petrova@shedula.com', password: 'password', publicId: '3' },
-    { id: 'doc_auth_4', name: 'Dr. Samuel Chen', email: 'samuel.chen@shedula.com', password: 'password', publicId: '4' },
+  { id: 'doc_auth_1', name: 'Dr. Evelyn Reed', email: 'evelyn.reed@shedula.com', publicId: '1' },
+  { id: 'doc_auth_2', name: 'Dr. Marcus Thorne', email: 'marcus.thorne@shedula.com', publicId: '2' },
+  { id: 'doc_auth_3', name: 'Dr. Lena Petrova', email: 'lena.petrova@shedula.com', publicId: '3' },
+  { id: 'doc_auth_4', name: 'Dr. Samuel Chen', email: 'samuel.chen@shedula.com', publicId: '4' },
 ];
 
 const getDoctorUsers = (): DoctorUser[] => {
   if (typeof window === 'undefined') return initialDoctorUsers;
-  const usersJson = localStorage.getItem(DOCTOR_USERS_KEY);
-  if (!usersJson) {
-      // Initialize with hardcoded data if none exists
+  try {
+    const usersJson = localStorage.getItem(DOCTOR_USERS_KEY);
+    if (!usersJson) {
       saveDoctorUsers(initialDoctorUsers);
       return initialDoctorUsers;
+    }
+    return JSON.parse(usersJson);
+  } catch(e) {
+    console.error("Failed to parse doctor users from localStorage", e);
+    saveDoctorUsers(initialDoctorUsers);
+    return initialDoctorUsers;
   }
-  return JSON.parse(usersJson);
 };
 
 const saveDoctorUsers = (users: DoctorUser[]) => {
@@ -42,17 +57,53 @@ const notifyDoctorListeners = () => {
   doctorListeners.forEach(listener => listener());
 };
 
-export const createDoctor = (newDoctor: Omit<DoctorUser, 'id' | 'publicId'>) => {
+export const createDoctorAccount = async (newDoctorData: Omit<DoctorUser, 'id' | 'publicId'> & { password_provided: string }): Promise<FirebaseUser> => {
+  const { email, password_provided, name } = newDoctorData;
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password_provided);
+  const firebaseUser = userCredential.user;
+
+  const localDoctorData: DoctorUser = {
+    id: firebaseUser.uid,
+    name,
+    email,
+  };
+  
   const doctors = getDoctorUsers();
-  if (doctors.find(d => d.email === newDoctor.email)) {
-    throw new Error('A doctor with this email already exists.');
+  if (doctors.find(d => d.email === email)) {
+    throw new Error('A doctor with this email already exists in the local store.');
   }
 
-  const doctor: DoctorUser = { ...newDoctor, id: `doctor_${Date.now()}` };
-  doctors.push(doctor);
+  doctors.push(localDoctorData);
   saveDoctorUsers(doctors);
-  return doctor;
+
+  return firebaseUser;
 };
+
+
+export const loginDoctor = async (email: string, password_provided: string): Promise<DoctorUser> => {
+  const userCredential = await signInWithEmailAndPassword(auth, email, password_provided);
+  const firebaseUser = userCredential.user;
+
+  let localDoctor = findDoctorById(firebaseUser.uid);
+  if (!localDoctor) {
+    // If a user exists in Firebase but not locally, create a local record
+    localDoctor = {
+      id: firebaseUser.uid,
+      email: firebaseUser.email || '',
+      name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Doctor',
+    };
+    const doctors = getDoctorUsers();
+    doctors.push(localDoctor);
+    saveDoctorUsers(doctors);
+  }
+  
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(LOGGED_IN_DOCTOR_KEY, localDoctor.id);
+  }
+  notifyDoctorListeners();
+  return localDoctor;
+};
+
 
 export const updateDoctor = (id: string, updates: Partial<Omit<DoctorUser, 'id'>>) => {
     let doctors = getDoctorUsers();
@@ -94,19 +145,8 @@ export const findDoctorById = (id: string): DoctorUser | undefined => {
     return doctors.find(d => d.id === id);
 }
 
-export const loginDoctor = (email: string, password_provided: string): DoctorUser => {
-  const doctor = findDoctorByEmail(email);
-  if (!doctor || doctor.password !== password_provided) {
-    throw new Error('Invalid email or password');
-  }
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LOGGED_IN_DOCTOR_KEY, doctor.id);
-  }
-  notifyDoctorListeners();
-  return doctor;
-};
-
-export const logoutDoctor = () => {
+export const logoutDoctor = async () => {
+  await signOut(auth);
   if (typeof window !== 'undefined') {
     localStorage.removeItem(LOGGED_IN_DOCTOR_KEY);
   }

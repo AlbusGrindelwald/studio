@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User as UserIcon, Mail, Phone, Calendar, Search, Eye } from 'lucide-react';
+import { User as UserIcon, Mail, Phone, Calendar, Search, Eye } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function PatientCardSkeleton() {
@@ -90,8 +90,8 @@ export default function PatientsPage() {
 
   useEffect(() => {
     const doctor = getLoggedInDoctor();
-    if (doctor) {
-      setPatients(getPatientsForDoctor(doctor.email));
+    if (doctor && doctor.publicId) {
+      setPatients(getPatientsForDoctor(doctor.publicId));
     }
     setIsClient(true);
   }, []);

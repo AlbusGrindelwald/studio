@@ -1,7 +1,7 @@
 
 
 import type { Appointment, Doctor } from './types';
-import { findUserById, findDoctorById, getDoctors } from './data';
+import { findUserById, getDoctors, findDoctorById } from './data';
 import { addNotification } from './notifications';
 import { format, parseISO, isToday, addDays, subDays } from 'date-fns';
 import { User, getUsers } from './user';
@@ -23,6 +23,7 @@ const loadAppointments = () => {
         const stored = localStorage.getItem(APPOINTMENTS_KEY);
         if (stored) {
             const loadedAppointments = JSON.parse(stored);
+             // Ensure that nested doctor and user objects are fully hydrated from our data sources
             appointments = loadedAppointments.map((app: any) => ({
                 ...app,
                 doctor: findDoctorById(app.doctor.id) || app.doctor,
@@ -34,28 +35,53 @@ const loadAppointments = () => {
             const tomorrowStr = format(addDays(new Date(), 1), 'yyyy-MM-dd');
             const yesterdayStr = format(subDays(new Date(), 1), 'yyyy-MM-dd');
             const lastWeekStr = format(subDays(new Date(), 7), 'yyyy-MM-dd');
-            appointments = [
-                // Upcoming for user1
-                { id: 'appt1', doctor: findDoctorById('1')!, user: findUserById('user1')!, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '1234' },
-                { id: 'appt4', doctor: findDoctorById('2')!, user: findUserById('user1')!, date: tomorrowStr, time: '01:00 PM', status: 'upcoming', type: 'Consultation', token: '1237' },
-                
-                // Completed for user1
-                { id: 'appt5', doctor: findDoctorById('1')!, user: findUserById('user1')!, date: yesterdayStr, time: '03:00 PM', status: 'completed', type: 'Consultation', token: '1238' },
-                { id: 'appt7', doctor: findDoctorById('3')!, user: findUserById('user1')!, date: lastWeekStr, time: '09:00 AM', status: 'completed', type: 'Check-up', token: '1240' },
+            
+            const allDoctors = getDoctors();
+            const allUsers = getUsers();
 
-                // Canceled for user1
-                { id: 'appt8', doctor: findDoctorById('4')!, user: findUserById('user1')!, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1241' },
+            const evelynReed = allDoctors.find(d => d.name === 'Dr. Evelyn Reed');
+            const marcusThorne = allDoctors.find(d => d.name === 'Dr. Marcus Thorne');
+            const lenaPetrova = allDoctors.find(d => d.name === 'Dr. Lena Petrova');
+            const samuelChen = allDoctors.find(d => d.name === 'Dr. Samuel Chen');
 
-                // Appointments for other users to ensure doctor's view is populated
-                { id: 'appt2', doctor: findDoctorById('1')!, user: findUserById('user2')!, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '1235' },
-                { id: 'appt3', doctor: findDoctorById('1')!, user: findUserById('user3')!, date: todayStr, time: '02:00 PM', status: 'upcoming', type: 'Check-up', token: '1236' },
-                { id: 'appt6', doctor: findDoctorById('1')!, user: findUserById('user2')!, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1239' },
-            ];
+            const user1 = allUsers.find(u => u.id === 'user1');
+            const user2 = allUsers.find(u => u.id === 'user2');
+            const user3 = allUsers.find(u => u.id === 'user3');
+
+            appointments = [];
+
+            if (evelynReed && user1) {
+                appointments.push({ id: 'appt1', doctor: evelynReed, user: user1, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '1234' });
+            }
+            if (marcusThorne && user1) {
+                 appointments.push({ id: 'appt4', doctor: marcusThorne, user: user1, date: tomorrowStr, time: '01:00 PM', status: 'upcoming', type: 'Consultation', token: '1237' });
+            }
+             if (evelynReed && user1) {
+                appointments.push({ id: 'appt5', doctor: evelynReed, user: user1, date: yesterdayStr, time: '03:00 PM', status: 'completed', type: 'Consultation', token: '1238' });
+            }
+            if (lenaPetrova && user1) {
+                appointments.push({ id: 'appt7', doctor: lenaPetrova, user: user1, date: lastWeekStr, time: '09:00 AM', status: 'completed', type: 'Check-up', token: '1240' });
+            }
+             if (samuelChen && user1) {
+                appointments.push({ id: 'appt8', doctor: samuelChen, user: user1, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1241' });
+            }
+
+            // Appointments for other users to ensure doctor's view is populated
+            if (evelynReed && user2) {
+                 appointments.push({ id: 'appt2', doctor: evelynReed, user: user2, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '1235' });
+            }
+            if (evelynReed && user3) {
+                 appointments.push({ id: 'appt3', doctor: evelynReed, user: user3, date: todayStr, time: '02:00 PM', status: 'upcoming', type: 'Check-up', token: '1236' });
+            }
+             if (evelynReed && user2) {
+                appointments.push({ id: 'appt6', doctor: evelynReed, user: user2, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1239' });
+            }
+
             saveAppointments();
         }
     } catch(e) {
         console.error("Failed to parse appointments from localStorage", e);
-        appointments = [];
+        appointments = []; // Start fresh if there's a parsing error
     }
     isLoaded = true;
 };
@@ -80,12 +106,12 @@ export const getAppointmentsForUser = (userId: string): Appointment[] => {
     return appointments.filter(app => app.user && app.user.id === userId);
 };
 
-export const getAppointmentsForDoctor = (doctorEmail: string): Appointment[] => {
-    return appointments.filter(app => app.doctor && app.doctor.email === doctorEmail);
+export const getAppointmentsForDoctor = (doctorPublicId: string): Appointment[] => {
+    return appointments.filter(app => app.doctor && app.doctor.id === doctorPublicId);
 }
 
-export const getPatientsForDoctor = (doctorEmail: string): User[] => {
-    const doctorAppointments = getAppointmentsForDoctor(doctorEmail);
+export const getPatientsForDoctor = (doctorPublicId: string): User[] => {
+    const doctorAppointments = getAppointmentsForDoctor(doctorPublicId);
     const patientMap = new Map<string, User>();
     doctorAppointments.forEach(app => {
         if (app.user && !patientMap.has(app.user.id)) {

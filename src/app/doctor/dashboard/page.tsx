@@ -7,7 +7,6 @@ import { useEffect, useState, useMemo } from 'react';
 import type { DoctorUser } from '@/lib/doctor-auth';
 import { getAppointmentsForDoctor, subscribe } from '@/lib/appointments';
 import type { Appointment } from '@/lib/types';
-import { DoctorAppointmentCard } from '@/components/doctor/AppointmentCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Calendar, DollarSign, MessageSquareWarning, ChevronRight } from 'lucide-react';
@@ -116,14 +115,17 @@ export default function DoctorDashboardPage() {
     const loggedInDoctor = getLoggedInDoctor();
     if (loggedInDoctor) {
       setDoctor(loggedInDoctor);
-      setAppointments(getAppointmentsForDoctor(loggedInDoctor.email));
+      // Fetch appointments using the doctor's public ID if it exists
+      if (loggedInDoctor.publicId) {
+        setAppointments(getAppointmentsForDoctor(loggedInDoctor.publicId));
+      }
     } else {
       router.push('/doctor/login');
     }
     
     const unsubscribe = subscribe(() => {
-         if (loggedInDoctor) {
-            setAppointments(getAppointmentsForDoctor(loggedInDoctor.email));
+         if (loggedInDoctor && loggedInDoctor.publicId) {
+            setAppointments(getAppointmentsForDoctor(loggedInDoctor.publicId));
          }
     });
 

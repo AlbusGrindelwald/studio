@@ -3,7 +3,7 @@
 import type { Appointment, Doctor } from './types';
 import { findUserById, findDoctorById, getDoctors } from './data';
 import { addNotification } from './notifications';
-import { format, parseISO, isToday } from 'date-fns';
+import { format, parseISO, isToday, addDays, subDays } from 'date-fns';
 import { User, getUsers } from './user';
 import { getLoggedInDoctor } from './doctor-auth';
 
@@ -31,12 +31,24 @@ const loadAppointments = () => {
         } else {
             // Seed with initial data if nothing is in localStorage
             const todayStr = format(new Date(), 'yyyy-MM-dd');
+            const tomorrowStr = format(addDays(new Date(), 1), 'yyyy-MM-dd');
+            const yesterdayStr = format(subDays(new Date(), 1), 'yyyy-MM-dd');
+            const lastWeekStr = format(subDays(new Date(), 7), 'yyyy-MM-dd');
             appointments = [
+                // Upcoming for user1
                 { id: 'appt1', doctor: findDoctorById('1')!, user: findUserById('user1')!, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '1234' },
+                { id: 'appt4', doctor: findDoctorById('2')!, user: findUserById('user1')!, date: tomorrowStr, time: '01:00 PM', status: 'upcoming', type: 'Consultation', token: '1237' },
+                
+                // Completed for user1
+                { id: 'appt5', doctor: findDoctorById('1')!, user: findUserById('user1')!, date: yesterdayStr, time: '03:00 PM', status: 'completed', type: 'Consultation', token: '1238' },
+                { id: 'appt7', doctor: findDoctorById('3')!, user: findUserById('user1')!, date: lastWeekStr, time: '09:00 AM', status: 'completed', type: 'Check-up', token: '1240' },
+
+                // Canceled for user1
+                { id: 'appt8', doctor: findDoctorById('4')!, user: findUserById('user1')!, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1241' },
+
+                // Appointments for other users to ensure doctor's view is populated
                 { id: 'appt2', doctor: findDoctorById('1')!, user: findUserById('user2')!, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '1235' },
                 { id: 'appt3', doctor: findDoctorById('1')!, user: findUserById('user3')!, date: todayStr, time: '02:00 PM', status: 'upcoming', type: 'Check-up', token: '1236' },
-                { id: 'appt4', doctor: findDoctorById('2')!, user: findUserById('user1')!, date: '2024-08-18', time: '01:00 PM', status: 'upcoming', type: 'Consultation', token: '1237' },
-                { id: 'appt5', doctor: findDoctorById('1')!, user: findUserById('user1')!, date: '2024-08-20', time: '03:00 PM', status: 'completed', type: 'Consultation', token: '1238' },
                 { id: 'appt6', doctor: findDoctorById('1')!, user: findUserById('user2')!, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1239' },
             ];
             saveAppointments();

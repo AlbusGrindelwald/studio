@@ -77,7 +77,7 @@ export default function DashboardPage() {
     }
   }, [user?.id]);
 
-  const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').slice(0, 1);
+  const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(0, 1);
 
   if (!isClient) {
     return (

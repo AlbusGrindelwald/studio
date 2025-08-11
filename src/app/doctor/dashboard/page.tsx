@@ -77,8 +77,8 @@ function DoctorDashboardHeader({ doctor }: { doctor: DoctorUser }) {
 }
 
 function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
-    // This logic determines if the badge is 'pending' or 'confirmed'
-    const isConfirmed = appointment.token !== '2003';
+    const isConfirmed = appointment.status === 'upcoming';
+    
     return (
         <Card className="bg-card">
             <CardContent className="p-4 flex items-center justify-between">
@@ -132,11 +132,12 @@ export default function DoctorDashboardPage() {
          }
     });
 
+    // Set static values for the stats
     setStats({
-        todaysAppointments: Math.floor(Math.random() * 15) + 1,
-        totalPatients: Math.floor(Math.random() * 150) + 50,
-        pendingReviews: Math.floor(Math.random() * 10),
-        monthlyRevenue: Math.floor(Math.random() * 20000) + 5000,
+        todaysAppointments: 3, // This will be replaced by the actual count below
+        totalPatients: 178,
+        pendingReviews: 5,
+        monthlyRevenue: 12500,
     });
     
     setIsClient(true);
@@ -145,40 +146,8 @@ export default function DoctorDashboardPage() {
 
 
   const todaysAppointments = useMemo(() => {
-    const hardcodedAppointments: Appointment[] = [
-        {
-            id: 'appt_sj',
-            user: { id: 'user4', name: 'Sarah Johnson', email: 'sarah.j@example.com' },
-            doctor: {} as any, 
-            date: format(new Date(), 'yyyy-MM-dd'),
-            time: '10:00 AM',
-            status: 'upcoming',
-            type: 'Consultation',
-            token: '2001'
-        },
-        {
-            id: 'appt_mc',
-            user: { id: 'user5', name: 'Michael Chen', email: 'michael.c@example.com' },
-            doctor: {} as any,
-            date: format(new Date(), 'yyyy-MM-dd'),
-            time: '11:30 AM',
-            status: 'upcoming',
-            type: 'Follow-up',
-            token: '2002'
-        },
-        {
-            id: 'appt_er',
-            user: { id: 'user6', name: 'Emily Rodriguez', email: 'emily.r@example.com' },
-            doctor: {} as any,
-            date: format(new Date(), 'yyyy-MM-dd'),
-            time: '02:00 PM',
-            status: 'upcoming',
-            type: 'Check-up',
-            token: '2003'
-        },
-    ];
-    return hardcodedAppointments;
-  }, []);
+    return appointments.filter(app => isToday(parseISO(app.date)));
+  }, [appointments]);
 
 
   if (!isClient || !doctor) {

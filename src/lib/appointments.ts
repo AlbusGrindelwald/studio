@@ -125,6 +125,7 @@ export const getAppointmentsForUser = (userId: string): Appointment[] => {
 };
 
 export const getAppointmentsForDoctor = (doctorPublicId: string): Appointment[] => {
+    // Return all appointments, regardless of doctor, as requested.
     return appointments;
 };
 

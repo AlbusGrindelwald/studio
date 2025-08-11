@@ -77,7 +77,7 @@ function DoctorDashboardHeader({ doctor }: { doctor: DoctorUser }) {
 
 function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
     // This logic determines if the badge is 'pending' or 'confirmed'
-    const isConfirmed = appointment.time !== '02:00 PM'; 
+    const isConfirmed = appointment.token !== '2003'; 
     return (
         <Card className="bg-card">
             <CardContent className="p-4 flex items-center justify-between">

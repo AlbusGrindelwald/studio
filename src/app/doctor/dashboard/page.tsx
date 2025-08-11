@@ -111,7 +111,6 @@ export default function DoctorDashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [stats, setStats] = useState({
-    todaysAppointments: 0,
     totalPatients: 0,
     pendingReviews: 0,
     monthlyRevenue: 0,
@@ -134,7 +133,6 @@ export default function DoctorDashboardPage() {
 
     // Set static values for the stats
     setStats({
-        todaysAppointments: 3, // This will be replaced by the actual count below
         totalPatients: 178,
         pendingReviews: 5,
         monthlyRevenue: 12500,

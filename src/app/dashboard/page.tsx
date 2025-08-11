@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { CalendarCheck, ChevronRight, User, Stethoscope, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getAppointmentsForUser, subscribe as subscribeAppointments } from '@/lib/appointments';
-import { getLoggedInUser, subscribe as subscribeUser } from '@/lib/user';
+import { getAppointmentsForUser } from '@/lib/appointments';
+import { getLoggedInUser, findUserById } from '@/lib/user';
 import type { Appointment } from '@/lib/types';
 import type { User as PatientUser } from '@/lib/user';
 import { useEffect, useState } from 'react';
@@ -48,34 +48,16 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const handleUserChange = () => {
-        const loggedInUser = getLoggedInUser();
-        setUser(loggedInUser);
-        
-        // Fetch appointments once we have the user
-        if (loggedInUser) {
-            setAppointments(getAppointmentsForUser(loggedInUser.id));
-        }
-    }
+    // Hardcode user to user1 to ensure consistent data
+    const loggedInUser = findUserById('user1');
+    setUser(loggedInUser);
 
-    const handleAppointmentsChange = () => {
-        if(user) {
-            setAppointments(getAppointmentsForUser(user.id));
-        }
-    };
-    
-    const unsubscribeUser = subscribeUser(handleUserChange);
-    const unsubscribeAppointments = subscribeAppointments(handleAppointmentsChange);
-    
-    handleUserChange(); // Initial user fetch
+    if (loggedInUser) {
+      setAppointments(getAppointmentsForUser(loggedInUser.id));
+    }
     
     setIsClient(true);
-    
-    return () => {
-        unsubscribeAppointments();
-        unsubscribeUser();
-    }
-  }, [user?.id]);
+  }, []);
 
   const upcomingAppointments = appointments.filter(a => a.status === 'upcoming').sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(0, 1);
 

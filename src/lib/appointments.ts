@@ -124,13 +124,12 @@ export const getAppointmentsForUser = (userId: string): Appointment[] => {
     return appointments.filter(app => app.user && app.user.id === userId);
 };
 
-export const getAppointmentsForDoctor = (doctorPublicId: string): Appointment[] => {
-    // Return all appointments, regardless of doctor, as requested.
+export const getAppointmentsForDoctor = (): Appointment[] => {
     return appointments;
 };
 
 export const getPatientsForDoctor = (doctorPublicId: string): User[] => {
-    const doctorAppointments = getAppointmentsForDoctor(doctorPublicId);
+    const doctorAppointments = getAppointmentsForDoctor();
     const patientMap = new Map<string, User>();
     doctorAppointments.forEach(app => {
         if (app.user && !patientMap.has(app.user.id)) {

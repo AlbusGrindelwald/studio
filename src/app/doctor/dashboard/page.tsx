@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -120,14 +121,14 @@ export default function DoctorDashboardPage() {
     const loggedInDoctor = getLoggedInDoctor();
     if (loggedInDoctor) {
       setDoctor(loggedInDoctor);
-      setAppointments(getAppointmentsForDoctor(loggedInDoctor.publicId || ''));
+      setAppointments(getAppointmentsForDoctor());
     } else {
       router.push('/doctor/login');
     }
     
     const unsubscribe = subscribe(() => {
          if (loggedInDoctor) {
-            setAppointments(getAppointmentsForDoctor(loggedInDoctor.publicId || ''));
+            setAppointments(getAppointmentsForDoctor());
          }
     });
 

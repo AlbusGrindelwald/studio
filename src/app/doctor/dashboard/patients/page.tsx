@@ -90,8 +90,8 @@ export default function PatientsPage() {
 
   useEffect(() => {
     const doctor = getLoggedInDoctor();
-    if (doctor && doctor.publicId) {
-      setPatients(getPatientsForDoctor(doctor.publicId));
+    if (doctor) {
+      setPatients(getPatientsForDoctor());
     }
     setIsClient(true);
   }, []);

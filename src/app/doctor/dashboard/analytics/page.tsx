@@ -46,7 +46,7 @@ export default function AnalyticsPage() {
     useEffect(() => {
         const doctor = getLoggedInDoctor();
         if (doctor) {
-            setAppointments(getAppointmentsForDoctor(doctor.email));
+            setAppointments(getAppointmentsForDoctor());
         }
         setIsClient(true);
     }, []);

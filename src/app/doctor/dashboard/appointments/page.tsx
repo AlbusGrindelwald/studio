@@ -47,8 +47,8 @@ export default function DoctorAppointmentsPage() {
 
   useEffect(() => {
     const doctor = getLoggedInDoctor();
-    if (doctor && doctor.publicId) {
-      setAppointments(getAppointmentsForDoctor(doctor.publicId));
+    if (doctor) {
+      setAppointments(getAppointmentsForDoctor());
     }
     setIsClient(true);
   }, []);
@@ -57,8 +57,8 @@ export default function DoctorAppointmentsPage() {
       updateAppointmentStatus(id, newStatus);
       // Re-fetch appointments to update the UI
       const doctor = getLoggedInDoctor();
-      if (doctor && doctor.publicId) {
-          setAppointments(getAppointmentsForDoctor(doctor.publicId));
+      if (doctor) {
+          setAppointments(getAppointmentsForDoctor());
       }
 
       toast({

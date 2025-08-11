@@ -131,7 +131,6 @@ export default function DoctorDashboardPage() {
          }
     });
 
-    // Set static values for the stats
     setStats({
         totalPatients: 178,
         pendingReviews: 5,

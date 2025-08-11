@@ -128,7 +128,7 @@ export const getAppointmentsForDoctor = (): Appointment[] => {
     return appointments;
 };
 
-export const getPatientsForDoctor = (doctorPublicId: string): User[] => {
+export const getPatientsForDoctor = (): User[] => {
     const doctorAppointments = getAppointmentsForDoctor();
     const patientMap = new Map<string, User>();
     doctorAppointments.forEach(app => {

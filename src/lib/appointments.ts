@@ -82,7 +82,7 @@ const loadAppointments = () => {
             if (evelynReed) {
                 appointments.push({ id: 'appt_sj', doctor: evelynReed, user: sarahJohnson, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '2001' });
                 appointments.push({ id: 'appt_mc', doctor: evelynReed, user: michaelChen, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '2002' });
-                appointments.push({ id: 'appt_er', doctor: evelynReed, user: emilyRodriguez, date: todayStr, time: '02:00 PM', status: 'upcoming', type: 'Check-up', token: '2003' });
+                appointments.push({ id: 'appt_er', doctor: evelynReed, user: emilyRodriguez, date: todayStr, time: '02:00 PM', status: 'upcoming', token: '2003', type: 'Check-up' });
             }
             if (evelynReed && user2) {
                  appointments.push({ id: 'appt2', doctor: evelynReed, user: user2, date: tomorrowStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '1235' });

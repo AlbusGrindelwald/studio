@@ -78,7 +78,7 @@ function DoctorDashboardHeader({ doctor }: { doctor: DoctorUser }) {
 
 function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
     // This logic determines if the badge is 'pending' or 'confirmed'
-    const isConfirmed = appointment.token !== '2003'; 
+    const isConfirmed = appointment.token !== '2003';
     return (
         <Card className="bg-card">
             <CardContent className="p-4 flex items-center justify-between">
@@ -145,8 +145,40 @@ export default function DoctorDashboardPage() {
 
 
   const todaysAppointments = useMemo(() => {
-    return appointments.filter(a => isToday(parseISO(a.date))).sort((a,b) => a.time.localeCompare(b.time));
-  }, [appointments]);
+    const hardcodedAppointments: Appointment[] = [
+        {
+            id: 'appt_sj',
+            user: { id: 'user4', name: 'Sarah Johnson', email: 'sarah.j@example.com' },
+            doctor: {} as any, 
+            date: format(new Date(), 'yyyy-MM-dd'),
+            time: '10:00 AM',
+            status: 'upcoming',
+            type: 'Consultation',
+            token: '2001'
+        },
+        {
+            id: 'appt_mc',
+            user: { id: 'user5', name: 'Michael Chen', email: 'michael.c@example.com' },
+            doctor: {} as any,
+            date: format(new Date(), 'yyyy-MM-dd'),
+            time: '11:30 AM',
+            status: 'upcoming',
+            type: 'Follow-up',
+            token: '2002'
+        },
+        {
+            id: 'appt_er',
+            user: { id: 'user6', name: 'Emily Rodriguez', email: 'emily.r@example.com' },
+            doctor: {} as any,
+            date: format(new Date(), 'yyyy-MM-dd'),
+            time: '02:00 PM',
+            status: 'upcoming',
+            type: 'Check-up',
+            token: '2003'
+        },
+    ];
+    return hardcodedAppointments;
+  }, []);
 
 
   if (!isClient || !doctor) {

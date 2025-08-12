@@ -49,9 +49,9 @@ const loadAppointments = () => {
             const user3 = allUsers.find(u => u.id === 'user3');
 
             // Find new users from the image
-            const oliviaDavis = { id: 'user4', name: 'Olivia Davis', email: 'olivia.d@example.com', phone: '1234567890', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330'};
-            const liamWilson = { id: 'user5', name: 'Liam Wilson', email: 'liam.w@example.com', phone: '0987654321', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d'};
-            const avaGarcia = { id: 'user6', name: 'Ava Garcia', email: 'ava.g@example.com', phone: '1122334455', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956'};
+            const oliviaDavis = { id: 'user4', name: 'Maria Garcia', email: 'olivia.d@example.com', phone: '1234567890', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330'};
+            const liamWilson = { id: 'user5', name: 'David Smith', email: 'liam.w@example.com', phone: '0987654321', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d'};
+            const avaGarcia = { id: 'user6', name: 'Olivia Wilson', email: 'ava.g@example.com', phone: '1122334455', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956'};
             // We need to add these users to the user list if they dont exist
             [oliviaDavis, liamWilson, avaGarcia].forEach(u => {
                 if(!findUserById(u.id)) {
@@ -130,19 +130,7 @@ export const getAppointmentsForDoctor = (): Appointment[] => {
 };
 
 export const getPatientsForDoctor = (): User[] => {
-    const doctorAppointments = getAppointmentsForDoctor();
-    const patientMap = new Map<string, User>();
-    doctorAppointments.forEach(app => {
-        if (app.user && !patientMap.has(app.user.id)) {
-             const lastVisit = doctorAppointments
-                .filter(a => a.user.id === app.user.id)
-                .map(a => parseISO(a.date))
-                .sort((a,b) => b.getTime() - a.getTime())[0];
-            
-            patientMap.set(app.user.id, { ...app.user, lastVisit: lastVisit ? format(lastVisit, 'yyyy-MM-dd') : 'N/A' });
-        }
-    });
-    return Array.from(patientMap.values());
+    return [];
 }
 
 export const addAppointment = (newAppointment: {

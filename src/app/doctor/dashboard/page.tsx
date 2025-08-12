@@ -150,13 +150,31 @@ export default function DoctorDashboardPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [patients, setPatients] = useState<User[]>([]);
   const [isClient, setIsClient] = useState(false);
+  
+  const [stats, setStats] = useState({
+      todaysAppointments: '0',
+      totalPatients: '0',
+      pendingReviews: '0',
+      monthlyRevenue: '$0'
+  });
 
   useEffect(() => {
     const loggedInDoctor = getLoggedInDoctor();
     if (loggedInDoctor) {
       setDoctor(loggedInDoctor);
-      setAppointments(getAppointments());
-      setPatients(getPatientsForDoctor());
+      const allAppointments = getAppointments();
+      setAppointments(allAppointments);
+      const allPatients = getPatientsForDoctor();
+      setPatients(allPatients);
+
+      // Set static stats
+      setStats({
+          todaysAppointments: allAppointments.filter(app => format(new Date(app.date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')).length.toString(),
+          totalPatients: '156',
+          pendingReviews: '3',
+          monthlyRevenue: '$12,500'
+      });
+
     } else {
       router.push('/doctor/login');
     }
@@ -179,10 +197,10 @@ export default function DoctorDashboardPage() {
             <DoctorDashboardHeader doctor={doctor} />
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <StatCard icon={<Calendar className="h-6 w-6 text-blue-600" />} title="Today's Appointments" value="8" color="border-blue-500" bgColor="bg-blue-100" />
-                <StatCard icon={<Users className="h-6 w-6 text-green-600" />} title="Total Patients" value="156" color="border-green-500" bgColor="bg-green-100" />
-                <StatCard icon={<ListTodo className="h-6 w-6 text-orange-600" />} title="Pending Reviews" value="3" color="border-orange-500" bgColor="bg-orange-100" />
-                <StatCard icon={<DollarSign className="h-6 w-6 text-purple-600" />} title="Monthly Revenue" value="$12,500" color="border-purple-500" bgColor="bg-purple-100" />
+                <StatCard icon={<Calendar className="h-6 w-6 text-blue-600" />} title="Today's Appointments" value={stats.todaysAppointments} color="border-blue-500" bgColor="bg-blue-100" />
+                <StatCard icon={<Users className="h-6 w-6 text-green-600" />} title="Total Patients" value={stats.totalPatients} color="border-green-500" bgColor="bg-green-100" />
+                <StatCard icon={<ListTodo className="h-6 w-6 text-orange-600" />} title="Pending Reviews" value={stats.pendingReviews} color="border-orange-500" bgColor="bg-orange-100" />
+                <StatCard icon={<DollarSign className="h-6 w-6 text-purple-600" />} title="Monthly Revenue" value={stats.monthlyRevenue} color="border-purple-500" bgColor="bg-purple-100" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -212,9 +230,13 @@ export default function DoctorDashboardPage() {
                                 <Button variant="link" className="text-primary">View All</Button>
                             </Link>
                         </div>
-                        {patients.slice(0, 3).map(patient => (
-                            <RecentPatientCard key={patient.id} patient={patient} />
-                        ))}
+                        {patients.length > 0 ? (
+                            patients.slice(0, 3).map(patient => (
+                                <RecentPatientCard key={patient.id} patient={patient} />
+                            ))
+                        ) : (
+                             <p className="text-muted-foreground text-center py-8">No recent patients found.</p>
+                        )}
                     </CardContent>
                 </Card>
             </div>

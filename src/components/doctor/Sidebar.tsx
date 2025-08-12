@@ -1,18 +1,14 @@
 
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
-  Calendar,
-  Users,
-  User,
-  LogOut,
-  Stethoscope,
-  CalendarCheck,
   CalendarClock,
   BarChart,
+  Stethoscope,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/Logo';
@@ -29,12 +25,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getLoggedInDoctor, logoutDoctor } from '@/lib/doctor-auth';
 import { useEffect, useState } from 'react';
 import type { DoctorUser } from '@/lib/doctor-auth';
+import { LogOut } from 'lucide-react';
 
 const navItems = [
   { href: '/doctor/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/doctor/dashboard/appointments', label: 'Appointments', icon: CalendarCheck },
   { href: '/doctor/dashboard/schedule', label: 'Schedule', icon: CalendarClock },
-  { href: '/doctor/dashboard/patients', label: 'My Patients', icon: Users },
   { href: '/doctor/dashboard/analytics', label: 'Analytics', icon: BarChart },
 ];
 

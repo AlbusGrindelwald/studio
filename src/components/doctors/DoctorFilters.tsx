@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { doctors } from '@/lib/data';
+import { getDoctors } from '@/lib/data';
 import type { Filters } from '@/app/dashboard/doctors/page';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 
+const doctors = getDoctors();
 const uniqueLocations = ['all', ...Array.from(new Set(doctors.map(d => d.location)))];
 const uniqueSpecialties = ['all', ...Array.from(new Set(doctors.map(d => d.specialty)))];
 const appointmentTypes: { id: Exclude<Filters['appointmentTypes'], undefined>[number], label: string }[] = [

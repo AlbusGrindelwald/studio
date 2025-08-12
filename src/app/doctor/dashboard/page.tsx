@@ -1,147 +1,263 @@
 
+
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { getLoggedInDoctor } from '@/lib/doctor-auth';
 import { useEffect, useState, useMemo } from 'react';
 import type { DoctorUser } from '@/lib/doctor-auth';
-import { getAppointmentsForDoctor } from '@/lib/appointments';
-import type { Appointment } from '@/lib/types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DoctorAppointmentCard } from '@/components/doctor/AppointmentCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Users, CalendarCheck, CircleX } from 'lucide-react';
+import { format } from 'date-fns';
+import { getAppointments, getPatientsForDoctor } from '@/lib/appointments';
+import type { Appointment } from '@/lib/types';
+import type { User } from '@/lib/user';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Calendar, Users, ListTodo, DollarSign, User as UserIcon, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
 
 function DoctorDashboardSkeleton() {
     return (
-        <div className="flex flex-col flex-1">
-            <header className="bg-background p-4 flex items-center justify-between border-b sticky top-0 z-10 h-16">
-                 <Skeleton className="h-8 w-48" />
+        <div className="flex-1 space-y-6 p-6">
+            <header className="flex justify-between items-start mb-6">
+                <div>
+                    <Skeleton className="h-8 w-64 mb-2" />
+                    <Skeleton className="h-4 w-48" />
+                </div>
+                <div className="text-right">
+                    <Skeleton className="h-8 w-24 mb-2" />
+                    <Skeleton className="h-4 w-20" />
+                </div>
             </header>
-            <main className="flex-1 p-4 md:p-6">
-                <div className="grid gap-4 md:grid-cols-3 mb-6">
-                    <Skeleton className="h-28 w-full" />
-                    <Skeleton className="h-28 w-full" />
-                    <Skeleton className="h-28 w-full" />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <Skeleton className="h-24 rounded-lg" />
+                <Skeleton className="h-24 rounded-lg" />
+                <Skeleton className="h-24 rounded-lg" />
+                <Skeleton className="h-24 rounded-lg" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                    <Skeleton className="h-64 rounded-lg" />
+                    <Skeleton className="h-64 rounded-lg" />
                 </div>
-                <div className="grid w-full grid-cols-3 gap-2 mb-4">
-                    <Skeleton className="h-10" />
-                    <Skeleton className="h-10" />
-                    <Skeleton className="h-10" />
-                </div>
-                <div className="space-y-4 pt-4">
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                </div>
-            </main>
+            </div>
         </div>
     );
 }
 
+function DoctorDashboardHeader({ doctor }: { doctor: DoctorUser }) {
+    const [time, setTime] = useState(new Date());
+    const [greeting, setGreeting] = useState('');
+
+    useEffect(() => {
+        const timer = setInterval(() => setTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    useEffect(() => {
+        const hour = time.getHours();
+        if (hour < 12) setGreeting('Good Morning');
+        else if (hour < 18) setGreeting('Good Afternoon');
+        else setGreeting('Good Evening');
+    }, [time]);
+
+    return (
+        <header className="flex justify-between items-start mb-6">
+            <div>
+                <h1 className="text-2xl font-bold text-primary">{greeting}, {doctor.name}!</h1>
+                <p className="text-muted-foreground">{format(time, 'EEEE, MMMM d, yyyy')}</p>
+            </div>
+            <div className="text-right">
+                <p className="text-2xl font-bold">{format(time, 'h:mm:ss a')}</p>
+                <p className="text-sm text-muted-foreground">Current Time</p>
+            </div>
+        </header>
+    );
+}
+
+function StatCard({ icon, title, value, color, bgColor }: { icon: React.ReactNode, title: string, value: string, color: string, bgColor: string }) {
+    return (
+        <Card className={cn("border-l-4", color)}>
+            <CardContent className="p-4 flex items-center justify-between">
+                <div>
+                    <p className="text-sm text-muted-foreground">{title}</p>
+                    <p className="text-2xl font-bold">{value}</p>
+                </div>
+                <div className={cn("p-3 rounded-lg", bgColor)}>
+                    {icon}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+
+function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
+    const isConfirmed = appointment.status === 'upcoming';
+    const isPending = appointment.status === 'pending';
+    const isCanceled = appointment.status === 'canceled';
+
+    return (
+        <div className="flex items-center justify-between p-3 rounded-lg bg-background hover:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-100 rounded-full">
+                    <UserIcon className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                    <p className="font-semibold text-sm">{appointment.user.name}</p>
+                    <p className="text-xs text-muted-foreground">{appointment.type}</p>
+                </div>
+            </div>
+            <div className="text-right">
+                <p className="text-sm font-medium">{appointment.time}</p>
+                {isConfirmed && (
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                        confirmed
+                    </span>
+                )}
+                 {isPending && (
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
+                        pending
+                    </span>
+                )}
+                 {isCanceled && (
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                        canceled
+                    </span>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function RecentPatientCard({ patient }: { patient: User }) {
+    return (
+        <div className="flex items-center justify-between p-3 rounded-lg bg-background hover:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+                 <div className="p-2 bg-gray-100 rounded-full">
+                    <UserIcon className="h-5 w-5 text-gray-600" />
+                </div>
+                <div>
+                    <p className="font-semibold text-sm">{patient.name}</p>
+                    <p className="text-xs text-muted-foreground">{patient.condition}</p>
+                </div>
+            </div>
+            <Badge
+                className={cn(
+                    "capitalize",
+                    patient.status === 'stable' && 'bg-green-100 text-green-700',
+                    patient.status === 'monitoring' && 'bg-yellow-100 text-yellow-700'
+                )}
+                variant="outline"
+            >
+                {patient.status}
+            </Badge>
+        </div>
+    )
+}
 
 export default function DoctorDashboardPage() {
   const router = useRouter();
   const [doctor, setDoctor] = useState<DoctorUser | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [patients, setPatients] = useState<User[]>([]);
   const [isClient, setIsClient] = useState(false);
+  
+  const [stats, setStats] = useState({
+      todaysAppointments: '0',
+      totalPatients: '156',
+      pendingReviews: '3',
+      monthlyRevenue: '$12,500'
+  });
 
   useEffect(() => {
     const loggedInDoctor = getLoggedInDoctor();
     if (loggedInDoctor) {
       setDoctor(loggedInDoctor);
-      setAppointments(getAppointmentsForDoctor(loggedInDoctor.email));
+      const allAppointments = getAppointments();
+      setAppointments(allAppointments);
+      const allPatients = getPatientsForDoctor();
+      setPatients(allPatients);
+    } else {
+      router.push('/doctor/login');
     }
+    
     setIsClient(true);
-  }, []);
+  }, [router]);
 
-
-  const filteredAppointments = useMemo(() => {
-    return {
-      upcoming: appointments.filter(a => a.status === 'upcoming'),
-      completed: appointments.filter(a => a.status === 'completed'),
-      canceled: appointments.filter(a => a.status === 'canceled'),
-    };
+  const todaysAppointments = useMemo(() => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    return appointments.filter(app => app.date === today);
   }, [appointments]);
+
+  useEffect(() => {
+    if (isClient) {
+        setStats({
+            todaysAppointments: todaysAppointments.length.toString(),
+            totalPatients: '156',
+            pendingReviews: '3',
+            monthlyRevenue: '$12,500'
+        });
+    }
+  }, [isClient, todaysAppointments]);
+
 
   if (!isClient || !doctor) {
     return <DoctorDashboardSkeleton />;
   }
-  
-  const totalPatients = new Set(appointments.map(a => a.user.id)).size;
 
   return (
-    <div className="flex flex-col flex-1">
-        <header className="bg-background p-4 flex items-center justify-between border-b sticky top-0 z-10 h-16">
-            <h1 className="text-xl font-bold tracking-tight">Dashboard</h1>
-        </header>
+    <div className="flex flex-col flex-1 bg-muted/40">
+        <main className="flex-1 p-4 md:p-6 space-y-6">
+            <DoctorDashboardHeader doctor={doctor} />
 
-        <main className="flex-1 p-4 md:p-6">
-            <div className="grid gap-4 md:grid-cols-3 mb-6">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{totalPatients}</div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <StatCard icon={<Calendar className="h-6 w-6 text-blue-600" />} title="Today's Appointments" value={stats.todaysAppointments} color="border-blue-500" bgColor="bg-blue-100" />
+                <StatCard icon={<Users className="h-6 w-6 text-green-600" />} title="Total Patients" value={stats.totalPatients} color="border-green-500" bgColor="bg-green-100" />
+                <StatCard icon={<ListTodo className="h-6 w-6 text-orange-600" />} title="Pending Reviews" value={stats.pendingReviews} color="border-orange-500" bgColor="bg-orange-100" />
+                <StatCard icon={<DollarSign className="h-6 w-6 text-purple-600" />} title="Monthly Revenue" value={stats.monthlyRevenue} color="border-purple-500" bgColor="bg-purple-100" />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="lg:col-span-2">
+                    <CardContent className="p-4 space-y-2">
+                        <div className="flex justify-between items-center mb-2">
+                            <h3 className="font-semibold">Today's Appointments</h3>
+                             <Link href="#">
+                                <Button variant="link" className="text-primary">View All</Button>
+                            </Link>
+                        </div>
+                        {todaysAppointments.length > 0 ? (
+                            todaysAppointments.map(app => (
+                                <TodaysAppointmentCard key={app.id} appointment={app} />
+                            ))
+                        ) : (
+                            <p className="text-muted-foreground text-center py-8">No appointments scheduled for today.</p>
+                        )}
                     </CardContent>
                 </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Upcoming Appointments</CardTitle>
-                        <CalendarCheck className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{filteredAppointments.upcoming.length}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Canceled Appointments</CardTitle>
-                        <CircleX className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{filteredAppointments.canceled.length}</div>
+
+                 <Card>
+                    <CardContent className="p-4 space-y-2">
+                        <div className="flex justify-between items-center mb-2">
+                            <h3 className="font-semibold">Recent Patients</h3>
+                            <Link href="#">
+                                <Button variant="link" className="text-primary">View All</Button>
+                            </Link>
+                        </div>
+                        {patients.length > 0 ? (
+                            patients.map(patient => (
+                                <RecentPatientCard key={patient.id} patient={patient} />
+                            ))
+                        ) : (
+                             <p className="text-muted-foreground text-center py-8">No recent patients found.</p>
+                        )}
                     </CardContent>
                 </Card>
             </div>
-            
-            <Tabs defaultValue="upcoming" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="upcoming">Upcoming ({filteredAppointments.upcoming.length})</TabsTrigger>
-                    <TabsTrigger value="completed">Completed ({filteredAppointments.completed.length})</TabsTrigger>
-                    <TabsTrigger value="canceled">Canceled ({filteredAppointments.canceled.length})</TabsTrigger>
-                </TabsList>
-                <TabsContent value="upcoming">
-                    <div className="space-y-4 pt-4">
-                        {filteredAppointments.upcoming.length > 0 ? filteredAppointments.upcoming.map(app => (
-                            <DoctorAppointmentCard key={app.id} appointment={app} />
-                        )) : (
-                            <p className="text-center text-muted-foreground py-8">No upcoming appointments.</p>
-                        )}
-                    </div>
-                </TabsContent>
-                <TabsContent value="completed">
-                    <div className="space-y-4 pt-4">
-                        {filteredAppointments.completed.length > 0 ? filteredAppointments.completed.map(app => (
-                            <DoctorAppointmentCard key={app.id} appointment={app} />
-                        )) : (
-                            <p className="text-center text-muted-foreground py-8">No completed appointments.</p>
-                        )}
-                    </div>
-                </TabsContent>
-                <TabsContent value="canceled">
-                     <div className="space-y-4 pt-4">
-                        {filteredAppointments.canceled.length > 0 ? filteredAppointments.canceled.map(app => (
-                            <DoctorAppointmentCard key={app.id} appointment={app} />
-                        )) : (
-                            <p className="text-center text-muted-foreground py-8">No canceled appointments.</p>
-                        )}
-                    </div>
-                </TabsContent>
-            </Tabs>
         </main>
     </div>
   );

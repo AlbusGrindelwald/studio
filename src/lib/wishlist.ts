@@ -1,6 +1,6 @@
 
 import type { Doctor } from './types';
-import { doctors } from './data';
+import { getDoctors } from './data';
 import { addNotification } from './notifications';
 
 const WISHLIST_KEY = 'shedula_wishlist';
@@ -29,7 +29,7 @@ if (typeof window !== 'undefined') {
 }
 
 export const getWishlist = (): Doctor[] => {
-    return doctors.filter(doctor => wishlistedDoctorIds.includes(doctor.id));
+    return getDoctors().filter(doctor => wishlistedDoctorIds.includes(doctor.id));
 };
 
 export const isDoctorInWishlist = (doctorId: string): boolean => {
@@ -41,7 +41,7 @@ export const addToWishlist = (doctorId: string) => {
         wishlistedDoctorIds.push(doctorId);
         saveWishlist();
 
-        const doctor = doctors.find(d => d.id === doctorId);
+        const doctor = getDoctors().find(d => d.id === doctorId);
         if (doctor) {
             addNotification({
                 title: 'Added to Wishlist',
@@ -58,7 +58,7 @@ export const removeFromWishlist = (doctorId: string) => {
         wishlistedDoctorIds.splice(index, 1);
         saveWishlist();
 
-         const doctor = doctors.find(d => d.id === doctorId);
+         const doctor = getDoctors().find(d => d.id === doctorId);
         if (doctor) {
             addNotification({
                 title: 'Removed from Wishlist',

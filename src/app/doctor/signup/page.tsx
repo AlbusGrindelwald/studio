@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
-import { createDoctor, loginDoctor } from '@/lib/doctor-auth';
+import { createDoctorAccount, loginDoctor } from '@/lib/doctor-auth';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function SignupSkeleton() {
@@ -57,13 +57,15 @@ export default function DoctorSignupPage() {
     setIsClient(true);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      createDoctor({ name, email, password });
-      // Log the user in immediately after signup
-      loginDoctor(email, password);
+      // Step 1: Create user in Firebase Auth and local storage
+      await createDoctorAccount({ name, email, password_provided: password });
+      
+      // Step 2: Log the user in immediately after signup
+      await loginDoctor(email, password);
       
       toast({
         title: 'Account Created',

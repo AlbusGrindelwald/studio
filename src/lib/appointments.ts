@@ -1,84 +1,105 @@
 
 import type { Appointment, Doctor } from './types';
-import { doctors, findUserById } from './data';
+import { findUserById, getDoctors, findDoctorById, getUsers } from './data';
 import { addNotification } from './notifications';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isToday, addDays, subDays } from 'date-fns';
 import { User } from './user';
+import { getLoggedInDoctor } from './doctor-auth';
 
 const APPOINTMENTS_KEY = 'shedula_appointments';
 let appointments: Appointment[] = [];
 const listeners: (() => void)[] = [];
 
-// Hardcoded initial data
-const mockAppointments: Appointment[] = [
-  {
-    id: 'A1',
-    doctor: doctors[2],
-    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
-    date: '2024-08-20',
-    time: '10:00 AM',
-    status: 'completed',
-    token: '1234',
-  },
-  {
-    id: 'A2',
-    doctor: doctors[0],
-    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
-    date: '2024-07-15',
-    time: '09:00 AM',
-    status: 'completed',
-    token: '5678',
-  },
-  {
-    id: 'A3',
-    doctor: doctors[1],
-    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
-    date: '2024-06-25',
-    time: '02:30 PM',
-    status: 'completed',
-    token: '9101',
-  },
-  {
-    id: 'A4',
-    doctor: doctors[3],
-    user: { id: 'user1', name: 'John Doe', email: 'patient@shedula.com' },
-    date: '2024-08-25',
-    time: '11:00 AM',
-    status: 'upcoming',
-    token: '1121',
-  },
-];
-
+let isLoaded = false;
 
 const loadAppointments = () => {
-    if (typeof window === 'undefined') return;
-    // For this fix, we will clear the local storage ONCE to ensure no bad data persists.
-    // In a real app, this might be handled by a versioning system.
-    if (!localStorage.getItem('shedula_data_migrated_v1')) {
-        localStorage.removeItem(APPOINTMENTS_KEY);
-        localStorage.setItem('shedula_data_migrated_v1', 'true');
+    if (typeof window === 'undefined' || isLoaded) {
+        return;
     }
+    
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const genericDoctor = getDoctors()[0]; 
 
-    try {
-        const stored = localStorage.getItem(APPOINTMENTS_KEY);
-        // If there's no data in local storage, initialize it with our mock data.
-        if (!stored || JSON.parse(stored).length === 0) {
-            appointments = mockAppointments;
-            saveAppointments();
-        } else {
-             // Otherwise, load the existing data.
-            appointments = JSON.parse(stored);
-        }
-    } catch(e) {
-        console.error("Failed to parse appointments from localStorage", e);
-        // Fallback to mock data if parsing fails
-        appointments = mockAppointments;
-    }
+    const users = getUsers();
+    const user1 = users.find(u => u.name === 'John Doe') || users[0];
+    const user2 = users.find(u => u.name === 'Jane Smith') || users[1];
+    const user3 = users.find(u => u.name === 'Peter Jones') || users[2];
+    
+    // Static list of appointments, always loaded this way.
+    appointments = [
+        { 
+            id: 'appt_sarah', 
+            doctor: genericDoctor, 
+            user: { ...user1, name: 'Sarah Johnson', phone: '+1 (555) 123-4567' },
+            date: todayStr,
+            time: '10:00 AM', 
+            duration: 30,
+            status: 'upcoming', 
+            token: '3001', 
+            type: 'Consultation',
+            reason: 'Regular checkup',
+            notes: 'Patient reports feeling well.'
+        },
+        { 
+            id: 'appt_michael',
+            doctor: genericDoctor,
+            user: { ...user2, name: 'Michael Chen', phone: '+1 (555) 234-5678' },
+            date: todayStr, 
+            time: '11:30 AM', 
+            duration: 45,
+            status: 'pending', 
+            token: '3002', 
+            type: 'Follow-up',
+            reason: 'Blood pressure monitoring',
+            notes: 'Follow-up on medication adjustment.'
+        },
+        { 
+            id: 'appt_emily', 
+            doctor: genericDoctor, 
+            user: { ...user3, name: 'Emily Rodriguez', phone: '+1 (555) 345-6789' },
+            date: todayStr, 
+            time: '02:00 PM', 
+            duration: 30,
+            status: 'canceled', 
+            token: '3003',
+            type: 'Check-up',
+            reason: 'Annual physical exam',
+            notes: 'Wants to discuss diet and exercise.'
+        },
+         { 
+            id: 'appt_david', 
+            doctor: genericDoctor, 
+            user: { ...user1, id: 'user4', name: 'David Lee', phone: '+1 (555) 456-7890' },
+            date: format(subDays(new Date(), 2), 'yyyy-MM-dd'),
+            time: '03:00 PM', 
+            duration: 20,
+            status: 'completed', 
+            token: '3004',
+            type: 'Consultation',
+            reason: 'Sore throat',
+            notes: 'Patient canceled due to a conflict.'
+        },
+         { 
+            id: 'appt_jessica', 
+            doctor: genericDoctor, 
+            user: { ...user2, id: 'user5', name: 'Jessica Miller', phone: '+1 (555) 567-8901' },
+            date: format(addDays(new Date(), 1), 'yyyy-MM-dd'), 
+            time: '09:00 AM', 
+            duration: 60,
+            status: 'upcoming', 
+            token: '3005',
+            type: 'Consultation',
+            reason: 'Second opinion for knee surgery.',
+            notes: ''
+        },
+    ];
+
+    saveAppointments();
+    isLoaded = true;
 };
 
 const saveAppointments = () => {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
+    // No-op for saving to localStorage to keep data static per session load.
     notifyListeners();
 };
 
@@ -86,30 +107,44 @@ const notifyListeners = () => {
   listeners.forEach(listener => listener());
 };
 
-// Initialize appointments on load
-if (typeof window !== 'undefined') {
-  loadAppointments();
-}
+loadAppointments();
 
 export const getAppointments = (): Appointment[] => {
   return appointments;
 };
 
-export const getAppointmentsForDoctor = (doctorEmail: string): Appointment[] => {
-    return appointments.filter(app => app.doctor.email === doctorEmail);
-}
+export const getAppointmentsForUser = (userId: string): Appointment[] => {
+    return appointments.filter(app => app.user && app.user.id === userId);
+};
 
-export const getPatientsForDoctor = (doctorEmail: string): User[] => {
-    const doctorAppointments = getAppointmentsForDoctor(doctorEmail);
-    const patientIds = new Set(doctorAppointments.map(app => app.user.id));
-    const uniquePatients: User[] = [];
-    patientIds.forEach(id => {
-        const user = findUserById(id);
-        if (user) {
-            uniquePatients.push(user);
-        }
-    });
-    return uniquePatients;
+export const getAppointmentsForDoctor = (): Appointment[] => {
+    return appointments;
+};
+
+export const getPatientsForDoctor = (): User[] => {
+    return [
+      {
+        id: 'user1',
+        name: 'John Smith',
+        email: 'john.smith@example.com',
+        condition: 'Hypertension',
+        status: 'stable',
+      },
+      {
+        id: 'user2',
+        name: 'Lisa Wilson',
+        email: 'lisa.wilson@example.com',
+        condition: 'Diabetes',
+        status: 'monitoring',
+      },
+       {
+        id: 'user3',
+        name: 'David Lee',
+        email: 'david.lee@example.com',
+        condition: 'Asthma',
+        status: 'stable',
+      },
+    ];
 }
 
 export const addAppointment = (newAppointment: {
@@ -119,7 +154,7 @@ export const addAppointment = (newAppointment: {
   userId: string;
   token: string;
 }) => {
-  const doctor = doctors.find(d => d.id === newAppointment.doctorId);
+  const doctor = findDoctorById(newAppointment.doctorId);
   if (!doctor) {
     throw new Error('Doctor not found');
   }
@@ -129,19 +164,20 @@ export const addAppointment = (newAppointment: {
     throw new Error('User not found');
   }
 
-  // Simulate a booking failure for a specific doctor and time
-  if (doctor.id === '1' && newAppointment.time === '02:00 PM') {
+  if (doctor.id === '1' && newAppointment.time === '02:00 PM' && !isToday(parseISO(newAppointment.date))) {
     throw new Error('Booking Failed: This slot is no longer available.');
   }
 
   const appointment: Appointment = {
-    id: `A${Date.now()}`, // Ensure unique ID
+    id: `A${Date.now()}`,
     doctor,
     user,
     date: newAppointment.date,
     time: newAppointment.time,
     status: 'upcoming',
     token: newAppointment.token,
+    type: 'Consultation',
+    duration: 30, // default
   };
 
   appointments = [appointment, ...appointments];
@@ -156,7 +192,7 @@ export const addAppointment = (newAppointment: {
   return appointment;
 };
 
-export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'completed' | 'canceled') => {
+export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'completed' | 'canceled' | 'pending') => {
     const appointment = appointments.find(app => app.id === id);
     if (!appointment) return;
     
@@ -164,13 +200,15 @@ export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'comple
         app.id === id ? { ...app, status } : app
     );
 
-    if (status === 'canceled') {
-        addNotification({
-            title: 'Appointment Canceled',
-            description: `Your appointment with ${appointment.doctor.name} on ${format(parseISO(appointment.date), 'MMM d, yyyy')} has been canceled.`,
-            type: 'destructive'
-        });
-    }
+    const notificationType = status === 'upcoming' ? 'success' : 'destructive';
+    const notificationTitle = status === 'upcoming' ? 'Appointment Confirmed' : 'Appointment Canceled';
+    const notificationDescription = `The appointment for ${appointment.user.name} has been ${status}.`;
+
+    addNotification({
+        title: notificationTitle,
+        description: notificationDescription,
+        type: notificationType
+    });
 
     saveAppointments();
 };
@@ -204,7 +242,6 @@ export const rescheduleAppointment = (id: string, newDate: string, newTime: stri
 
 export const subscribe = (listener: () => void) => {
   listeners.push(listener);
-  // Return an unsubscribe function
   return () => {
     const index = listeners.indexOf(listener);
     if (index > -1) {

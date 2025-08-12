@@ -2,7 +2,7 @@
 import type { Appointment, Doctor } from './types';
 import { User, getUsers } from './user';
 
-export let doctors: Doctor[] = [
+let doctors: Doctor[] = [
   {
     id: '1',
     name: 'Dr. Evelyn Reed',
@@ -84,16 +84,13 @@ export let doctors: Doctor[] = [
 // Re-exporting from user.ts to avoid circular dependencies
 export { findUserById, findUserByEmailOrPhone, getUsers } from './user';
 
-const allUsers = getUsers();
-const patientUser = allUsers.find(u => u.email === 'patient@shedula.com') || allUsers[0];
-
-export const appointments: Appointment[] = [
-  // This is now handled in appointments.ts to avoid data conflicts
-];
-
 export const findDoctorById = (id: string): Doctor | undefined => {
   return doctors.find(doctor => doctor.id === id);
 }
+
+export const getDoctors = (): Doctor[] => {
+    return doctors;
+};
 
 export const updatePublicDoctor = (id: string, updatedData: Partial<Doctor>): Doctor => {
   let updatedDoctor: Doctor | undefined;
@@ -130,4 +127,30 @@ export const updateDoctorAvailability = (doctorId: string, date: string, slots: 
         throw new Error('Doctor not found');
     }
     return updatedDoctor;
+}
+
+
+export const createPublicDoctorProfile = (data: any): Doctor => {
+    const newPublicId = `doc_pub_${Date.now()}`;
+    const newDoctor: Doctor = {
+        id: newPublicId,
+        name: `${data.title} ${data.name}`,
+        email: data.email, // This should come from the logged-in doctor user.
+        specialty: data.specialization,
+        location: data.city,
+        rating: 4.5, // Default rating
+        reviews: 0, // Starts with 0 reviews
+        image: 'https://placehold.co/128x128.png?text=Dr',
+        description: `A dedicated ${data.specialization.toLowerCase()} based in ${data.city}.`,
+        availability: {}, // Starts with empty availability
+        specialities: [data.specialization],
+        fees: 200, // Default fee
+        appointmentTypes: ['in-person'],
+    };
+
+    doctors = [...doctors, newDoctor];
+    // In a real app, you'd save this to a persistent database.
+    // For this demo, it's just in memory for the session.
+    
+    return newDoctor;
 }

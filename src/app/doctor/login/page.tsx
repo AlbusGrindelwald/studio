@@ -31,10 +31,10 @@ export default function DoctorLoginPage() {
     setIsLoading(true);
 
     try {
-        const doctor = loginDoctor(email, password);
+        const doctor = await loginDoctor(email, password);
         toast({
             title: "Login Successful",
-            description: `Welcome back, Dr. ${doctor.name.split(' ').pop()}!`
+            description: `Welcome back, ${doctor.name}!`
         });
         router.push('/doctor/dashboard');
     } catch (error: any) {
@@ -43,9 +43,9 @@ export default function DoctorLoginPage() {
             description: error.message || "Please check your email and password.",
             variant: "destructive"
         });
+    } finally {
+        setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   if (!isClient) {

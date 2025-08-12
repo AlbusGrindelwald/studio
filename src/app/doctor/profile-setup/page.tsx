@@ -57,9 +57,14 @@ export default function ProfileSetupPage() {
   useEffect(() => {
     // This code runs only on the client, after the initial render.
     const loggedInDoctor = getLoggedInDoctor();
+    if (!loggedInDoctor) {
+        toast({ title: 'Not Logged In', description: 'Please log in to set up your profile.', variant: 'destructive' });
+        router.push('/doctor/login');
+        return;
+    }
     setDoctor(loggedInDoctor);
     setIsClient(true);
-  }, []);
+  }, [router, toast]);
 
   const { control, handleSubmit, formState: { errors } } = useForm<ProfileStep1Values>({
     resolver: zodResolver(profileStep1Schema),
@@ -73,15 +78,13 @@ export default function ProfileSetupPage() {
 
   const onSubmit = (data: ProfileStep1Values) => {
     setIsLoading(true);
-    console.log('Profile Step 1 Data:', { doctorId: doctor?.id, ...data });
-
-    // Here you would save the data and move to the next step
-    toast({
-      title: 'Profile Details Saved',
-      description: 'Moving to the next step...',
-    });
     
-    router.push('/doctor/profile-setup/medical-registration');
+    // Pass data to the next step via query parameters
+    const query = new URLSearchParams({
+        data: JSON.stringify(data),
+    }).toString();
+    
+    router.push(`/doctor/profile-setup/medical-registration?${query}`);
   };
 
   return (

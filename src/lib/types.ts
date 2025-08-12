@@ -22,10 +22,14 @@ export interface Appointment {
   id: string;
   doctor: Doctor;
   user: User;
-  date: string;
-  time: string;
-  status: 'upcoming' | 'completed' | 'canceled';
+  date: string; // "yyyy-MM-dd"
+  time: string; // "HH:mm AM/PM"
+  duration: number; // in minutes
+  status: 'upcoming' | 'completed' | 'canceled' | 'pending';
   token: string;
+  type?: 'Consultation' | 'Follow-up' | 'Check-up';
+  reason?: string;
+  notes?: string;
 }
 
 export interface Notification {
@@ -36,4 +40,3 @@ export interface Notification {
   read: boolean;
   type: 'success' | 'destructive' | 'info';
 }
-

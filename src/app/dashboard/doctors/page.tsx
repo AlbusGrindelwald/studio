@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { doctors as allDoctors } from '@/lib/data';
+import { getDoctors } from '@/lib/data';
 import { DoctorCard } from '@/components/doctors/DoctorCard';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import type { Doctor } from '@/lib/types';
@@ -32,6 +32,7 @@ export type Filters = {
   appointmentTypes?: ('in-person' | 'online' | 'home-visit')[];
 };
 
+const allDoctors = getDoctors();
 const maxFee = Math.max(...allDoctors.map(d => d.fees || 0), 500);
 
 export default function DoctorsPage() {

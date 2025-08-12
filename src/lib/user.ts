@@ -7,6 +7,8 @@ export interface User {
   phone?: string;
   image?: string; // To store the profile image URL
   lastVisit?: string;
+  condition?: string;
+  status?: 'stable' | 'monitoring' | 'critical';
 }
 
 // This is a simple in-memory "database" using localStorage.
@@ -15,25 +17,53 @@ const listeners: (() => void)[] = [];
 const USERS_KEY = 'shedula_users';
 const LOGGED_IN_USER_KEY = 'shedula_logged_in_user';
 
-// Initialize users from localStorage on client-side
+let isLoaded = false;
 let users: User[] = [];
-if (typeof window !== 'undefined') {
-  const usersJson = localStorage.getItem(USERS_KEY);
-  if (usersJson) {
-      try {
-        const parsedUsers = JSON.parse(usersJson);
-        // Add mock lastVisit data if it doesn't exist
-        users = parsedUsers.map((u: User, index: number) => ({
-            ...u,
-            lastVisit: u.lastVisit || `2024-07-${15 - index}`
-        }));
-      } catch (e) {
-        console.error("Failed to parse users, initializing empty.", e);
-        users = [];
-      }
-  }
-}
 
+const initialUsers: User[] = [
+    {
+        id: 'user1',
+        name: 'John Doe',
+        email: 'patient@shedula.com',
+        phone: '1112223333',
+        image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6',
+        lastVisit: '2024-07-10',
+    },
+    {
+        id: 'user2',
+        name: 'Jane Smith',
+        email: 'jane.smith@example.com',
+        phone: '4445556666',
+        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
+        lastVisit: '2024-06-22',
+    },
+     {
+        id: 'user3',
+        name: 'Peter Jones',
+        email: 'peter.jones@example.com',
+        phone: '7778889999',
+        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
+        lastVisit: '2024-05-15',
+    },
+];
+
+const loadUsers = () => {
+    if (typeof window === 'undefined' || isLoaded) return;
+    const usersJson = localStorage.getItem(USERS_KEY);
+    if (usersJson) {
+        try {
+            users = JSON.parse(usersJson);
+        } catch (e) {
+            console.error("Failed to parse users, initializing with default.", e);
+            users = initialUsers;
+        }
+    } else {
+        users = initialUsers;
+    }
+    isLoaded = true;
+};
+
+loadUsers();
 
 export const getUsers = (): User[] => {
   return users;

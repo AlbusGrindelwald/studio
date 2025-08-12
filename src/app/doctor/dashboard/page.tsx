@@ -226,7 +226,7 @@ export default function DoctorDashboardPage() {
                     <CardContent className="p-4 space-y-2">
                         <div className="flex justify-between items-center mb-2">
                             <h3 className="font-semibold">Today's Appointments</h3>
-                             <Link href="#">
+                             <Link href="/doctor/dashboard/appointments">
                                 <Button variant="link" className="text-primary">View All</Button>
                             </Link>
                         </div>
@@ -244,7 +244,7 @@ export default function DoctorDashboardPage() {
                     <CardContent className="p-4 space-y-2">
                         <div className="flex justify-between items-center mb-2">
                             <h3 className="font-semibold">Recent Patients</h3>
-                            <Link href="#">
+                            <Link href="/doctor/dashboard/patients">
                                 <Button variant="link" className="text-primary">View All</Button>
                             </Link>
                         </div>

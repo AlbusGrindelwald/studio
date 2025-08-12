@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, CheckCircle, Clock, XCircle, BadgeHelp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isToday, isFuture, parseISO } from 'date-fns';
+import { Button } from '@/components/ui/button';
 
 const StatCard = ({
   title,
@@ -171,4 +172,3 @@ export default function DoctorAppointmentsPage() {
         </div>
     );
 }
-

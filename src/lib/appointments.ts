@@ -1,4 +1,5 @@
 
+
 import type { Appointment, Doctor } from './types';
 import { findUserById, getDoctors, findDoctorById, getUsers } from './data';
 import { addNotification } from './notifications';
@@ -94,12 +95,11 @@ const loadAppointments = () => {
         },
     ];
 
-    saveAppointments();
     isLoaded = true;
+    notifyListeners();
 };
 
 const saveAppointments = () => {
-    // No-op for saving to localStorage to keep data static per session load.
     notifyListeners();
 };
 
@@ -124,26 +124,78 @@ export const getAppointmentsForDoctor = (): Appointment[] => {
 export const getPatientsForDoctor = (): User[] => {
     return [
       {
-        id: 'user1',
-        name: 'John Smith',
-        email: 'john.smith@example.com',
+        id: 'user_sarah',
+        name: 'Sarah Johnson',
+        email: 'sarah.j@example.com',
+        phone: '+1 (555) 123-4567',
+        age: 34,
+        gender: 'Female',
+        status: 'active',
         condition: 'Hypertension',
-        status: 'stable',
+        lastVisit: '2024-01-15',
+        nextAppointment: '2024-08-20',
+        image: `https://placehold.co/64x64.png?text=SJ`
       },
       {
-        id: 'user2',
-        name: 'Lisa Wilson',
-        email: 'lisa.wilson@example.com',
-        condition: 'Diabetes',
-        status: 'monitoring',
+        id: 'user_michael',
+        name: 'Michael Chen',
+        email: 'michael.c@example.com',
+        phone: '+1 (555) 234-5678',
+        age: 28,
+        gender: 'Male',
+        status: 'active',
+        condition: 'Diabetes Type 2',
+        lastVisit: '2024-01-14',
+        image: `https://placehold.co/64x64.png?text=MC`
+      },
+      {
+        id: 'user_emily',
+        name: 'Emily Rodriguez',
+        email: 'emily.r@example.com',
+        phone: '+1 (555) 345-6789',
+        age: 42,
+        gender: 'Female',
+        status: 'active',
+        condition: 'Arthritis',
+        lastVisit: '2024-01-12',
+        image: `https://placehold.co/64x64.png?text=ER`
+      },
+      {
+        id: 'user_david',
+        name: 'David Wilson',
+        email: 'david.w@example.com',
+        phone: '+1 (555) 555-5555',
+        age: 55,
+        gender: 'Male',
+        status: 'critical',
+        condition: 'Heart Disease',
+        lastVisit: '2023-12-20',
+        image: `https://placehold.co/64x64.png?text=DW`
       },
        {
-        id: 'user3',
-        name: 'David Lee',
-        email: 'david.lee@example.com',
-        condition: 'Asthma',
-        status: 'stable',
+        id: 'user_lisa',
+        name: 'Lisa Miller',
+        email: 'lisa.m@example.com',
+        phone: '+1 (555) 666-6666',
+        age: 38,
+        gender: 'Female',
+        status: 'inactive',
+        condition: 'Migraines',
+        lastVisit: '2023-05-10',
+        image: `https://placehold.co/64x64.png?text=LM`
       },
+      {
+        id: 'user_robert',
+        name: 'Robert Brown',
+        email: 'robert.b@example.com',
+        phone: '+1 (555) 777-7777',
+        age: 62,
+        gender: 'Male',
+        status: 'active',
+        condition: 'Cholesterol',
+        lastVisit: '2024-02-01',
+        image: `https://placehold.co/64x64.png?text=RB`
+      }
     ];
 }
 

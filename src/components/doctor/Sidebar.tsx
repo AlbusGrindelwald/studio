@@ -57,15 +57,15 @@ function UserProfileDropdown({ doctor, onLogout }: { doctor: DoctorUser, onLogou
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start">
+                <Button variant="ghost" className="w-full justify-start h-auto py-2">
                 <Avatar className="h-8 w-8 mr-2">
                     <AvatarFallback>
                     <Stethoscope className="h-4 w-4" />
                     </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col items-start">
-                    <span className="font-semibold">{doctor.name}</span>
-                    <span className="text-xs text-muted-foreground">
+                <div className="flex flex-col items-start text-left">
+                    <span className="font-semibold text-sm leading-tight">{doctor.name}</span>
+                    <span className="text-xs text-muted-foreground leading-tight">
                     {doctor.email}
                     </span>
                 </div>
@@ -94,7 +94,6 @@ function UserProfileDropdown({ doctor, onLogout }: { doctor: DoctorUser, onLogou
 
 export function Sidebar() {
   const router = useRouter();
-  const pathname = usePathname();
   const [doctor, setDoctor] = useState<DoctorUser | null>(null);
 
   useEffect(() => {
@@ -110,8 +109,6 @@ export function Sidebar() {
     return null;
   }
   
-  const isSpecialLayoutPage = pathname === '/doctor/dashboard/schedule' || pathname === '/doctor/dashboard/analytics';
-
   return (
     <div className="hidden border-r bg-background md:block w-64">
       <div className="flex h-full max-h-screen flex-col gap-2">
@@ -119,12 +116,10 @@ export function Sidebar() {
           <Logo />
         </div>
         
-        {isSpecialLayoutPage && (
-            <div className="p-4 border-b">
-                 <UserProfileDropdown doctor={doctor} onLogout={handleLogout} />
-            </div>
-        )}
-
+        <div className="p-4 border-b">
+            <UserProfileDropdown doctor={doctor} onLogout={handleLogout} />
+        </div>
+        
         <div className="flex-1 overflow-auto py-2">
           <nav className="grid items-start px-4 text-sm font-medium">
             {navItems.map((item) => (
@@ -133,11 +128,6 @@ export function Sidebar() {
           </nav>
         </div>
 
-        {!isSpecialLayoutPage && (
-            <div className="mt-auto p-4 border-t">
-                <UserProfileDropdown doctor={doctor} onLogout={handleLogout} />
-            </div>
-        )}
       </div>
     </div>
   );

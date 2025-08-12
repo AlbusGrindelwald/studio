@@ -1,5 +1,4 @@
 
-
 import type { Appointment, Doctor } from './types';
 import { findUserById, getDoctors, findDoctorById, getUsers } from './data';
 import { addNotification } from './notifications';
@@ -14,10 +13,9 @@ const listeners: (() => void)[] = [];
 let isLoaded = false;
 
 const loadAppointments = () => {
-    // if (typeof window !== 'undefined' && isLoaded) {
-    //     // Data is already loaded, and we want to keep it static for the session.
-    //     return;
-    // }
+    if (typeof window === 'undefined' || isLoaded) {
+        return;
+    }
     
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const genericDoctor = getDoctors()[0]; 
@@ -49,7 +47,7 @@ const loadAppointments = () => {
             date: todayStr, 
             time: '11:30 AM', 
             duration: 45,
-            status: 'upcoming', 
+            status: 'pending', 
             token: '3002', 
             type: 'Follow-up',
             reason: 'Blood pressure monitoring',
@@ -62,7 +60,7 @@ const loadAppointments = () => {
             date: todayStr, 
             time: '02:00 PM', 
             duration: 30,
-            status: 'pending', 
+            status: 'canceled', 
             token: '3003',
             type: 'Check-up',
             reason: 'Annual physical exam',
@@ -75,7 +73,7 @@ const loadAppointments = () => {
             date: format(subDays(new Date(), 2), 'yyyy-MM-dd'),
             time: '03:00 PM', 
             duration: 20,
-            status: 'canceled', 
+            status: 'completed', 
             token: '3004',
             type: 'Consultation',
             reason: 'Sore throat',
@@ -112,8 +110,6 @@ const notifyListeners = () => {
 loadAppointments();
 
 export const getAppointments = (): Appointment[] => {
-  // Directly call loadAppointments to ensure the static data is always fresh.
-  loadAppointments();
   return appointments;
 };
 
@@ -122,7 +118,6 @@ export const getAppointmentsForUser = (userId: string): Appointment[] => {
 };
 
 export const getAppointmentsForDoctor = (): Appointment[] => {
-    loadAppointments();
     return appointments;
 };
 
@@ -141,6 +136,13 @@ export const getPatientsForDoctor = (): User[] => {
         email: 'lisa.wilson@example.com',
         condition: 'Diabetes',
         status: 'monitoring',
+      },
+       {
+        id: 'user3',
+        name: 'David Lee',
+        email: 'david.lee@example.com',
+        condition: 'Asthma',
+        status: 'stable',
       },
     ];
 }

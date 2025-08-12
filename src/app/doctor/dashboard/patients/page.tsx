@@ -59,7 +59,7 @@ const PatientCard = ({ patient }: { patient: User }) => {
     const statusMap = {
       active: { text: 'Active', className: 'bg-green-100 text-green-700 border-green-200' },
       critical: { text: 'Critical', className: 'bg-red-100 text-red-700 border-red-200' },
-      inactive: { text: 'Inactive', className: 'bg-gray-100 text-gray-700 border-gray-200' },
+      inactive: { text: 'Inactive', className: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
     };
 
     const statusInfo = statusMap[patient.status as keyof typeof statusMap] || statusMap.inactive;
@@ -178,7 +178,7 @@ export default function MyPatientsPage() {
                     <StatCard title="Total Patients" value={patientStats.total} icon={<Users className="h-6 w-6 text-blue-500" />} color="bg-blue-100" />
                     <StatCard title="Active" value={patientStats.active} icon={<CheckCircle className="h-6 w-6 text-green-500" />} color="bg-green-100" />
                     <StatCard title="Critical" value={patientStats.critical} icon={<AlertTriangle className="h-6 w-6 text-red-500" />} color="bg-red-100" />
-                    <StatCard title="Inactive" value={patientStats.inactive} icon={<XCircle className="h-6 w-6 text-gray-500" />} color="bg-gray-100" />
+                    <StatCard title="Inactive" value={patientStats.inactive} icon={<XCircle className="h-6 w-6 text-yellow-500" />} color="bg-yellow-100" />
                 </div>
                 
                  <Card>

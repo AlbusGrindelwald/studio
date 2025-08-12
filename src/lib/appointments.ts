@@ -1,5 +1,4 @@
 
-
 import type { Appointment, Doctor } from './types';
 import { findUserById, getDoctors, findDoctorById } from './data';
 import { addNotification } from './notifications';
@@ -22,24 +21,24 @@ const loadAppointments = () => {
     const genericDoctor = getDoctors()[0]; 
 
     // Find or create users for the static appointments
-    let sarah = findUserById('user_sarah');
-    if (!sarah) {
-        sarah = { id: 'user_sarah', name: 'Sarah Johnson', email: 'sarah.j@example.com', phone: '1234567891', image: `https://placehold.co/40x40.png?text=S` };
+    let user1 = findUserById('user_liam');
+    if (!user1) {
+        user1 = { id: 'user_liam', name: 'Liam Neeson', email: 'liam.n@example.com', phone: '1234567891', image: `https://placehold.co/40x40.png?text=L` };
     }
-    let michael = findUserById('user_michael');
-    if (!michael) {
-        michael = { id: 'user_michael', name: 'Michael Chen', email: 'michael.c@example.com', phone: '1234567892', image: `https://placehold.co/40x40.png?text=M` };
+    let user2 = findUserById('user_olivia');
+    if (!user2) {
+        user2 = { id: 'user_olivia', name: 'Olivia Chen', email: 'olivia.c@example.com', phone: '1234567892', image: `https://placehold.co/40x40.png?text=O` };
     }
-    let emily = findUserById('user_emily');
-    if (!emily) {
-        emily = { id: 'user_emily', name: 'Emily Rodriguez', email: 'emily.r@example.com', phone: '1234567893', image: `https://placehold.co/40x40.png?text=E` };
+    let user3 = findUserById('user_noah');
+    if (!user3) {
+        user3 = { id: 'user_noah', name: 'Noah Patel', email: 'noah.p@example.com', phone: '1234567893', image: `https://placehold.co/40x40.png?text=N` };
     }
     
     // Always use this static list, ignoring localStorage for this feature.
     appointments = [
-        { id: 'appt_sarah', doctor: genericDoctor, user: sarah, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '3001' },
-        { id: 'appt_michael', doctor: genericDoctor, user: michael, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '3002' },
-        { id: 'appt_emily', doctor: genericDoctor, user: emily, date: todayStr, time: '02:00 PM', status: 'canceled', token: '3003', type: 'Check-up' },
+        { id: 'appt_liam', doctor: genericDoctor, user: user1, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '3001' },
+        { id: 'appt_olivia', doctor: genericDoctor, user: user2, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '3002' },
+        { id: 'appt_noah', doctor: genericDoctor, user: user3, date: todayStr, time: '02:00 PM', status: 'canceled', token: '3003', type: 'Check-up' },
     ];
 
     saveAppointments();
@@ -48,7 +47,8 @@ const loadAppointments = () => {
 
 const saveAppointments = () => {
     if (typeof window === 'undefined') return;
-    localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
+    // We are no longer saving to localStorage to ensure data is always static
+    // localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
     notifyListeners();
 };
 
@@ -59,6 +59,8 @@ const notifyListeners = () => {
 loadAppointments();
 
 export const getAppointments = (): Appointment[] => {
+  // Directly call loadAppointments to ensure the static data is always fresh.
+  loadAppointments();
   return appointments;
 };
 
@@ -67,6 +69,8 @@ export const getAppointmentsForUser = (userId: string): Appointment[] => {
 };
 
 export const getAppointmentsForDoctor = (): Appointment[] => {
+    // Call loadAppointments to reset to the static list every time.
+    loadAppointments();
     return appointments;
 };
 

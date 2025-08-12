@@ -9,6 +9,8 @@ import {
   CalendarClock,
   BarChart,
   Stethoscope,
+  Users,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/Logo';
@@ -29,7 +31,9 @@ import { LogOut } from 'lucide-react';
 
 const navItems = [
   { href: '/doctor/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/doctor/dashboard/appointments', label: 'Appointments', icon: Calendar },
   { href: '/doctor/dashboard/schedule', label: 'Schedule', icon: CalendarClock },
+  { href: '/doctor/dashboard/patients', label: 'My Patients', icon: Users },
   { href: '/doctor/dashboard/analytics', label: 'Analytics', icon: BarChart },
 ];
 

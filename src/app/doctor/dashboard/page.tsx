@@ -166,15 +166,6 @@ export default function DoctorDashboardPage() {
       setAppointments(allAppointments);
       const allPatients = getPatientsForDoctor();
       setPatients(allPatients);
-
-      // Set static stats
-      setStats({
-          todaysAppointments: allAppointments.filter(app => format(new Date(app.date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')).length.toString(),
-          totalPatients: '156',
-          pendingReviews: '3',
-          monthlyRevenue: '$12,500'
-      });
-
     } else {
       router.push('/doctor/login');
     }
@@ -186,6 +177,18 @@ export default function DoctorDashboardPage() {
     const today = format(new Date(), 'yyyy-MM-dd');
     return appointments.filter(app => app.date === today);
   }, [appointments]);
+
+  useEffect(() => {
+    if (isClient) {
+        setStats({
+            todaysAppointments: todaysAppointments.length.toString(),
+            totalPatients: '156',
+            pendingReviews: '3',
+            monthlyRevenue: '$12,500'
+        });
+    }
+  }, [isClient, todaysAppointments]);
+
 
   if (!isClient || !doctor) {
     return <DoctorDashboardSkeleton />;

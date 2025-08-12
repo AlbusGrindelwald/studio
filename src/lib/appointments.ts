@@ -32,69 +32,35 @@ const loadAppointments = () => {
         } else {
             // Seed with initial data if nothing is in localStorage
             const todayStr = format(new Date(), 'yyyy-MM-dd');
-            const tomorrowStr = format(addDays(new Date(), 1), 'yyyy-MM-dd');
-            const yesterdayStr = format(subDays(new Date(), 1), 'yyyy-MM-dd');
-            const lastWeekStr = format(subDays(new Date(), 7), 'yyyy-MM-dd');
-            
-            const allDoctors = getDoctors();
+            const genericDoctor = getDoctors()[0]; // Use a generic doctor for all appointments
+
             const allUsers = getUsers();
 
-            const evelynReed = allDoctors.find(d => d.name === 'Dr. Evelyn Reed');
-            const marcusThorne = allDoctors.find(d => d.name === 'Dr. Marcus Thorne');
-            const lenaPetrova = allDoctors.find(d => d.name === 'Dr. Lena Petrova');
-            const samuelChen = allDoctors.find(d => d.name === 'Dr. Samuel Chen');
+            // Find or create users for the static appointments
+            let sarah = findUserById('user_sarah');
+            if (!sarah) {
+                sarah = { id: 'user_sarah', name: 'Sarah Johnson', email: 'sarah.j@example.com', phone: '1234567891', image: `https://placehold.co/40x40.png?text=S` };
+                allUsers.push(sarah);
+            }
+            let michael = findUserById('user_michael');
+            if (!michael) {
+                michael = { id: 'user_michael', name: 'Michael Chen', email: 'michael.c@example.com', phone: '1234567892', image: `https://placehold.co/40x40.png?text=M` };
+                allUsers.push(michael);
+            }
+            let emily = findUserById('user_emily');
+            if (!emily) {
+                emily = { id: 'user_emily', name: 'Emily Rodriguez', email: 'emily.r@example.com', phone: '1234567893', image: `https://placehold.co/40x40.png?text=E` };
+                allUsers.push(emily);
+            }
+            
+            localStorage.setItem('shedula_users', JSON.stringify(allUsers));
 
-            const user1 = allUsers.find(u => u.id === 'user1');
-            const user2 = allUsers.find(u => u.id === 'user2');
-            const user3 = allUsers.find(u => u.id === 'user3');
 
-            // Find new users from the image
-            const oliviaDavis = { id: 'user4', name: 'Maria Garcia', email: 'olivia.d@example.com', phone: '1234567890', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330'};
-            const liamWilson = { id: 'user5', name: 'David Smith', email: 'liam.w@example.com', phone: '0987654321', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d'};
-            const avaGarcia = { id: 'user6', name: 'Olivia Wilson', email: 'ava.g@example.com', phone: '1122334455', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956'};
-            // We need to add these users to the user list if they dont exist
-            [oliviaDavis, liamWilson, avaGarcia].forEach(u => {
-                if(!findUserById(u.id)) {
-                    getUsers().push(u);
-                }
-            });
-
-
-            appointments = [];
-
-            if (evelynReed && user1) {
-                appointments.push({ id: 'appt1', doctor: evelynReed, user: user1, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '1234' });
-            }
-            if (marcusThorne && user1) {
-                 appointments.push({ id: 'appt4', doctor: marcusThorne, user: user1, date: tomorrowStr, time: '01:00 PM', status: 'upcoming', type: 'Consultation', token: '1237' });
-            }
-             if (evelynReed && user1) {
-                appointments.push({ id: 'appt5', doctor: evelynReed, user: user1, date: yesterdayStr, time: '03:00 PM', status: 'completed', type: 'Consultation', token: '1238' });
-            }
-            if (lenaPetrova && user1) {
-                appointments.push({ id: 'appt7', doctor: lenaPetrova, user: user1, date: lastWeekStr, time: '09:00 AM', status: 'completed', type: 'Check-up', token: '1240' });
-            }
-             if (samuelChen && user1) {
-                appointments.push({ id: 'appt8', doctor: samuelChen, user: user1, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1241' });
-            }
-
-            // Appointments for other users to ensure doctor's view is populated
-            if (evelynReed) {
-                appointments.push({ id: 'appt_od', doctor: evelynReed, user: oliviaDavis, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '2001' });
-                appointments.push({ id: 'appt_lw', doctor: evelynReed, user: liamWilson, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '2002' });
-                // Setting to a non-upcoming status will make it "pending" in the UI
-                appointments.push({ id: 'appt_ag', doctor: evelynReed, user: avaGarcia, date: todayStr, time: '02:00 PM', status: 'canceled', token: '2003', type: 'Check-up' });
-            }
-            if (evelynReed && user2) {
-                 appointments.push({ id: 'appt2', doctor: evelynReed, user: user2, date: tomorrowStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '1235' });
-            }
-            if (evelynReed && user3) {
-                 appointments.push({ id: 'appt3', doctor: evelynReed, user: user3, date: tomorrowStr, time: '02:00 PM', status: 'upcoming', type: 'Check-up', token: '1236' });
-            }
-             if (evelynReed && user2) {
-                appointments.push({ id: 'appt6', doctor: evelynReed, user: user2, date: '2024-08-21', time: '10:00 AM', status: 'canceled', type: 'Consultation', token: '1239' });
-            }
-
+            appointments = [
+                { id: 'appt_sarah', doctor: genericDoctor, user: sarah, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '3001' },
+                { id: 'appt_michael', doctor: genericDoctor, user: michael, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '3002' },
+                { id: 'appt_emily', doctor: genericDoctor, user: emily, date: todayStr, time: '02:00 PM', status: 'canceled', token: '3003', type: 'Check-up' },
+            ];
 
             saveAppointments();
         }

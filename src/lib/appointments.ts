@@ -14,38 +14,86 @@ const listeners: (() => void)[] = [];
 let isLoaded = false;
 
 const loadAppointments = () => {
-    if (typeof window !== 'undefined' && isLoaded) {
-        // Data is already loaded, and we want to keep it static for the session.
-        return;
-    }
+    // if (typeof window !== 'undefined' && isLoaded) {
+    //     // Data is already loaded, and we want to keep it static for the session.
+    //     return;
+    // }
     
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const genericDoctor = getDoctors()[0]; 
 
-    // Find or create users for the static appointments
-    let user1 = findUserById('user_liam');
-    if (!user1) {
-        user1 = { id: 'user_liam', name: 'Liam Neeson', email: 'liam.n@example.com', phone: '1234567891', image: `https://placehold.co/40x40.png?text=L` };
-    }
-    let user2 = findUserById('user_olivia');
-    if (!user2) {
-        user2 = { id: 'user_olivia', name: 'Olivia Chen', email: 'olivia.c@example.com', phone: '1234567892', image: `https://placehold.co/40x40.png?text=O` };
-    }
-    let user3 = findUserById('user_noah');
-    if (!user3) {
-        user3 = { id: 'user_noah', name: 'Noah Patel', email: 'noah.p@example.com', phone: '1234567893', image: `https://placehold.co/40x40.png?text=N` };
-    }
-    let user4 = findUserById('user_emma');
-    if (!user4) {
-        user4 = { id: 'user_emma', name: 'Emma Stone', email: 'emma.s@example.com', phone: '1234567894', image: `https://placehold.co/40x40.png?text=E` };
-    }
+    const users = getUsers();
+    const user1 = users.find(u => u.name === 'John Doe') || users[0];
+    const user2 = users.find(u => u.name === 'Jane Smith') || users[1];
+    const user3 = users.find(u => u.name === 'Peter Jones') || users[2];
     
     // Static list of appointments, always loaded this way.
     appointments = [
-        { id: 'appt_liam', doctor: genericDoctor, user: user1, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '3001' },
-        { id: 'appt_olivia', doctor: genericDoctor, user: user2, date: todayStr, time: '11:30 AM', status: 'pending', type: 'Follow-up', token: '3002' },
-        { id: 'appt_noah', doctor: genericDoctor, user: user3, date: format(addDays(new Date(), 1), 'yyyy-MM-dd'), time: '02:00 PM', status: 'upcoming', token: '3003', type: 'Check-up' },
-        { id: 'appt_emma', doctor: genericDoctor, user: user4, date: todayStr, time: '02:00 PM', status: 'canceled', token: '3004', type: 'Check-up' },
+        { 
+            id: 'appt_sarah', 
+            doctor: genericDoctor, 
+            user: { ...user1, name: 'Sarah Johnson', phone: '+1 (555) 123-4567' },
+            date: todayStr,
+            time: '10:00 AM', 
+            duration: 30,
+            status: 'upcoming', 
+            token: '3001', 
+            type: 'Consultation',
+            reason: 'Regular checkup',
+            notes: 'Patient reports feeling well.'
+        },
+        { 
+            id: 'appt_michael',
+            doctor: genericDoctor,
+            user: { ...user2, name: 'Michael Chen', phone: '+1 (555) 234-5678' },
+            date: todayStr, 
+            time: '11:30 AM', 
+            duration: 45,
+            status: 'upcoming', 
+            token: '3002', 
+            type: 'Follow-up',
+            reason: 'Blood pressure monitoring',
+            notes: 'Follow-up on medication adjustment.'
+        },
+        { 
+            id: 'appt_emily', 
+            doctor: genericDoctor, 
+            user: { ...user3, name: 'Emily Rodriguez', phone: '+1 (555) 345-6789' },
+            date: todayStr, 
+            time: '02:00 PM', 
+            duration: 30,
+            status: 'pending', 
+            token: '3003',
+            type: 'Check-up',
+            reason: 'Annual physical exam',
+            notes: 'Wants to discuss diet and exercise.'
+        },
+         { 
+            id: 'appt_david', 
+            doctor: genericDoctor, 
+            user: { ...user1, id: 'user4', name: 'David Lee', phone: '+1 (555) 456-7890' },
+            date: todayStr, 
+            time: '03:00 PM', 
+            duration: 20,
+            status: 'canceled', 
+            token: '3004',
+            type: 'Consultation',
+            reason: 'Sore throat',
+            notes: 'Patient canceled due to a conflict.'
+        },
+         { 
+            id: 'appt_jessica', 
+            doctor: genericDoctor, 
+            user: { ...user2, id: 'user5', name: 'Jessica Miller', phone: '+1 (555) 567-8901' },
+            date: format(addDays(new Date(), 1), 'yyyy-MM-dd'), 
+            time: '09:00 AM', 
+            duration: 60,
+            status: 'upcoming', 
+            token: '3005',
+            type: 'Consultation',
+            reason: 'Second opinion for knee surgery.',
+            notes: ''
+        },
     ];
 
     saveAppointments();
@@ -79,7 +127,6 @@ export const getAppointmentsForDoctor = (): Appointment[] => {
 };
 
 export const getPatientsForDoctor = (): User[] => {
-    // Return a static list of users as recent patients
     return [
       {
         id: 'user1',
@@ -128,6 +175,7 @@ export const addAppointment = (newAppointment: {
     status: 'upcoming',
     token: newAppointment.token,
     type: 'Consultation',
+    duration: 30, // default
   };
 
   appointments = [appointment, ...appointments];

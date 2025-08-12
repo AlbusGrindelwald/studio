@@ -7,9 +7,26 @@ import { Badge } from '@/components/ui/badge';
 import { User as UserIcon, Clock, Calendar, Phone, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
-export function DetailedAppointmentCard({ appointment }: { appointment: Appointment }) {
-  const { user, status, type, time, duration, date, notes, reason } = appointment;
+
+interface DetailedAppointmentCardProps {
+    appointment: Appointment;
+    onStatusChange: (appointmentId: string, newStatus: Appointment['status']) => void;
+}
+
+export function DetailedAppointmentCard({ appointment, onStatusChange }: DetailedAppointmentCardProps) {
+  const { id, user, status, type, time, duration, date, notes, reason } = appointment;
 
   const statusMap: Record<Appointment['status'], { text: string; className: string }> = {
     upcoming: { text: 'Confirmed', className: 'bg-green-100 text-green-700 border-green-200' },
@@ -56,7 +73,27 @@ export function DetailedAppointmentCard({ appointment }: { appointment: Appointm
                 </div>
             </div>
 
-            <div>
+            <div className="flex items-center gap-2">
+                {status === 'pending' && (
+                    <>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">Cancel</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>This will cancel the appointment for {user.name}.</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Go Back</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => onStatusChange(id, 'canceled')}>Confirm Cancel</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                         <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => onStatusChange(id, 'upcoming')}>Confirm</Button>
+                    </>
+                )}
                 <Button variant="ghost" size="icon">
                     <MoreHorizontal className="h-5 w-5" />
                 </Button>
@@ -66,4 +103,3 @@ export function DetailedAppointmentCard({ appointment }: { appointment: Appointm
     </Card>
   );
 }
-

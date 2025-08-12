@@ -72,7 +72,7 @@ const loadAppointments = () => {
             id: 'appt_david', 
             doctor: genericDoctor, 
             user: { ...user1, id: 'user4', name: 'David Lee', phone: '+1 (555) 456-7890' },
-            date: todayStr, 
+            date: format(subDays(new Date(), 2), 'yyyy-MM-dd'),
             time: '03:00 PM', 
             duration: 20,
             status: 'canceled', 
@@ -198,13 +198,15 @@ export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'comple
         app.id === id ? { ...app, status } : app
     );
 
-    if (status === 'canceled') {
-        addNotification({
-            title: 'Appointment Canceled',
-            description: `Your appointment with ${appointment.doctor.name} on ${format(parseISO(appointment.date), 'MMM d, yyyy')} has been canceled.`,
-            type: 'destructive'
-        });
-    }
+    const notificationType = status === 'upcoming' ? 'success' : 'destructive';
+    const notificationTitle = status === 'upcoming' ? 'Appointment Confirmed' : 'Appointment Canceled';
+    const notificationDescription = `The appointment for ${appointment.user.name} has been ${status}.`;
+
+    addNotification({
+        title: notificationTitle,
+        description: notificationDescription,
+        type: notificationType
+    });
 
     saveAppointments();
 };

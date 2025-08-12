@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { getAppointmentsForDoctor } from '@/lib/appointments';
+import { getAppointmentsForDoctor, updateAppointmentStatus } from '@/lib/appointments';
 import type { Appointment } from '@/lib/types';
 import { DetailedAppointmentCard } from '@/components/doctor/DetailedAppointmentCard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -78,6 +78,12 @@ export default function DoctorAppointmentsPage() {
         setAppointments(getAppointmentsForDoctor());
         setIsClient(true);
     }, []);
+    
+    const handleStatusChange = (appointmentId: string, newStatus: Appointment['status']) => {
+        updateAppointmentStatus(appointmentId, newStatus);
+        // Re-fetch appointments to update the UI
+        setAppointments(getAppointmentsForDoctor());
+    };
 
     const stats = useMemo(() => {
         const todayApps = appointments.filter(app => isToday(parseISO(app.date)));
@@ -157,7 +163,7 @@ export default function DoctorAppointmentsPage() {
                 {filteredAppointments.length > 0 ? (
                     <div className="space-y-4">
                         {filteredAppointments.map(app => (
-                            <DetailedAppointmentCard key={app.id} appointment={app} />
+                            <DetailedAppointmentCard key={app.id} appointment={app} onStatusChange={handleStatusChange} />
                         ))}
                     </div>
                 ) : (

@@ -75,7 +75,7 @@ export function DetailedAppointmentCard({ appointment, onStatusChange }: Detaile
 
             <div className="flex items-center gap-2">
                 {status === 'pending' && (
-                    <>
+                    <div className="flex items-center gap-2">
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="destructive" size="sm">Cancel</Button>
@@ -92,7 +92,7 @@ export function DetailedAppointmentCard({ appointment, onStatusChange }: Detaile
                             </AlertDialogContent>
                         </AlertDialog>
                          <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => onStatusChange(id, 'upcoming')}>Confirm</Button>
-                    </>
+                    </div>
                 )}
                 <Button variant="ghost" size="icon">
                     <MoreHorizontal className="h-5 w-5" />

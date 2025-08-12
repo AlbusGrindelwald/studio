@@ -75,7 +75,7 @@ export function DetailedAppointmentCard({ appointment, onStatusChange }: Detaile
 
             <div className="flex items-center gap-2">
                 {status === 'pending' && (
-                    <div className="flex items-center gap-2">
+                    <>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="destructive" size="sm">Cancel</Button>
@@ -91,8 +91,24 @@ export function DetailedAppointmentCard({ appointment, onStatusChange }: Detaile
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
-                         <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => onStatusChange(id, 'upcoming')}>Confirm</Button>
-                    </div>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button size="sm" className="bg-green-500 hover:bg-green-600">Confirm</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Confirm Appointment?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This will confirm the appointment for {user.name}. The patient will be notified.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Go Back</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => onStatusChange(id, 'upcoming')}>Accept</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </>
                 )}
                 <Button variant="ghost" size="icon">
                     <MoreHorizontal className="h-5 w-5" />

@@ -49,11 +49,11 @@ const loadAppointments = () => {
             const user3 = allUsers.find(u => u.id === 'user3');
 
             // Find new users from the image
-            const sarahJohnson = { id: 'user4', name: 'Sarah Johnson', email: 'sarah.j@example.com', phone: '1234567890'};
-            const michaelChen = { id: 'user5', name: 'Michael Chen', email: 'michael.c@example.com', phone: '0987654321'};
-            const emilyRodriguez = { id: 'user6', name: 'Emily Rodriguez', email: 'emily.r@example.com', phone: '1122334455'};
+            const oliviaDavis = { id: 'user4', name: 'Olivia Davis', email: 'olivia.d@example.com', phone: '1234567890', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330'};
+            const liamWilson = { id: 'user5', name: 'Liam Wilson', email: 'liam.w@example.com', phone: '0987654321', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d'};
+            const avaGarcia = { id: 'user6', name: 'Ava Garcia', email: 'ava.g@example.com', phone: '1122334455', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956'};
             // We need to add these users to the user list if they dont exist
-            [sarahJohnson, michaelChen, emilyRodriguez].forEach(u => {
+            [oliviaDavis, liamWilson, avaGarcia].forEach(u => {
                 if(!findUserById(u.id)) {
                     getUsers().push(u);
                 }
@@ -80,10 +80,10 @@ const loadAppointments = () => {
 
             // Appointments for other users to ensure doctor's view is populated
             if (evelynReed) {
-                appointments.push({ id: 'appt_sj', doctor: evelynReed, user: sarahJohnson, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '2001' });
-                appointments.push({ id: 'appt_mc', doctor: evelynReed, user: michaelChen, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '2002' });
+                appointments.push({ id: 'appt_od', doctor: evelynReed, user: oliviaDavis, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '2001' });
+                appointments.push({ id: 'appt_lw', doctor: evelynReed, user: liamWilson, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '2002' });
                 // Setting to a non-upcoming status will make it "pending" in the UI
-                appointments.push({ id: 'appt_er', doctor: evelynReed, user: emilyRodriguez, date: todayStr, time: '02:00 PM', status: 'canceled', token: '2003', type: 'Check-up' });
+                appointments.push({ id: 'appt_ag', doctor: evelynReed, user: avaGarcia, date: todayStr, time: '02:00 PM', status: 'canceled', token: '2003', type: 'Check-up' });
             }
             if (evelynReed && user2) {
                  appointments.push({ id: 'appt2', doctor: evelynReed, user: user2, date: tomorrowStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '1235' });

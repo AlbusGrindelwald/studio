@@ -13,7 +13,8 @@ const listeners: (() => void)[] = [];
 let isLoaded = false;
 
 const loadAppointments = () => {
-    if (typeof window === 'undefined') {
+    if (typeof window !== 'undefined' && isLoaded) {
+        // Data is already loaded, and we want to keep it static for the session.
         return;
     }
     
@@ -38,12 +39,12 @@ const loadAppointments = () => {
         user4 = { id: 'user_emma', name: 'Emma Stone', email: 'emma.s@example.com', phone: '1234567894', image: `https://placehold.co/40x40.png?text=E` };
     }
     
-    // Always use this static list, ignoring localStorage for this feature.
+    // Static list of appointments, always loaded this way.
     appointments = [
         { id: 'appt_liam', doctor: genericDoctor, user: user1, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '3001' },
-        { id: 'appt_olivia', doctor: genericDoctor, user: user2, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '3002' },
-        { id: 'appt_emma', doctor: genericDoctor, user: user4, date: todayStr, time: '02:00 PM', status: 'canceled', token: '3004', type: 'Check-up' },
+        { id: 'appt_olivia', doctor: genericDoctor, user: user2, date: todayStr, time: '11:30 AM', status: 'pending', type: 'Follow-up', token: '3002' },
         { id: 'appt_noah', doctor: genericDoctor, user: user3, date: format(addDays(new Date(), 1), 'yyyy-MM-dd'), time: '02:00 PM', status: 'upcoming', token: '3003', type: 'Check-up' },
+        { id: 'appt_emma', doctor: genericDoctor, user: user4, date: todayStr, time: '02:00 PM', status: 'canceled', token: '3004', type: 'Check-up' },
     ];
 
     saveAppointments();
@@ -51,9 +52,7 @@ const loadAppointments = () => {
 };
 
 const saveAppointments = () => {
-    if (typeof window === 'undefined') return;
-    // We are no longer saving to localStorage to ensure data is always static
-    // localStorage.setItem(APPOINTMENTS_KEY, JSON.stringify(appointments));
+    // No-op for saving to localStorage to keep data static per session load.
     notifyListeners();
 };
 
@@ -74,7 +73,6 @@ export const getAppointmentsForUser = (userId: string): Appointment[] => {
 };
 
 export const getAppointmentsForDoctor = (): Appointment[] => {
-    // Call loadAppointments to reset to the static list every time.
     loadAppointments();
     return appointments;
 };
@@ -127,7 +125,7 @@ export const addAppointment = (newAppointment: {
   return appointment;
 };
 
-export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'completed' | 'canceled') => {
+export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'completed' | 'canceled' | 'pending') => {
     const appointment = appointments.find(app => app.id === id);
     if (!appointment) return;
     

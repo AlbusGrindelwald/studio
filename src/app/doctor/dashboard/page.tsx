@@ -96,6 +96,7 @@ function StatCard({ icon, title, value, color, bgColor }: { icon: React.ReactNod
 
 function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
     const isConfirmed = appointment.status === 'upcoming';
+    const isPending = appointment.status === 'pending';
     const isCanceled = appointment.status === 'canceled';
 
     return (
@@ -116,9 +117,14 @@ function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
                         confirmed
                     </span>
                 )}
-                 {isCanceled && (
+                 {isPending && (
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
                         pending
+                    </span>
+                )}
+                 {isCanceled && (
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                        canceled
                     </span>
                 )}
             </div>

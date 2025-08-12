@@ -24,7 +24,7 @@ export interface Appointment {
   user: User;
   date: string;
   time: string;
-  status: 'upcoming' | 'completed' | 'canceled';
+  status: 'upcoming' | 'completed' | 'canceled' | 'pending';
   token: string;
   type?: 'Consultation' | 'Follow-up' | 'Check-up';
 }

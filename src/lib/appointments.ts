@@ -42,7 +42,7 @@ const loadAppointments = () => {
     appointments = [
         { id: 'appt_liam', doctor: genericDoctor, user: user1, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '3001' },
         { id: 'appt_olivia', doctor: genericDoctor, user: user2, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '3002' },
-        { id: 'appt_emma', doctor: genericDoctor, user: user4, date: todayStr, time: '12:30 PM', status: 'canceled', token: '3004', type: 'Routine Check' },
+        { id: 'appt_emma', doctor: genericDoctor, user: user4, date: todayStr, time: '02:00 PM', status: 'canceled', token: '3004', type: 'Check-up' },
         { id: 'appt_noah', doctor: genericDoctor, user: user3, date: format(addDays(new Date(), 1), 'yyyy-MM-dd'), time: '02:00 PM', status: 'upcoming', token: '3003', type: 'Check-up' },
     ];
 

@@ -1,4 +1,5 @@
 
+
 import type { Appointment, Doctor } from './types';
 import { findUserById, getDoctors, findDoctorById } from './data';
 import { addNotification } from './notifications';
@@ -78,7 +79,12 @@ export const getAppointmentsForDoctor = (): Appointment[] => {
 };
 
 export const getPatientsForDoctor = (): User[] => {
-    return [];
+    const users = getUsers();
+    // Return a static list of the first 3 users as recent patients
+    return users.slice(0, 3).map((user, i) => ({
+      ...user,
+      lastVisit: format(subDays(new Date(), (i + 1) * 10), 'yyyy-MM-dd')
+    }));
 }
 
 export const addAppointment = (newAppointment: {

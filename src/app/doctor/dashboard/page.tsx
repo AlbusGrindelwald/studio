@@ -96,6 +96,8 @@ function StatCard({ icon, title, value, color, bgColor }: { icon: React.ReactNod
 
 function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
     const isConfirmed = appointment.status === 'upcoming';
+    const isCanceled = appointment.status === 'canceled';
+
     return (
         <div className="flex items-center justify-between p-3 rounded-lg bg-background hover:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
@@ -109,12 +111,16 @@ function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
             </div>
             <div className="text-right">
                 <p className="text-sm font-medium">{appointment.time}</p>
-                <span className={cn(
-                    "text-xs font-semibold px-2 py-0.5 rounded-full",
-                    isConfirmed ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-                )}>
-                    {isConfirmed ? 'confirmed' : 'pending'}
-                </span>
+                {isConfirmed && (
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+                        confirmed
+                    </span>
+                )}
+                 {isCanceled && (
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
+                        pending
+                    </span>
+                )}
             </div>
         </div>
     );

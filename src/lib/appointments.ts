@@ -17,57 +17,32 @@ const loadAppointments = () => {
     if (typeof window === 'undefined') {
         return;
     }
-    if (isLoaded) return;
+    
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const genericDoctor = getDoctors()[0]; 
 
-    try {
-        const stored = localStorage.getItem(APPOINTMENTS_KEY);
-        if (stored) {
-            const loadedAppointments = JSON.parse(stored);
-             // Ensure that nested doctor and user objects are fully hydrated from our data sources
-            appointments = loadedAppointments.map((app: any) => ({
-                ...app,
-                doctor: findDoctorById(app.doctor.id) || app.doctor,
-                user: findUserById(app.user.id) || app.user,
-            }));
-        } else {
-            // Seed with initial data if nothing is in localStorage
-            const todayStr = format(new Date(), 'yyyy-MM-dd');
-            const genericDoctor = getDoctors()[0]; // Use a generic doctor for all appointments
-
-            const allUsers = getUsers();
-
-            // Find or create users for the static appointments
-            let sarah = findUserById('user_sarah');
-            if (!sarah) {
-                sarah = { id: 'user_sarah', name: 'Sarah Johnson', email: 'sarah.j@example.com', phone: '1234567891', image: `https://placehold.co/40x40.png?text=S` };
-                allUsers.push(sarah);
-            }
-            let michael = findUserById('user_michael');
-            if (!michael) {
-                michael = { id: 'user_michael', name: 'Michael Chen', email: 'michael.c@example.com', phone: '1234567892', image: `https://placehold.co/40x40.png?text=M` };
-                allUsers.push(michael);
-            }
-            let emily = findUserById('user_emily');
-            if (!emily) {
-                emily = { id: 'user_emily', name: 'Emily Rodriguez', email: 'emily.r@example.com', phone: '1234567893', image: `https://placehold.co/40x40.png?text=E` };
-                allUsers.push(emily);
-            }
-            
-            localStorage.setItem('shedula_users', JSON.stringify(allUsers));
-
-
-            appointments = [
-                { id: 'appt_sarah', doctor: genericDoctor, user: sarah, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '3001' },
-                { id: 'appt_michael', doctor: genericDoctor, user: michael, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '3002' },
-                { id: 'appt_emily', doctor: genericDoctor, user: emily, date: todayStr, time: '02:00 PM', status: 'canceled', token: '3003', type: 'Check-up' },
-            ];
-
-            saveAppointments();
-        }
-    } catch(e) {
-        console.error("Failed to parse appointments from localStorage", e);
-        appointments = []; // Start fresh if there's a parsing error
+    // Find or create users for the static appointments
+    let sarah = findUserById('user_sarah');
+    if (!sarah) {
+        sarah = { id: 'user_sarah', name: 'Sarah Johnson', email: 'sarah.j@example.com', phone: '1234567891', image: `https://placehold.co/40x40.png?text=S` };
     }
+    let michael = findUserById('user_michael');
+    if (!michael) {
+        michael = { id: 'user_michael', name: 'Michael Chen', email: 'michael.c@example.com', phone: '1234567892', image: `https://placehold.co/40x40.png?text=M` };
+    }
+    let emily = findUserById('user_emily');
+    if (!emily) {
+        emily = { id: 'user_emily', name: 'Emily Rodriguez', email: 'emily.r@example.com', phone: '1234567893', image: `https://placehold.co/40x40.png?text=E` };
+    }
+    
+    // Always use this static list, ignoring localStorage for this feature.
+    appointments = [
+        { id: 'appt_sarah', doctor: genericDoctor, user: sarah, date: todayStr, time: '10:00 AM', status: 'upcoming', type: 'Consultation', token: '3001' },
+        { id: 'appt_michael', doctor: genericDoctor, user: michael, date: todayStr, time: '11:30 AM', status: 'upcoming', type: 'Follow-up', token: '3002' },
+        { id: 'appt_emily', doctor: genericDoctor, user: emily, date: todayStr, time: '02:00 PM', status: 'canceled', token: '3003', type: 'Check-up' },
+    ];
+
+    saveAppointments();
     isLoaded = true;
 };
 

@@ -7,6 +7,8 @@ export interface User {
   phone?: string;
   image?: string; // To store the profile image URL
   lastVisit?: string;
+  condition?: string;
+  status?: 'stable' | 'monitoring' | 'critical';
 }
 
 // This is a simple in-memory "database" using localStorage.

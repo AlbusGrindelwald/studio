@@ -17,6 +17,7 @@ import { Calendar, Users, ListTodo, DollarSign, User as UserIcon, ChevronRight }
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
 
 function DoctorDashboardSkeleton() {
     return (
@@ -136,22 +137,24 @@ function RecentPatientCard({ patient }: { patient: User }) {
     return (
         <div className="flex items-center justify-between p-3 rounded-lg bg-background hover:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
-                 <Image
-                    src={patient.image || `https://placehold.co/40x40.png?text=${patient.name.charAt(0)}`}
-                    alt={patient.name}
-                    width={40}
-                    height={40}
-                    className="rounded-full object-cover"
-                    data-ai-hint="person portrait"
-                />
+                 <div className="p-2 bg-gray-100 rounded-full">
+                    <UserIcon className="h-5 w-5 text-gray-600" />
+                </div>
                 <div>
                     <p className="font-semibold text-sm">{patient.name}</p>
-                    <p className="text-xs text-muted-foreground">Last Visit: {patient.lastVisit}</p>
+                    <p className="text-xs text-muted-foreground">{patient.condition}</p>
                 </div>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
-            </Button>
+            <Badge
+                className={cn(
+                    "capitalize",
+                    patient.status === 'stable' && 'bg-green-100 text-green-700',
+                    patient.status === 'monitoring' && 'bg-yellow-100 text-yellow-700'
+                )}
+                variant="outline"
+            >
+                {patient.status}
+            </Badge>
         </div>
     )
 }
@@ -165,9 +168,9 @@ export default function DoctorDashboardPage() {
   
   const [stats, setStats] = useState({
       todaysAppointments: '0',
-      totalPatients: '0',
-      pendingReviews: '0',
-      monthlyRevenue: '$0'
+      totalPatients: '156',
+      pendingReviews: '3',
+      monthlyRevenue: '$12,500'
   });
 
   useEffect(() => {
@@ -246,7 +249,7 @@ export default function DoctorDashboardPage() {
                             </Link>
                         </div>
                         {patients.length > 0 ? (
-                            patients.slice(0, 3).map(patient => (
+                            patients.map(patient => (
                                 <RecentPatientCard key={patient.id} patient={patient} />
                             ))
                         ) : (

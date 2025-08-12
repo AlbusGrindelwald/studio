@@ -1,10 +1,10 @@
 
 
 import type { Appointment, Doctor } from './types';
-import { findUserById, getDoctors, findDoctorById } from './data';
+import { findUserById, getDoctors, findDoctorById, getUsers } from './data';
 import { addNotification } from './notifications';
 import { format, parseISO, isToday, addDays, subDays } from 'date-fns';
-import { User, getUsers } from './user';
+import { User } from './user';
 import { getLoggedInDoctor } from './doctor-auth';
 
 const APPOINTMENTS_KEY = 'shedula_appointments';
@@ -79,12 +79,23 @@ export const getAppointmentsForDoctor = (): Appointment[] => {
 };
 
 export const getPatientsForDoctor = (): User[] => {
-    const users = getUsers();
-    // Return a static list of the first 3 users as recent patients
-    return users.slice(0, 3).map((user, i) => ({
-      ...user,
-      lastVisit: format(subDays(new Date(), (i + 1) * 10), 'yyyy-MM-dd')
-    }));
+    // Return a static list of users as recent patients
+    return [
+      {
+        id: 'user1',
+        name: 'John Smith',
+        email: 'john.smith@example.com',
+        condition: 'Hypertension',
+        status: 'stable',
+      },
+      {
+        id: 'user2',
+        name: 'Lisa Wilson',
+        email: 'lisa.wilson@example.com',
+        condition: 'Diabetes',
+        status: 'monitoring',
+      },
+    ];
 }
 
 export const addAppointment = (newAppointment: {

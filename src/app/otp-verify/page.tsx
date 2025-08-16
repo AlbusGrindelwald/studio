@@ -188,7 +188,17 @@ function OtpVerificationForm() {
 
 export default function OtpVerifyPage() {
   return (
-    <Suspense fallback={<div className='flex items-center justify-center min-h-screen'>Loading...</div>}>
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center h-screen bg-background p-4">
+        <Skeleton className="h-8 w-48 mx-auto mb-2" />
+        <Skeleton className="h-5 w-64 mx-auto mb-8" />
+        <div className="flex justify-center gap-3 mb-8">
+          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-16 w-12 rounded-lg" />)}
+        </div>
+        <Skeleton className="h-6 w-40 mx-auto mb-8" />
+        <Skeleton className="h-12 w-full rounded-full" />
+      </div>
+    }>
       <OtpVerificationForm />
     </Suspense>
   );

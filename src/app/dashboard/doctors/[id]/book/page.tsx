@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Moon, Sun } from 'lucide-react';
@@ -78,7 +78,7 @@ function BookingPageSkeleton() {
 }
 
 
-export default function BookAppointmentPage() {
+function BookAppointmentPageContent() {
   const params = useParams();
   const router = useRouter();
   const id = typeof params.id === 'string' ? params.id : '';
@@ -315,5 +315,13 @@ export default function BookAppointmentPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function BookAppointmentPage() {
+  return (
+    <Suspense fallback={<BookingPageSkeleton />}>
+      <BookAppointmentPageContent />
+    </Suspense>
   );
 }

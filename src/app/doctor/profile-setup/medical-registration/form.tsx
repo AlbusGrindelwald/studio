@@ -58,7 +58,7 @@ function RegistrationSkeleton() {
     )
 }
 
-export default function MedicalRegistrationForm() {
+function MedicalRegistrationFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -206,5 +206,17 @@ export default function MedicalRegistrationForm() {
 
       </div>
     </div>
+  );
+}
+
+export default function MedicalRegistrationForm() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <RegistrationSkeleton />
+      </div>
+    }>
+      <MedicalRegistrationFormContent />
+    </Suspense>
   );
 }

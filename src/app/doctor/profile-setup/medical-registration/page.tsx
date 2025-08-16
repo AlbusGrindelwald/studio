@@ -34,7 +34,11 @@ function RegistrationSkeleton() {
 
 export default function MedicalRegistrationPage() {
     return (
-        <Suspense fallback={<RegistrationSkeleton />}>
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center bg-background p-4">
+                <RegistrationSkeleton />
+            </div>
+        }>
             <MedicalRegistrationForm />
         </Suspense>
     )

@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const LandingPage = dynamic(() => import('./landing-page'), {
   ssr: false,
+  loading: () => <LandingPageSkeleton />
 });
 
 function LandingPageSkeleton() {
@@ -33,8 +34,6 @@ function LandingPageSkeleton() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<LandingPageSkeleton />}>
-      <LandingPage />
-    </Suspense>
+    <LandingPage />
   );
 }

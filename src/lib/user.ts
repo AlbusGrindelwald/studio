@@ -8,7 +8,10 @@ export interface User {
   image?: string; // To store the profile image URL
   lastVisit?: string;
   condition?: string;
-  status?: 'stable' | 'monitoring' | 'critical';
+  status?: 'active' | 'critical' | 'inactive' | 'stable' | 'monitoring';
+  age?: number;
+  gender?: 'Male' | 'Female' | 'Other';
+  nextAppointment?: string;
 }
 
 // This is a simple in-memory "database" using localStorage.

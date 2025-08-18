@@ -134,6 +134,14 @@ function TodaysAppointmentCard({ appointment }: { appointment: Appointment }) {
 }
 
 function RecentPatientCard({ patient }: { patient: User }) {
+    const statusMap = {
+        active: { text: 'Active', className: 'bg-green-100 text-green-700 border-green-200' },
+        critical: { text: 'Critical', className: 'bg-red-100 text-red-700 border-red-200' },
+        inactive: { text: 'Inactive', className: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+    };
+
+    const statusInfo = statusMap[patient.status as keyof typeof statusMap] || statusMap.inactive;
+
     return (
         <div className="flex items-center justify-between p-3 rounded-lg bg-background hover:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
@@ -148,12 +156,11 @@ function RecentPatientCard({ patient }: { patient: User }) {
             <Badge
                 className={cn(
                     "capitalize",
-                    patient.status === 'stable' && 'bg-green-100 text-green-700',
-                    patient.status === 'monitoring' && 'bg-yellow-100 text-yellow-700'
+                    statusInfo.className
                 )}
                 variant="outline"
             >
-                {patient.status}
+                {statusInfo.text}
             </Badge>
         </div>
     )
@@ -226,7 +233,7 @@ export default function DoctorDashboardPage() {
                     <CardContent className="p-4 space-y-2">
                         <div className="flex justify-between items-center mb-2">
                             <h3 className="font-semibold">Today's Appointments</h3>
-                             <Link href="#">
+                             <Link href="/doctor/dashboard/appointments">
                                 <Button variant="link" className="text-primary">View All</Button>
                             </Link>
                         </div>
@@ -244,12 +251,12 @@ export default function DoctorDashboardPage() {
                     <CardContent className="p-4 space-y-2">
                         <div className="flex justify-between items-center mb-2">
                             <h3 className="font-semibold">Recent Patients</h3>
-                            <Link href="#">
+                            <Link href="/doctor/dashboard/patients">
                                 <Button variant="link" className="text-primary">View All</Button>
                             </Link>
                         </div>
                         {patients.length > 0 ? (
-                            patients.map(patient => (
+                            patients.slice(0, 5).map(patient => (
                                 <RecentPatientCard key={patient.id} patient={patient} />
                             ))
                         ) : (

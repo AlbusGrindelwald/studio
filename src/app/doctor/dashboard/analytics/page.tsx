@@ -140,7 +140,7 @@ export default function AnalyticsPage() {
                             <p className="text-sm text-muted-foreground">Appointment trends over the last 6 months</p>
                         </CardHeader>
                         <CardContent>
-                            <MonthlyAppointmentsChart appointments={appointments} />
+                            <MonthlyAppointmentsChart />
                         </CardContent>
                     </Card>
                      <Card>
@@ -149,7 +149,7 @@ export default function AnalyticsPage() {
                              <p className="text-sm text-muted-foreground">Monthly revenue from completed appointments</p>
                         </CardHeader>
                         <CardContent>
-                           <RevenueTrendChart appointments={appointments} />
+                           <RevenueTrendChart />
                         </CardContent>
                     </Card>
                  </div>

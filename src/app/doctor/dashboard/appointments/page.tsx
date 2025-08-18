@@ -124,9 +124,15 @@ export default function DoctorAppointmentsPage() {
 
     return (
         <div className="flex flex-col flex-1 h-screen bg-muted/40">
-             <header className="bg-background text-foreground p-6 border-b sticky top-0 z-10">
-                <h1 className="text-2xl font-bold tracking-tight">Appointments Management</h1>
-                <p className="text-muted-foreground">Manage your patient appointments and schedule</p>
+             <header className="bg-background text-foreground p-6 border-b sticky top-0 z-10 flex justify-between items-center">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Appointments Management</h1>
+                    <p className="text-muted-foreground">Manage your patient appointments and schedule</p>
+                </div>
+                <Button variant="outline">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Calendar View
+                </Button>
             </header>
 
             <main className="flex-1 p-6 overflow-y-auto space-y-6">

@@ -252,9 +252,24 @@ export const updateAppointmentStatus = (id: string, status: 'upcoming' | 'comple
         app.id === id ? { ...app, status } : app
     );
 
-    const notificationType = status === 'upcoming' ? 'success' : 'destructive';
-    const notificationTitle = status === 'upcoming' ? 'Appointment Confirmed' : 'Appointment Canceled';
-    const notificationDescription = `The appointment for ${appointment.user.name} has been ${status}.`;
+    let notificationType: 'success' | 'destructive' | 'info' = 'info';
+    let notificationTitle = 'Appointment Updated';
+    let notificationDescription = `The appointment for ${appointment.user.name} has been updated.`;
+
+    if (status === 'upcoming') {
+        notificationType = 'success';
+        notificationTitle = 'Appointment Confirmed';
+        notificationDescription = `The appointment for ${appointment.user.name} has been confirmed.`;
+    } else if (status === 'canceled') {
+        notificationType = 'destructive';
+        notificationTitle = 'Appointment Canceled';
+        notificationDescription = `The appointment for ${appointment.user.name} has been canceled.`;
+    } else if (status === 'completed') {
+        notificationType = 'success';
+        notificationTitle = 'Appointment Completed';
+        notificationDescription = `The appointment for ${appointment.user.name} has been marked as completed.`;
+    }
+
 
     addNotification({
         title: notificationTitle,

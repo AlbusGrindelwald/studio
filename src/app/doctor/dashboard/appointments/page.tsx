@@ -129,7 +129,7 @@ export default function DoctorAppointmentsPage() {
                     <h1 className="text-2xl font-bold tracking-tight">Appointments Management</h1>
                     <p className="text-muted-foreground">Manage your patient appointments and schedule</p>
                 </div>
-                <Button variant="outline">
+                <Button>
                     <Calendar className="mr-2 h-4 w-4" />
                     Calendar View
                 </Button>

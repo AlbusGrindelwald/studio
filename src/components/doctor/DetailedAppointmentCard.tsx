@@ -4,7 +4,7 @@
 import type { Appointment } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { User as UserIcon, Clock, Calendar, Phone, MoreHorizontal } from 'lucide-react';
+import { User as UserIcon, Clock, Calendar, Phone, MoreHorizontal, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import {
@@ -109,6 +109,28 @@ export function DetailedAppointmentCard({ appointment, onStatusChange }: Detaile
                             </AlertDialogContent>
                         </AlertDialog>
                     </div>
+                )}
+                 {status === 'upcoming' && (
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700">
+                                <Check className="mr-2 h-4 w-4" />
+                                Mark as Completed
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Complete Appointment?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This will mark the appointment for {user.name} as completed. This action cannot be undone.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Go Back</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => onStatusChange(id, 'completed')}>Confirm</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 )}
                 <Button variant="ghost" size="icon">
                     <MoreHorizontal className="h-5 w-5" />

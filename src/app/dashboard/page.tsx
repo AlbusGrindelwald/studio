@@ -6,7 +6,7 @@ import { CalendarCheck, ChevronRight, User, Stethoscope, Heart } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAppointmentsForUser } from '@/lib/appointments';
-import { getLoggedInUser, findUserById } from '@/lib/user';
+import { getLoggedInUser } from '@/lib/user';
 import type { Appointment } from '@/lib/types';
 import type { User as PatientUser } from '@/lib/user';
 import { useEffect, useState } from 'react';
@@ -48,8 +48,7 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Hardcode user to user1 to ensure consistent data
-    const loggedInUser = findUserById('user1');
+    const loggedInUser = getLoggedInUser();
     setUser(loggedInUser);
 
     if (loggedInUser) {

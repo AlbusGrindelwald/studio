@@ -113,7 +113,7 @@ export function DetailedAppointmentCard({ appointment, onStatusChange }: Detaile
                  {status === 'upcoming' && (
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm">
+                            <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700">
                                 <Check className="mr-2 h-4 w-4" />
                                 Mark as Completed
                             </Button>
